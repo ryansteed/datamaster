@@ -1,6 +1,8 @@
 import networkx as nx
 import numpy as np
 
+import munge
+
 class CitationNetwork:
     G = None
     weighting_method = None
@@ -12,7 +14,7 @@ class CitationNetwork:
 
     def print_custom_metrics(self):
         for node in self.G.nodes:
-            print(G.nodes[node])
+            print(self.G.nodes[node])
 
     # Analytics #
 
@@ -74,7 +76,7 @@ class CitationNetwork:
                 ))
             custom_centralities[node] = s_optimums[0] / (s_optimums[0] + s_optimums[1])
 
-        nx.set_node_attributes(G, custom_centralities, 'custom_centrality')
+        nx.set_node_attributes(self.G, custom_centralities, 'custom_centrality')
 
     def eval_quality(self):
         nx.set_node_attributes(
@@ -133,9 +135,7 @@ def h_index(m):
             return i
     return 0
 
-
-if __name__ == "__main__":
-    # Test network
+def test_manual():
     G = nx.DiGraph()
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
@@ -143,3 +143,13 @@ if __name__ == "__main__":
 
     cn = CitationNetwork(G)
     cn.print_custom_metrics()
+
+def test_sample():
+    munger = munge.test(limit=10000)
+    cn = CitationNetwork(munger.get_network())
+    cn.print_custom_metrics()
+
+if __name__ == "__main__":
+    # Test network
+    test_manual()
+    test_sample()
