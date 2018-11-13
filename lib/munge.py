@@ -6,11 +6,6 @@ import requests
 
 class Munger:
 
-    datafile = None
-    limit = None
-    df = None
-    df_meta = None
-
     def __init__(self, datafile, limit=None):
         self.datafile = datafile
         self.limit = limit

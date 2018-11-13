@@ -1,16 +1,22 @@
 import networkx as nx
 import numpy as np
+from scipy.stats import sem
 
 import munge
 
-class CitationNetwork:
-    G = None
-    weighting_method = None
 
+class CitationNetwork:
     def __init__(self, G, weighting_method="custom_centrality"):
         self.G = G
         self.weighting_method = weighting_method
         self.evaluate()
+
+    def summary(self, attributes=['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality', 'knowledge']):
+        print(nx.info(self.G))
+        # average metrics
+        metrics = {attribute: list(nx.get_node_attributes(G, attribute).values()) for attribute in attributes}
+        for key, values in metrics.items():
+            print(key+":", round(np.average(values), 3), "(",round(sem(values), 3), ")")
 
     def print_custom_metrics(self):
         for node in self.G.nodes:
@@ -81,7 +87,7 @@ class CitationNetwork:
     def eval_quality(self):
         nx.set_node_attributes(
             self.G,
-            {node: int(in_degree * (len(self.G) - 1)) for node, in_degree in nx.out_degree_centrality(self.G).items()},
+            {node: int(out_degree * (len(self.G) - 1)) for node, out_degree in nx.out_degree_centrality(self.G).items()},
             'forward_cites'
         )
         nx.set_node_attributes(
@@ -135,21 +141,17 @@ def h_index(m):
             return i
     return 0
 
-def test_manual():
+def test(G):
+    cn = CitationNetwork(G)
+    # cn.print_custom_metrics()
+    cn.summary()
+
+if __name__ == "__main__":
+    # Test network
     G = nx.DiGraph()
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
     nx.draw_networkx(G, pos=nx.spring_layout(G))
-
-    cn = CitationNetwork(G)
-    cn.print_custom_metrics()
-
-def test_sample():
-    munger = munge.test(limit=10000)
-    cn = CitationNetwork(munger.get_network())
-    cn.print_custom_metrics()
-
-if __name__ == "__main__":
-    # Test network
-    test_manual()
-    test_sample()
+    test(G)
+    G = munge.test(limit=10000).get_network()
+    test(G)
