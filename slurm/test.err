@@ -1,0 +1,11 @@
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.5.0
+  latest version: 4.5.11
+
+Please update conda by running
+
+    $ conda update -n base conda
+
+

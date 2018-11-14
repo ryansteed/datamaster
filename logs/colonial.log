@@ -20,3 +20,19 @@ Number of nodes: 9
 Number of edges: 8
 Average in degree:   0.8889
 Average out degree:   0.8889
+[13Nov2018:20:39:43] INFO> ==== NEW SESSION ====
+[13Nov2018:20:39:43] INFO> Started application...
+[13Nov2018:20:39:44] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[13Nov2018:20:41:08] INFO> ==== NEW SESSION ====
+[13Nov2018:20:41:08] INFO> Started application...
+[13Nov2018:20:41:09] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
