@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 from scipy.stats import sem
 import app.lib.munge as munge
-from app.config import Config
+from app.config import Config, logger
 
 class CitationNetwork:
     def __init__(self, G, weighting_method="custom_centrality"):
@@ -11,7 +11,7 @@ class CitationNetwork:
         self.evaluate()
 
     def summary(self, attributes=['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality', 'knowledge']):
-        print(nx.info(self.G))
+        logger.info(nx.info(self.G))
         # average metrics
         metrics = {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}
         for key, values in metrics.items():
@@ -19,7 +19,7 @@ class CitationNetwork:
 
     def print_custom_metrics(self):
         for node in self.G.nodes:
-            print(self.G.nodes[node])
+            logger.info(self.G.nodes[node])
 
     # Analytics #
 
@@ -118,10 +118,10 @@ class CitationNetwork:
             sum_children += self.k(root, child, weighting_key)
         total_k = (self.G.nodes[node][weighting_key] + sum_children) * self.p(root, node)
         if verbose:
-            print('node', node)
-            print('> w: ', self.G.nodes[node][weighting_key])
-            print('> p: ', self.p(root, node))
-            print('> k: ', total_k)
+            logger.info('node', node)
+            logger.info('> w: ', self.G.nodes[node][weighting_key])
+            logger.info('> p: ', self.p(root, node))
+            logger.info('> k: ', total_k)
         return total_k
 
     def p(self, root, node):

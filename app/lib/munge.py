@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import requests
-from app.config import Config
+from app.config import Config, logger
 
 
 class Munger:
@@ -34,7 +34,7 @@ class Munger:
                     G.nodes[entry['patent_number']].update(
                         {key: val for key, val in entry.items() if key != 'patent_number'})
                 except KeyError:
-                    print("Couldn't find network entry for {}".format(entry['patent_number']))
+                    logger.error("Couldn't find network entry for {}".format(entry['patent_number']))
 
         return G
 
@@ -65,11 +65,11 @@ class Munger:
             self.df_meta = self.df_meta.append(pd.DataFrame(info['patents']), ignore_index=True, verify_integrity=True)
 
     def summary(self):
-        print(self.df.info())
+        logger.info(self.df.info())
 
     def summary_meta(self):
         self.ensure_meta()
-        print(self.df_meta.info())
+        logger.info(self.df_meta.info())
 
     def ensure_meta(self):
         if self.df_meta is None:
@@ -90,7 +90,7 @@ def main():
     # Test data
     munger = test()
     G = munger.get_network(metadata=True)
-    print(G.nodes.data())
+    logger.debug(G.nodes.data())
     munger.summary()
     munger.summary_meta()
 

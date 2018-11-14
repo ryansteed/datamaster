@@ -1,0 +1,13 @@
+[13Nov2018:20:00:14] INFO> Started application...
+[13Nov2018:20:00:14] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[13Nov2018:20:00:16] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
