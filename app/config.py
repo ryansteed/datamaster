@@ -26,3 +26,5 @@ formatter.datefmt = '%d%b%Y:%H:%M:%S'
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+logger.info("==== NEW SESSION ====")

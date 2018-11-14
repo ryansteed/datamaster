@@ -11,3 +11,30 @@ Number of nodes: 1998
 Number of edges: 1000
 Average in degree:   0.5005
 Average out degree:   0.5005
+[13Nov2018:20:01:39] INFO> Started application...
+[13Nov2018:20:01:39] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[13Nov2018:20:01:41] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[13Nov2018:20:02:09] INFO> ==== NEW SESSION ====
+[13Nov2018:20:02:09] INFO> Started application...
+[13Nov2018:20:02:09] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[13Nov2018:20:02:11] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
