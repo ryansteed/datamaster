@@ -4,12 +4,12 @@ import logging
 
 class Config:
 
-    ENV_NAME = "local"
+    ENV_NAME = "colonial"
 
     DATA_PATH = os.path.abspath('../../data')
-    LOG_PATH = os.path.dirname('logs/main.log')
+    LOG_PATH = os.path.dirname('logs/colonial.log')
 
-    DOC_LIMIT = 1000
+    DOC_LIMIT = None
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):
