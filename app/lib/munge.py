@@ -86,7 +86,7 @@ def test(limit=Config.DOC_LIMIT):
     return Munger(Config.DATA_PATH+'/uspatentcitation.tsv', limit=limit)
 
 
-if __name__ == "__main__":
+def main():
     # Test data
     munger = test()
     G = munger.get_network(metadata=True)

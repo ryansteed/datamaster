@@ -13,7 +13,7 @@ class CitationNetwork:
     def summary(self, attributes=['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality', 'knowledge']):
         print(nx.info(self.G))
         # average metrics
-        metrics = {attribute: list(nx.get_node_attributes(G, attribute).values()) for attribute in attributes}
+        metrics = {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}
         for key, values in metrics.items():
             print(key+":", round(np.average(values), 3), "(",round(sem(values), 3), ")")
 
@@ -145,7 +145,7 @@ def test(G):
     # cn.print_custom_metrics()
     cn.summary()
 
-if __name__ == "__main__":
+def main():
     # Test network
     G = nx.DiGraph()
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
