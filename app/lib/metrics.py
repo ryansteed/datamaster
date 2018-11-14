@@ -2,15 +2,19 @@ import networkx as nx
 import numpy as np
 from scipy.stats import sem
 import app.lib.munge as munge
+import csv
 from app.config import Config, logger
 
 class CitationNetwork:
+    attributes = ['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality',
+                       'knowledge']
+
     def __init__(self, G, weighting_method="custom_centrality"):
         self.G = G
         self.weighting_method = weighting_method
         self.evaluate()
 
-    def summary(self, attributes=['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality', 'knowledge']):
+    def summary(self, attributes=tuple(attributes)):
         logger.info(nx.info(self.G))
         # average metrics
         metrics = {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}
@@ -20,6 +24,14 @@ class CitationNetwork:
     def print_custom_metrics(self):
         for node in self.G.nodes:
             logger.info(self.G.nodes[node])
+
+    def file_custom_metrics(self, prefix):
+        with open(Config.DATA_PATH+'/'+prefix+'.csv', 'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            writer.writerow(['node']+self.attributes)
+            for node in self.G.nodes:
+                row = [node]+list(self.G.nodes[node].values())
+                writer.writerow(row)
 
     # Analytics #
 
@@ -140,10 +152,11 @@ def h_index(m):
             return i
     return 0
 
-def test(G):
+def test(G, name="test"):
     cn = CitationNetwork(G)
     # cn.print_custom_metrics()
     cn.summary()
+    cn.file_custom_metrics(name)
 
 def main():
     # Test network
@@ -151,6 +164,6 @@ def main():
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
     nx.draw_networkx(G, pos=nx.spring_layout(G))
-    test(G)
+    test(G, "manual")
     G = munge.test(limit=Config.DOC_LIMIT).get_network()
-    test(G)
+    test(G, "sample")
