@@ -1,4 +1,5 @@
 data/patent-citation-network-stanford.*
 application_data.*
 .idea
-lib/__pycache__
+app/lib/__pycache__
+app/__pycache__

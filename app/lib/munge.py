@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import requests
+from app.config import Config
 
 
 class Munger:
@@ -74,13 +75,16 @@ class Munger:
         if self.df_meta is None:
             self.load_metadata()
 
+
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-def test(limit=500):
-    return Munger('../../../data/uspatentcitation.tsv', limit=limit)
+
+def test(limit=Config.DOC_LIMIT):
+    return Munger(Config.DATA_PATH+'/uspatentcitation.tsv', limit=limit)
+
 
 if __name__ == "__main__":
     # Test data

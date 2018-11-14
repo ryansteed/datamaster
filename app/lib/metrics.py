@@ -1,9 +1,8 @@
 import networkx as nx
 import numpy as np
 from scipy.stats import sem
-
-import munge
-
+import app.lib.munge as munge
+from app.config import Config
 
 class CitationNetwork:
     def __init__(self, G, weighting_method="custom_centrality"):
@@ -153,5 +152,5 @@ if __name__ == "__main__":
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
     nx.draw_networkx(G, pos=nx.spring_layout(G))
     test(G)
-    G = munge.test(limit=10000).get_network()
+    G = munge.test(limit=Config.DOC_LIMIT).get_network()
     test(G)
