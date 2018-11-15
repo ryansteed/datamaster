@@ -3,7 +3,10 @@ import numpy as np
 from scipy.stats import sem
 import app.lib.munge as munge
 import csv
+
 from app.config import Config, logger
+from app.lib.helpers import Timer
+
 
 class CitationNetwork:
     attributes = ['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality',
@@ -12,37 +15,52 @@ class CitationNetwork:
     def __init__(self, G, weighting_method="custom_centrality"):
         self.G = G
         self.weighting_method = weighting_method
-        self.evaluate()
 
     def summary(self, attributes=tuple(attributes)):
+        logger.info("== CN Summary ==")
         logger.info(nx.info(self.G))
         # average metrics
-        metrics = {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}
-        for key, values in metrics.items():
+        for key, values in {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}.items():
             print(key+":", round(np.average(values), 3), "(",round(sem(values), 3), ")")
+        logger.info("====")
 
     def print_custom_metrics(self):
+        logger.info("== Calculated Metrics ==")
         for node in self.G.nodes:
             logger.info(self.G.nodes[node])
+        logger.info("====")
 
     def file_custom_metrics(self, prefix):
+        logger.info("Filing calculated metrics in {}.csv".format(prefix))
+        t = Timer("Filing metrics")
         with open(Config.DATA_PATH+'/'+prefix+'.csv', 'w') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
             writer.writerow(['node']+self.attributes)
             for node in self.G.nodes:
                 row = [node]+list(self.G.nodes[node].values())
                 writer.writerow(row)
+        t.log()
 
     # Analytics #
+    def eval_all(self, weighting_key=None):
+        logger.info("Calculating metrics")
+        t = Timer("Metric calculation")
 
-    def evaluate(self, weighting_key=None):
-        self.eval_weights()
-        self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
-
-    def eval_weights(self):
+        logger.info("Calculating quality")
         self.eval_quality()
+        t.log()
+
+        logger.info("Calculating H-index")
         self.eval_h()
+        t.log()
+
+        logger.info("Calculating centralities")
         self.eval_centrality()
+        t.log()
+
+        logger.info("Calculating knowledge")
+        self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
+        t.log()
 
     def eval_h(self):
         h_indices = {}
@@ -72,13 +90,13 @@ class CitationNetwork:
             nx.eigenvector_centrality_numpy(self.G),
             nx.closeness_centrality(self.G)
         ]
-        ## Local vals
+        # Local vals
         for centrality in centralities:
             c['+'].append(centrality[max(centrality, key=centrality.get)])
             c['-'].append(centrality[min(centrality, key=centrality.get)])
             c['var'].append(np.var([val for key, val in centrality.items()]))
 
-        ## Centrality metric
+        # Centrality metric
         var_t = sum(c['var'])
         s_optimums = []
         for node in self.G:
@@ -152,11 +170,14 @@ def h_index(m):
             return i
     return 0
 
+
 def test(G, name="test"):
     cn = CitationNetwork(G)
     # cn.print_custom_metrics()
+    cn.eval_all()
     cn.summary()
     cn.file_custom_metrics(name)
+
 
 def main():
     # Test network

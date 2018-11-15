@@ -11,19 +11,24 @@ class Munger:
         self.datafile = datafile
         self.limit = limit
         self.load_data(datafile)
+        self.df = None
 
     def load_data(self, datafile):
+        logger.info("Munging data from {}".format(datafile))
         if self.limit is not None:
             self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit)
             return
         self.df = pd.read_csv(datafile, delimiter='\t')
+        logger.info("Generated dataframe from {}".format(datafile))
 
     def get_network(self, metadata=False, limit=None):
+        logger.info("Generating network from data (metadata={}, limit={}".format(metadata, limit))
         df_edges = self.get_edges()
         if limit is not None:
             df_edges = df_edges.head(limit)
-        for key in self.get_citation_keys():
-            df_edges[key] = df_edges[key].str.strip()
+
+        # for key in self.get_citation_keys():
+        #     df_edges[key] = df_edges[key].str.strip()
 
         G = nx.from_pandas_edgelist(df_edges, source='patent_id', target='citation_id', create_using=nx.DiGraph())
 
@@ -36,9 +41,11 @@ class Munger:
                 except KeyError:
                     logger.error("Couldn't find network entry for {}".format(entry['patent_number']))
 
+        logger.info("Generated network")
         return G
 
     def get_edges(self):
+        self.ensure_data()
         return self.df[self.get_citation_keys()]
 
     @staticmethod
@@ -74,6 +81,10 @@ class Munger:
     def ensure_meta(self):
         if self.df_meta is None:
             self.load_metadata()
+
+    def ensure_data(self):
+        if self.df is None:
+            self.load_data(self.datafile)
 
 
 def chunks(l, n):

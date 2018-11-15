@@ -1,15 +1,16 @@
 import os
 import logging
-
+import sys
 
 class Config:
 
-    ENV_NAME = "colonial"
+    ENV_NAME = "local"
 
     DATA_PATH = os.path.abspath('../../data')
-    LOG_PATH = os.path.dirname('logs/colonial.log')
+    LOG_PATH = os.path.dirname('logs/local.log')
 
-    DOC_LIMIT = None
+    DOC_LIMIT = 1000
+
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):
@@ -26,5 +27,10 @@ formatter.datefmt = '%d%b%Y:%H:%M:%S'
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+handler_stdout = logging.StreamHandler(sys.stdout)
+handler_stdout.setLevel(logging.DEBUG)
+handler_stdout.setFormatter(formatter)
+logger.addHandler(handler_stdout)
 
 logger.info("==== NEW SESSION ====")

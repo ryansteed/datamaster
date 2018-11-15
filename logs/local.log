@@ -170,3 +170,320 @@ Number of nodes: 1998
 Number of edges: 1000
 Average in degree:   0.5005
 Average out degree:   0.5005
+[15Nov2018:11:33:34] INFO> ==== NEW SESSION ====
+[15Nov2018:11:34:22] INFO> ==== NEW SESSION ====
+[15Nov2018:11:34:34] INFO> ==== NEW SESSION ====
+[15Nov2018:11:34:51] INFO> ==== NEW SESSION ====
+[15Nov2018:11:35:10] INFO> ==== NEW SESSION ====
+[15Nov2018:11:36:43] INFO> ==== NEW SESSION ====
+[15Nov2018:11:36:58] INFO> ==== NEW SESSION ====
+[15Nov2018:11:37:53] INFO> ==== NEW SESSION ====
+[15Nov2018:11:38:25] INFO> ==== NEW SESSION ====
+[15Nov2018:11:38:26] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:11:38:28] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:11:39:12] INFO> ==== NEW SESSION ====
+[15Nov2018:11:39:13] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:11:39:43] INFO> ==== NEW SESSION ====
+[15Nov2018:11:39:43] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:11:39:51] INFO> ==== NEW SESSION ====
+[15Nov2018:11:39:51] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:11:39:53] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:11:40:27] INFO> ==== NEW SESSION ====
+[15Nov2018:11:40:28] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:11:40:30] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:10:10] INFO> ==== NEW SESSION ====
+[15Nov2018:12:10:10] INFO> Calculating metrics
+[15Nov2018:12:10:10] INFO> Calculating quality
+[15Nov2018:12:10:10] INFO> Metric calculation finished in 0.0002849102020263672 seconds
+[15Nov2018:12:10:10] INFO> Calculating H-index
+[15Nov2018:12:10:10] INFO> Metric calculation finished in 0.0007188320159912109 seconds
+[15Nov2018:12:10:10] INFO> Calculating centralities
+[15Nov2018:12:10:10] INFO> Metric calculation finished in 0.007719993591308594 seconds
+[15Nov2018:12:10:10] INFO> Calculating knowledge
+[15Nov2018:12:10:10] INFO> Metric calculation finished in 0.008118152618408203 seconds
+[15Nov2018:12:10:10] INFO> == CN Summary ==
+[15Nov2018:12:10:10] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:11:25] INFO> ==== NEW SESSION ====
+[15Nov2018:12:11:25] INFO> Calculating metrics
+[15Nov2018:12:11:25] INFO> Calculating quality
+[15Nov2018:12:11:25] INFO> Metric calculation finished in 0.0004401206970214844 seconds
+[15Nov2018:12:11:25] INFO> Calculating H-index
+[15Nov2018:12:11:25] INFO> Metric calculation finished in 0.0007290840148925781 seconds
+[15Nov2018:12:11:25] INFO> Calculating centralities
+[15Nov2018:12:11:25] INFO> Metric calculation finished in 0.00459599494934082 seconds
+[15Nov2018:12:11:25] INFO> Calculating knowledge
+[15Nov2018:12:11:25] INFO> Metric calculation finished in 0.0049250125885009766 seconds
+[15Nov2018:12:11:25] INFO> == CN Summary ==
+[15Nov2018:12:11:25] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:11:25] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:12:50] INFO> ==== NEW SESSION ====
+[15Nov2018:12:12:51] INFO> Calculating metrics
+[15Nov2018:12:12:51] INFO> Calculating quality
+[15Nov2018:12:12:51] INFO> Metric calculation finished in 0.0009531974792480469 seconds
+[15Nov2018:12:12:51] INFO> Calculating H-index
+[15Nov2018:12:12:51] INFO> Metric calculation finished in 0.0013892650604248047 seconds
+[15Nov2018:12:12:51] INFO> Calculating centralities
+[15Nov2018:12:12:51] INFO> Metric calculation finished in 0.007552146911621094 seconds
+[15Nov2018:12:12:51] INFO> Calculating knowledge
+[15Nov2018:12:12:51] INFO> Metric calculation finished in 0.007868051528930664 seconds
+[15Nov2018:12:12:51] INFO> == CN Summary ==
+[15Nov2018:12:12:51] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:12:51] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:12:59] INFO> ==== NEW SESSION ====
+[15Nov2018:12:12:59] INFO> Calculating metrics
+[15Nov2018:12:12:59] INFO> Calculating quality
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.0002911090850830078 seconds
+[15Nov2018:12:12:59] INFO> Calculating H-index
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.00047707557678222656 seconds
+[15Nov2018:12:12:59] INFO> Calculating centralities
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.0029931068420410156 seconds
+[15Nov2018:12:12:59] INFO> Calculating knowledge
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.003292083740234375 seconds
+[15Nov2018:12:12:59] INFO> == CN Summary ==
+[15Nov2018:12:12:59] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:12:59] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:12:59] INFO> Generated network
+[15Nov2018:12:12:59] INFO> Calculating metrics
+[15Nov2018:12:12:59] INFO> Calculating quality
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.03286576271057129 seconds
+[15Nov2018:12:12:59] INFO> Calculating H-index
+[15Nov2018:12:12:59] INFO> Metric calculation finished in 0.04072690010070801 seconds
+[15Nov2018:12:12:59] INFO> Calculating centralities
+[15Nov2018:12:13:01] INFO> Metric calculation finished in 1.697962999343872 seconds
+[15Nov2018:12:13:01] INFO> Calculating knowledge
+[15Nov2018:12:13:01] INFO> Metric calculation finished in 1.7091867923736572 seconds
+[15Nov2018:12:13:01] INFO> == CN Summary ==
+[15Nov2018:12:13:01] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:13:01] INFO> Filing calculated metrics in sample.csv
+[15Nov2018:12:15:59] INFO> ==== NEW SESSION ====
+[15Nov2018:12:16:00] INFO> Calculating metrics
+[15Nov2018:12:16:00] INFO> Calculating quality
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.0009980201721191406 seconds
+[15Nov2018:12:16:00] INFO> Calculating H-index
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.0013208389282226562 seconds
+[15Nov2018:12:16:00] INFO> Calculating centralities
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.006515979766845703 seconds
+[15Nov2018:12:16:00] INFO> Calculating knowledge
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.006823062896728516 seconds
+[15Nov2018:12:16:00] INFO> == CN Summary ==
+[15Nov2018:12:16:00] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:16:00] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:16:00] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:16:00] INFO> Generating network from data (metadata=False, limit=None
+[15Nov2018:12:16:00] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:16:00] INFO> Generated network
+[15Nov2018:12:16:00] INFO> Calculating metrics
+[15Nov2018:12:16:00] INFO> Calculating quality
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.02540302276611328 seconds
+[15Nov2018:12:16:00] INFO> Calculating H-index
+[15Nov2018:12:16:00] INFO> Metric calculation finished in 0.033638954162597656 seconds
+[15Nov2018:12:16:00] INFO> Calculating centralities
+[15Nov2018:12:16:01] INFO> Metric calculation finished in 1.7012369632720947 seconds
+[15Nov2018:12:16:01] INFO> Calculating knowledge
+[15Nov2018:12:16:01] INFO> Metric calculation finished in 1.712352991104126 seconds
+[15Nov2018:12:16:01] INFO> == CN Summary ==
+[15Nov2018:12:16:01] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:16:02] INFO> Filing calculated metrics in sample.csv
+[15Nov2018:12:16:19] INFO> ==== NEW SESSION ====
+[15Nov2018:12:16:19] INFO> ## Testing metrics ##
+[15Nov2018:12:16:19] INFO> Calculating metrics
+[15Nov2018:12:16:19] INFO> Calculating quality
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.0003058910369873047 seconds
+[15Nov2018:12:16:19] INFO> Calculating H-index
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.0005259513854980469 seconds
+[15Nov2018:12:16:19] INFO> Calculating centralities
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.0040569305419921875 seconds
+[15Nov2018:12:16:19] INFO> Calculating knowledge
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.004440784454345703 seconds
+[15Nov2018:12:16:19] INFO> == CN Summary ==
+[15Nov2018:12:16:19] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:16:19] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:16:19] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:16:19] INFO> Generating network from data (metadata=False, limit=None
+[15Nov2018:12:16:19] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:16:19] INFO> Generated network
+[15Nov2018:12:16:19] INFO> Calculating metrics
+[15Nov2018:12:16:19] INFO> Calculating quality
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.02582573890686035 seconds
+[15Nov2018:12:16:19] INFO> Calculating H-index
+[15Nov2018:12:16:19] INFO> Metric calculation finished in 0.03408384323120117 seconds
+[15Nov2018:12:16:19] INFO> Calculating centralities
+[15Nov2018:12:16:21] INFO> Metric calculation finished in 1.7256650924682617 seconds
+[15Nov2018:12:16:21] INFO> Calculating knowledge
+[15Nov2018:12:16:21] INFO> Metric calculation finished in 1.7373158931732178 seconds
+[15Nov2018:12:16:21] INFO> == CN Summary ==
+[15Nov2018:12:16:21] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:16:21] INFO> Filing calculated metrics in sample.csv
+[15Nov2018:12:22:00] INFO> ==== NEW SESSION ====
+[15Nov2018:12:22:00] INFO> ## Testing metrics ##
+[15Nov2018:12:22:01] INFO> Calculating metrics
+[15Nov2018:12:22:01] INFO> Calculating quality
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.0004820823669433594s)
+[15Nov2018:12:22:01] INFO> Calculating H-index
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.000843048095703125s)
+[15Nov2018:12:22:01] INFO> Calculating centralities
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.009042978286743164s)
+[15Nov2018:12:22:01] INFO> Calculating knowledge
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.009486198425292969s)
+[15Nov2018:12:22:01] INFO> == CN Summary ==
+[15Nov2018:12:22:01] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:22:01] INFO> ====
+[15Nov2018:12:22:01] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:22:01] INFO> Filing metrics done (0.0006139278411865234s)
+[15Nov2018:12:22:01] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:22:01] INFO> Generating network from data (metadata=False, limit=None
+[15Nov2018:12:22:01] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:22:01] INFO> Generated network
+[15Nov2018:12:22:01] INFO> Calculating metrics
+[15Nov2018:12:22:01] INFO> Calculating quality
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.032540082931518555s)
+[15Nov2018:12:22:01] INFO> Calculating H-index
+[15Nov2018:12:22:01] INFO> Metric calculation done (0.04120802879333496s)
+[15Nov2018:12:22:01] INFO> Calculating centralities
+[15Nov2018:12:22:02] INFO> Metric calculation done (1.868746042251587s)
+[15Nov2018:12:22:02] INFO> Calculating knowledge
+[15Nov2018:12:22:02] INFO> Metric calculation done (1.8811283111572266s)
+[15Nov2018:12:22:02] INFO> == CN Summary ==
+[15Nov2018:12:22:02] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:22:02] INFO> ====
+[15Nov2018:12:22:02] INFO> Filing calculated metrics in sample.csv
+[15Nov2018:12:22:02] INFO> Filing metrics done (0.01361703872680664s)
+[15Nov2018:12:26:20] INFO> ==== NEW SESSION ====
+[15Nov2018:12:26:20] INFO> ## Testing metrics ##
+[15Nov2018:12:26:20] INFO> Calculating metrics
+[15Nov2018:12:26:20] INFO> Calculating quality
+[15Nov2018:12:26:20] INFO> Metric calculation done (0.00045609474182128906s)
+[15Nov2018:12:26:20] INFO> Calculating H-index
+[15Nov2018:12:26:20] INFO> Metric calculation done (0.0010881423950195312s)
+[15Nov2018:12:26:20] INFO> Calculating centralities
+[15Nov2018:12:26:20] INFO> Metric calculation done (0.007323265075683594s)
+[15Nov2018:12:26:20] INFO> Calculating knowledge
+[15Nov2018:12:26:20] INFO> Metric calculation done (0.00781393051147461s)
+[15Nov2018:12:26:20] INFO> == CN Summary ==
+[15Nov2018:12:26:20] INFO> Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+[15Nov2018:12:26:20] INFO> ====
+[15Nov2018:12:26:20] INFO> Filing calculated metrics in manual.csv
+[15Nov2018:12:26:20] INFO> Filing metrics done (0.0004329681396484375s)
+[15Nov2018:12:26:20] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:26:20] INFO> Generating network from data (metadata=False, limit=None
+[15Nov2018:12:26:20] INFO> Munging data from /Users/Ryan/datamaster/data/uspatentcitation.tsv
+[15Nov2018:12:26:21] INFO> Generated network
+[15Nov2018:12:26:21] INFO> Calculating metrics
+[15Nov2018:12:26:21] INFO> Calculating quality
+[15Nov2018:12:26:21] INFO> Metric calculation done (0.028838157653808594s)
+[15Nov2018:12:26:21] INFO> Calculating H-index
+[15Nov2018:12:26:21] INFO> Metric calculation done (0.04050016403198242s)
+[15Nov2018:12:26:21] INFO> Calculating centralities
+[15Nov2018:12:26:22] INFO> Metric calculation done (1.7355782985687256s)
+[15Nov2018:12:26:22] INFO> Calculating knowledge
+[15Nov2018:12:26:22] INFO> Metric calculation done (1.747143030166626s)
+[15Nov2018:12:26:22] INFO> == CN Summary ==
+[15Nov2018:12:26:22] INFO> Name: 
+Type: DiGraph
+Number of nodes: 1998
+Number of edges: 1000
+Average in degree:   0.5005
+Average out degree:   0.5005
+[15Nov2018:12:26:22] INFO> ====
+[15Nov2018:12:26:22] INFO> Filing calculated metrics in sample.csv
+[15Nov2018:12:26:22] INFO> Filing metrics done (0.012125015258789062s)
