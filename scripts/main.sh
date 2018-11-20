@@ -12,4 +12,4 @@ module load miniconda/miniconda3
 source deactivate
 conda env update -f env.yml
 source activate datamaster
-python main.py
+python main.py metrics
