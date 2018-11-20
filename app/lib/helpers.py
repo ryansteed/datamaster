@@ -15,6 +15,8 @@ class Timer:
         logger.info("{} done ({}s)".format(self.name, self.elapsed()))
         return self
 
-    def reset(self):
+    def reset(self, name=None):
         self.start = time.time()
+        if name is not None:
+            self.name = name
         return self

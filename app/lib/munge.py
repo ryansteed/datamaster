@@ -2,24 +2,56 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import requests
+
 from app.config import Config, logger
+from app.lib.helpers import Timer
 
 
 class Munger:
 
-    def __init__(self, datafile, limit=None):
-        self.datafile = datafile
+    def __init__(self, limit=Config.DOC_LIMIT):
         self.limit = limit
-        self.load_data(datafile)
         self.df = None
 
-    def load_data(self, datafile):
+    def load_data_from_query(self, query):
+        logger.info("Munging data from query {}".format(query))
+        t = Timer("Querying")
+        r = requests.post(
+            'http://www.patentsview.org/api/patents/query',
+            json={
+                "q": query,
+                "f": ["patent_number", "cited_patent_number", "citedby_patent_number"]
+            }
+        )
+        info = r.json()
+        t.log()
+
+        t.reset(name="Parsing to dataframe")
+        data = set()
+        for patent in info['patents']:
+            logger.debug(patent)
+            for bcite in patent.get('cited_patents'):
+                edge = (patent['patent_number'], bcite['cited_patent_number'])
+                if None not in edge: data.add(edge)
+            for fcite in patent.get('citedby_patents'):
+                edge = (fcite['citedby_patent_number'], patent['patent_number'])
+                if None not in edge: data.add(edge)
+        df = pd.DataFrame(list(data), columns=self.get_citation_keys())
+
+        self.df = df
+        t.log()
+
+        logger.info("Collected {} documents with query {}".format(df.size, query))
+        return self
+
+    def load_data_from_file(self, datafile):
         logger.info("Munging data from {}".format(datafile))
         if self.limit is not None:
             self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit)
             return
         self.df = pd.read_csv(datafile, delimiter='\t')
-        logger.info("Generated dataframe from {}".format(datafile))
+        logger.info("Loaded {} documents from dataframe {}".format(self.df.size, datafile))
+        return self
 
     def get_network(self, metadata=False, limit=None):
         logger.info("Generating network from data (metadata={}, limit={}".format(metadata, limit))
@@ -84,7 +116,7 @@ class Munger:
 
     def ensure_data(self):
         if self.df is None:
-            self.load_data(self.datafile)
+            raise ValueError("Please load data first.")
 
 
 def chunks(l, n):
@@ -94,14 +126,32 @@ def chunks(l, n):
 
 
 def test(limit=Config.DOC_LIMIT):
-    return Munger(Config.DATA_PATH+'/uspatentcitation.tsv', limit=limit)
+    munger = Munger(limit=limit)
+
+    # from uspto file
+    # munger.load_data_from_file(Config.DATA_PATH+'/uspatentcitation.tsv')
+
+    # test from https://ropensci.github.io/patentsview/articles/citation-networks.html
+    # munger.load_data_from_query({"cpc_subgroup_id": "Y10S707/933"})
+
+    # test from https://link.springer.com/article/10.1007/s11192-017-2252-y
+    munger.load_data_from_query({"uspc_mainclass_id": "372"})
+
+    # artificial intelligence
+    # munger.load_data_from_query({"uspc_mainclass_id": "706"})
+
+    return munger
+
+
+def test_query():
+    munger = Munger()
+    print(munger.load_data_from_query({"cpc_subgroup_id": "Y10S707/933"}))
 
 
 def main():
     # Test data
     munger = test()
     G = munger.get_network(metadata=True)
-    logger.debug(G.nodes.data())
     munger.summary()
     munger.summary_meta()
 

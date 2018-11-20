@@ -87,9 +87,13 @@ class CitationNetwork:
         centralities = [
             nx.degree_centrality(self.G),
             nx.betweenness_centrality(self.G),
-            nx.eigenvector_centrality_numpy(self.G),
             nx.closeness_centrality(self.G)
         ]
+        try:
+            centralities.append(nx.eigenvector_centrality_numpy(self.G))
+        except Exception as e:
+            logger.warn("Failed to calculate eigenvector centralities with error {}".format(e))
+
         # Local vals
         for centrality in centralities:
             c['+'].append(centrality[max(centrality, key=centrality.get)])
@@ -144,7 +148,7 @@ class CitationNetwork:
 
     def k(self, root, node, weighting_key, verbose=False):
         sum_children = 0
-        for child in self.G.successors(node):
+        for child in [x for x in self.G.successors(node) if x is not None]:
             sum_children += self.k(root, child, weighting_key)
         total_k = (self.G.nodes[node][weighting_key] + sum_children) * self.p(root, node)
         if verbose:
@@ -155,7 +159,8 @@ class CitationNetwork:
         return total_k
 
     def p(self, root, node):
-        return 1 if node == root else 1 / self.G.in_degree(node)
+        test = self.G.in_degree(node)
+        return 1 if node == root else 1 / int(self.G.in_degree(node))
 
 
 # h-index calculation
@@ -184,7 +189,7 @@ def main():
     G = nx.DiGraph()
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
-    nx.draw_networkx(G, pos=nx.spring_layout(G))
+    # nx.draw_networkx(G, pos=nx.spring_layout(G))
     test(G, "manual")
     G = munge.test(limit=Config.DOC_LIMIT).get_network()
     test(G, "sample")
