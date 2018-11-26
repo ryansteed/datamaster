@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import requests
+import os
+import json
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -14,43 +16,56 @@ class Munger:
         self.df = None
 
     def load_data_from_query(self, query):
-        logger.info("Munging data from query {}".format(query))
-        t = Timer("Querying")
-        r = requests.post(
-            'http://www.patentsview.org/api/patents/query',
-            json={
-                "q": query,
-                "f": ["patent_number", "cited_patent_number", "citedby_patent_number"]
-            }
-        )
-        info = r.json()
-        t.log()
+        try:
+            self.load_data_from_file(self.make_query_filename(query))
+        except (FileNotFoundError, DataFormatError):
+            t = Timer("Munging data from query {}".format(query))
+            r = requests.post(
+                'http://www.patentsview.org/api/patents/query',
+                json={
+                    "q": query,
+                    "f": ["patent_number", "cited_patent_number", "citedby_patent_number"]
+                }
+            )
+            info = r.json()
+            t.log()
 
-        t.reset(name="Parsing to dataframe")
-        data = set()
-        for patent in info['patents']:
-            logger.debug(patent)
-            for bcite in patent.get('cited_patents'):
-                edge = (patent['patent_number'], bcite['cited_patent_number'])
-                if None not in edge: data.add(edge)
-            for fcite in patent.get('citedby_patents'):
-                edge = (fcite['citedby_patent_number'], patent['patent_number'])
-                if None not in edge: data.add(edge)
-        df = pd.DataFrame(list(data), columns=self.get_citation_keys())
+            t.reset(name="Parsing {} docs to dataframe".format(len(info['patents'])))
+            data = set()
+            for patent in info['patents']:
+                for bcite in patent.get('cited_patents'):
+                    edge = (patent['patent_number'], bcite['cited_patent_number'])
+                    if None not in edge: data.add(edge)
+                for fcite in patent.get('citedby_patents'):
+                    edge = (fcite['citedby_patent_number'], patent['patent_number'])
+                    if None not in edge: data.add(edge)
+            df = pd.DataFrame(list(data), columns=self.get_citation_keys())
+            self.df = df
+            t.log()
 
-        self.df = df
-        t.log()
-
-        logger.info("Collected {} documents with query {}".format(df.size, query))
+            self.write_data_to_file(self.make_query_filename(query))
+            logger.info("Collected {} edges with query {}".format(df.shape[0], query))
+            self.ensure_data()
         return self
+
+    def write_data_to_file(self, filename):
+        t = Timer("Writing data to file {}".format(filename))
+        with open(filename, "w+") as file:
+            self.df.to_csv(file, index=False, sep='\t')
+        t.log()
+
+    @staticmethod
+    def make_query_filename(query):
+        file_string = json.dumps(query)
+        for c in '"{} ':
+            file_string = file_string.replace(c, '')
+        return "{}.csv".format(os.path.join("query_data", file_string))
 
     def load_data_from_file(self, datafile):
         logger.info("Munging data from {}".format(datafile))
-        if self.limit is not None:
-            self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit)
-            return
-        self.df = pd.read_csv(datafile, delimiter='\t')
+        self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit) if self.limit is not None else pd.read_csv(datafile, delimiter='\t')
         logger.info("Loaded {} documents from dataframe {}".format(self.df.size, datafile))
+        self.ensure_data()
         return self
 
     def get_network(self, metadata=False, limit=None):
@@ -117,6 +132,8 @@ class Munger:
     def ensure_data(self):
         if self.df is None:
             raise ValueError("Please load data first.")
+        if not {'patent_id', 'citation_id'}.issubset(self.df.columns):
+            raise DataFormatError("Missing patent and citation columns in dataset")
 
 
 def chunks(l, n):
@@ -141,6 +158,10 @@ def test(limit=Config.DOC_LIMIT):
     # munger.load_data_from_query({"uspc_mainclass_id": "706"})
 
     return munger
+
+
+class DataFormatError(Exception):
+    pass
 
 
 def test_query():

@@ -17,10 +17,10 @@ if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
 logger = logging.getLogger(__package__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 handler = logging.FileHandler(os.path.join(log_dir,'{}.log'.format(Config.ENV_NAME)))
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s> %(message)s')
 formatter.datefmt = '%d%b%Y:%H:%M:%S'

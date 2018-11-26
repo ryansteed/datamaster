@@ -10,19 +10,19 @@ from app.lib.helpers import Timer
 
 class CitationNetwork:
     attributes = ['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality',
-                       'knowledge']
+                  'knowledge']
 
     def __init__(self, G, weighting_method="custom_centrality"):
         self.G = G
         self.weighting_method = weighting_method
 
     def summary(self, attributes=tuple(attributes)):
-        logger.info("== CN Summary ==")
-        logger.info(nx.info(self.G))
+        custom = ""
+        custom += "Connected components: {}\n".format(nx.number_connected_components(self.G.to_undirected()))
         # average metrics
         for key, values in {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}.items():
-            print(key+":", round(np.average(values), 3), "(",round(sem(values), 3), ")")
-        logger.info("====")
+            custom += "{}: {} ({})\n".format(key, round(np.average(values), 3), round(sem(values), 3))
+        logger.info("\n== CN Summary ==\n{}\n{}====".format(nx.info(self.G), custom))
 
     def print_custom_metrics(self):
         logger.info("== Calculated Metrics ==")
