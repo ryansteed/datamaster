@@ -5015,3 +5015,2303 @@ knowledge: 0.334 (0.051)
 [26Nov2018:16:30:09] INFO> Filing metrics done (0.0006947517395019531s)
 [26Nov2018:16:30:09] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
 [26Nov2018:16:30:09] INFO> Loaded 332 documents from dataframe query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:25:35] INFO> ==== NEW SESSION ====
+[26Nov2018:21:25:35] INFO> ## Testing metrics ##
+[26Nov2018:21:25:35] INFO> Calculating metrics
+[26Nov2018:21:25:35] INFO> Metric calculation started
+[26Nov2018:21:25:35] INFO> Calculating quality
+[26Nov2018:21:25:35] INFO> Metric calculation done (0.006067037582397461s)
+[26Nov2018:21:25:35] INFO> Calculating H-index
+[26Nov2018:21:25:35] INFO> Metric calculation done (0.008819103240966797s)
+[26Nov2018:21:25:35] INFO> Calculating centralities
+[26Nov2018:21:25:35] INFO> Metric calculation done (0.08185100555419922s)
+[26Nov2018:21:25:35] INFO> Calculating knowledge
+[26Nov2018:21:25:35] INFO> Metric calculation done (0.09978413581848145s)
+[26Nov2018:21:25:35] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.222 (0.434)
+num_claims: 1.778 (0.222)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:25:35] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:25:35] INFO> Filing metrics started
+[26Nov2018:21:25:35] INFO> Filing metrics done (0.009012937545776367s)
+[26Nov2018:21:25:35] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:25:35] INFO> Loaded 332 documents from dataframe query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:25:45] INFO> Munging data from query {'uspc_mainclass_id': '372'} started
+[26Nov2018:21:29:09] INFO> Munging data from query {'uspc_mainclass_id': '372'} done (203.45275688171387s)
+[26Nov2018:21:29:09] INFO> Parsing 25 docs to dataframe started
+[26Nov2018:21:29:09] INFO> Parsing 25 docs to dataframe done (0.004379987716674805s)
+[26Nov2018:21:29:09] INFO> Writing data to file query_data/uspc_mainclass_id:372.csv started
+[26Nov2018:21:29:09] INFO> Writing data to file query_data/uspc_mainclass_id:372.csv done (0.012346744537353516s)
+[26Nov2018:21:29:09] INFO> Collected 332 edges with query {'uspc_mainclass_id': '372'}
+[26Nov2018:21:29:09] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:29:09] INFO> Generated network
+[26Nov2018:21:29:09] INFO> Calculating metrics
+[26Nov2018:21:29:09] INFO> Metric calculation started
+[26Nov2018:21:29:09] INFO> Calculating quality
+[26Nov2018:21:29:09] INFO> Metric calculation done (0.01437687873840332s)
+[26Nov2018:21:29:09] INFO> Calculating H-index
+[26Nov2018:21:29:09] INFO> Metric calculation done (0.01895904541015625s)
+[26Nov2018:21:29:09] INFO> Calculating centralities
+[26Nov2018:21:29:09] WARNING> Failed to calculate eigenvector centralities with error ARPACK error -8: Error return from LAPACK eigenvalue calculation;
+[26Nov2018:21:29:09] INFO> Metric calculation done (0.18381094932556152s)
+[26Nov2018:21:29:09] INFO> Calculating knowledge
+[26Nov2018:21:29:09] INFO> Metric calculation done (0.26268792152404785s)
+[26Nov2018:21:29:09] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 350
+Number of edges: 332
+Average in degree:   0.9486
+Average out degree:   0.9486
+Connected components: 21
+forward_cites: 0.946 (0.037)
+backward_cites: 0.931 (0.266)
+family_size: 2.606 (0.102)
+num_claims: 1.994 (0.032)
+h_index: 0.76 (0.023)
+custom_centrality: 0.008 (0.0)
+knowledge: 0.011 (0.0)
+====
+[26Nov2018:21:29:09] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:29:09] INFO> Filing metrics started
+[26Nov2018:21:29:09] INFO> Filing metrics done (0.013061285018920898s)
+[26Nov2018:21:29:29] INFO> ==== NEW SESSION ====
+[26Nov2018:21:29:29] INFO> ## Testing metrics ##
+[26Nov2018:21:29:29] INFO> Calculating metrics
+[26Nov2018:21:29:29] INFO> Metric calculation started
+[26Nov2018:21:29:29] INFO> Calculating quality
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.0016808509826660156s)
+[26Nov2018:21:29:29] INFO> Calculating H-index
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.0020008087158203125s)
+[26Nov2018:21:29:29] INFO> Calculating centralities
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.006357908248901367s)
+[26Nov2018:21:29:29] INFO> Calculating knowledge
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.006846904754638672s)
+[26Nov2018:21:29:29] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.333 (0.527)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:29:29] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:29:29] INFO> Filing metrics started
+[26Nov2018:21:29:29] INFO> Filing metrics done (0.004197835922241211s)
+[26Nov2018:21:29:29] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:29:29] INFO> Loaded 664 documents from dataframe query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:29:29] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:29:29] INFO> Generated network
+[26Nov2018:21:29:29] INFO> Calculating metrics
+[26Nov2018:21:29:29] INFO> Metric calculation started
+[26Nov2018:21:29:29] INFO> Calculating quality
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.012429237365722656s)
+[26Nov2018:21:29:29] INFO> Calculating H-index
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.01595020294189453s)
+[26Nov2018:21:29:29] INFO> Calculating centralities
+[26Nov2018:21:29:29] WARNING> Failed to calculate eigenvector centralities with error ARPACK error -8: Error return from LAPACK eigenvalue calculation;
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.11522412300109863s)
+[26Nov2018:21:29:29] INFO> Calculating knowledge
+[26Nov2018:21:29:29] INFO> Metric calculation done (0.13041019439697266s)
+[26Nov2018:21:29:29] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 373
+Number of edges: 332
+Average in degree:   0.8901
+Average out degree:   0.8901
+Connected components: 43
+forward_cites: 0.89 (0.037)
+backward_cites: 0.89 (0.252)
+family_size: 2.713 (0.101)
+num_claims: 2.043 (0.029)
+h_index: 0.0 (0.0)
+custom_centrality: 0.009 (0.0)
+knowledge: 0.011 (0.0)
+====
+[26Nov2018:21:29:29] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:29:29] INFO> Filing metrics started
+[26Nov2018:21:29:29] INFO> Filing metrics done (0.007425069808959961s)
+[26Nov2018:21:30:27] INFO> ==== NEW SESSION ====
+[26Nov2018:21:30:27] INFO> ## Testing metrics ##
+[26Nov2018:21:30:27] INFO> Calculating metrics
+[26Nov2018:21:30:27] INFO> Metric calculation started
+[26Nov2018:21:30:27] INFO> Calculating quality
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.0015170574188232422s)
+[26Nov2018:21:30:27] INFO> Calculating H-index
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.0020852088928222656s)
+[26Nov2018:21:30:27] INFO> Calculating centralities
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.017014026641845703s)
+[26Nov2018:21:30:27] INFO> Calculating knowledge
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.017735958099365234s)
+[26Nov2018:21:30:27] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.556)
+num_claims: 2.0 (0.289)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:30:27] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:30:27] INFO> Filing metrics started
+[26Nov2018:21:30:27] INFO> Filing metrics done (0.0009326934814453125s)
+[26Nov2018:21:30:27] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:30:27] INFO> Loaded 664 documents from dataframe query_data/uspc_mainclass_id:372.csv
+[26Nov2018:21:30:27] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:30:27] INFO> Generated network
+[26Nov2018:21:30:27] INFO> Calculating metrics
+[26Nov2018:21:30:27] INFO> Metric calculation started
+[26Nov2018:21:30:27] INFO> Calculating quality
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.009048938751220703s)
+[26Nov2018:21:30:27] INFO> Calculating H-index
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.011006832122802734s)
+[26Nov2018:21:30:27] INFO> Calculating centralities
+[26Nov2018:21:30:27] WARNING> Failed to calculate eigenvector centralities with error ARPACK error -8: Error return from LAPACK eigenvalue calculation;
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.0990591049194336s)
+[26Nov2018:21:30:27] INFO> Calculating knowledge
+[26Nov2018:21:30:27] INFO> Metric calculation done (0.1088411808013916s)
+[26Nov2018:21:30:27] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 373
+Number of edges: 332
+Average in degree:   0.8901
+Average out degree:   0.8901
+Connected components: 43
+forward_cites: 0.89 (0.037)
+backward_cites: 0.89 (0.252)
+family_size: 2.469 (0.093)
+num_claims: 1.992 (0.029)
+h_index: 0.0 (0.0)
+custom_centrality: 0.009 (0.0)
+knowledge: 0.011 (0.0)
+====
+[26Nov2018:21:30:27] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:30:27] INFO> Filing metrics started
+[26Nov2018:21:30:27] INFO> Filing metrics done (0.017144203186035156s)
+[26Nov2018:21:32:04] INFO> ==== NEW SESSION ====
+[26Nov2018:21:32:04] INFO> ## Testing metrics ##
+[26Nov2018:21:32:04] INFO> Calculating metrics
+[26Nov2018:21:32:04] INFO> Metric calculation started
+[26Nov2018:21:32:04] INFO> Calculating quality
+[26Nov2018:21:32:04] INFO> Metric calculation done (0.0005619525909423828s)
+[26Nov2018:21:32:04] INFO> Calculating H-index
+[26Nov2018:21:32:04] INFO> Metric calculation done (0.0008561611175537109s)
+[26Nov2018:21:32:04] INFO> Calculating centralities
+[26Nov2018:21:32:04] INFO> Metric calculation done (0.004121303558349609s)
+[26Nov2018:21:32:04] INFO> Calculating knowledge
+[26Nov2018:21:32:04] INFO> Metric calculation done (0.004578113555908203s)
+[26Nov2018:21:32:04] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 1.111 (0.611)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:32:04] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:32:04] INFO> Filing metrics started
+[26Nov2018:21:32:04] INFO> Filing metrics done (0.0005848407745361328s)
+[26Nov2018:21:32:04] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:32:04] INFO> Missing query data file, querying USPTO
+[26Nov2018:21:32:04] INFO> Munging data from query {'uspc_mainclass_id': '706'} started
+[26Nov2018:21:32:46] INFO> Munging data from query {'uspc_mainclass_id': '706'} done (42.18497014045715s)
+[26Nov2018:21:32:46] INFO> Parsing 25 docs to dataframe started
+[26Nov2018:21:32:46] INFO> Parsing 25 docs to dataframe done (0.0055370330810546875s)
+[26Nov2018:21:32:46] INFO> Writing data to file query_data/uspc_mainclass_id:706.csv started
+[26Nov2018:21:32:46] INFO> Writing data to file query_data/uspc_mainclass_id:706.csv done (0.00555872917175293s)
+[26Nov2018:21:32:46] INFO> Collected 1494 edges with query {'uspc_mainclass_id': '706'}
+[26Nov2018:21:32:46] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:32:46] INFO> Generated network
+[26Nov2018:21:32:46] INFO> Calculating metrics
+[26Nov2018:21:32:46] INFO> Metric calculation started
+[26Nov2018:21:32:46] INFO> Calculating quality
+[26Nov2018:21:32:46] INFO> Metric calculation done (0.015974998474121094s)
+[26Nov2018:21:32:46] INFO> Calculating H-index
+[26Nov2018:21:32:46] INFO> Metric calculation done (0.0368199348449707s)
+[26Nov2018:21:32:46] INFO> Calculating centralities
+[26Nov2018:21:32:47] INFO> Metric calculation done (1.026749849319458s)
+[26Nov2018:21:32:47] INFO> Calculating knowledge
+[26Nov2018:21:32:47] INFO> Metric calculation done (1.1672840118408203s)
+[26Nov2018:21:32:47] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 1261
+Number of edges: 1494
+Average in degree:   1.1848
+Average out degree:   1.1848
+Connected components: 6
+forward_cites: 1.185 (0.041)
+backward_cites: 1.183 (0.303)
+family_size: 2.614 (0.052)
+num_claims: 2.001 (0.016)
+h_index: 0.956 (0.017)
+custom_centrality: 0.0 (0.0)
+knowledge: 0.0 (0.0)
+====
+[26Nov2018:21:32:47] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:32:47] INFO> Filing metrics started
+[26Nov2018:21:32:47] INFO> Filing metrics done (0.010184049606323242s)
+[26Nov2018:21:33:40] INFO> ==== NEW SESSION ====
+[26Nov2018:21:33:40] INFO> ## Testing metrics ##
+[26Nov2018:21:33:40] INFO> Calculating metrics
+[26Nov2018:21:33:40] INFO> Metric calculation started
+[26Nov2018:21:33:40] INFO> Calculating quality
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.0018618106842041016s)
+[26Nov2018:21:33:40] INFO> Calculating H-index
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.0028848648071289062s)
+[26Nov2018:21:33:40] INFO> Calculating centralities
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.013745784759521484s)
+[26Nov2018:21:33:40] INFO> Calculating knowledge
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.014258861541748047s)
+[26Nov2018:21:33:40] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.444 (0.766)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:33:40] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:33:40] INFO> Filing metrics started
+[26Nov2018:21:33:40] INFO> Filing metrics done (0.0009810924530029297s)
+[26Nov2018:21:33:40] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:33:40] INFO> Loaded 2000 documents from file query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:33:40] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:33:40] INFO> Generated network
+[26Nov2018:21:33:40] INFO> Calculating metrics
+[26Nov2018:21:33:40] INFO> Metric calculation started
+[26Nov2018:21:33:40] INFO> Calculating quality
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.009475231170654297s)
+[26Nov2018:21:33:40] INFO> Calculating H-index
+[26Nov2018:21:33:40] INFO> Metric calculation done (0.0164642333984375s)
+[26Nov2018:21:33:40] INFO> Calculating centralities
+[26Nov2018:21:33:41] INFO> Metric calculation done (0.48610401153564453s)
+[26Nov2018:21:33:41] INFO> Calculating knowledge
+[26Nov2018:21:33:41] INFO> Metric calculation done (0.5033919811248779s)
+[26Nov2018:21:33:41] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 896
+Number of edges: 1000
+Average in degree:   1.1161
+Average out degree:   1.1161
+Connected components: 24
+forward_cites: 0.307 (0.043)
+backward_cites: 0.985 (0.278)
+family_size: 2.583 (0.064)
+num_claims: 2.019 (0.019)
+h_index: 0.0 (0.0)
+custom_centrality: 0.407 (0.0)
+knowledge: 0.467 (0.014)
+====
+[26Nov2018:21:33:41] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:33:41] INFO> Filing metrics started
+[26Nov2018:21:33:41] INFO> Filing metrics done (0.015713930130004883s)
+[26Nov2018:21:45:34] INFO> ==== NEW SESSION ====
+[26Nov2018:21:45:34] INFO> ## Testing metrics ##
+[26Nov2018:21:45:34] INFO> Calculating metrics
+[26Nov2018:21:45:34] INFO> Metric calculation started
+[26Nov2018:21:45:34] INFO> Calculating quality
+[26Nov2018:21:45:34] INFO> Metric calculation done (0.0015869140625s)
+[26Nov2018:21:45:34] INFO> Calculating H-index
+[26Nov2018:21:45:34] INFO> Metric calculation done (0.001961946487426758s)
+[26Nov2018:21:45:34] INFO> Calculating centralities
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.017628908157348633s)
+[26Nov2018:21:45:35] INFO> Calculating knowledge
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.01811504364013672s)
+[26Nov2018:21:45:35] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.222 (0.547)
+num_claims: 1.889 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:45:35] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:45:35] INFO> Filing metrics started
+[26Nov2018:21:45:35] INFO> Filing metrics done (0.0011026859283447266s)
+[26Nov2018:21:45:35] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:45:35] INFO> Loaded 2000 documents from file query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:45:35] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:45:35] INFO> Generated network
+[26Nov2018:21:45:35] INFO> Calculating metrics
+[26Nov2018:21:45:35] INFO> Metric calculation started
+[26Nov2018:21:45:35] INFO> Calculating quality
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.01655411720275879s)
+[26Nov2018:21:45:35] INFO> Calculating H-index
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.025181055068969727s)
+[26Nov2018:21:45:35] INFO> Calculating centralities
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.8461368083953857s)
+[26Nov2018:21:45:35] INFO> Calculating knowledge
+[26Nov2018:21:45:35] INFO> Metric calculation done (0.8644838333129883s)
+[26Nov2018:21:45:35] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 896
+Number of edges: 1000
+Average in degree:   1.1161
+Average out degree:   1.1161
+Connected components: 24
+forward_cites: 0.307 (0.043)
+backward_cites: 0.985 (0.278)
+family_size: 2.574 (0.064)
+num_claims: 2.035 (0.018)
+h_index: 0.0 (0.0)
+custom_centrality: 0.407 (0.0)
+knowledge: 0.467 (0.014)
+====
+[26Nov2018:21:45:35] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:45:35] INFO> Filing metrics started
+[26Nov2018:21:45:35] INFO> Filing metrics done (0.010231971740722656s)
+[26Nov2018:21:49:27] INFO> ==== NEW SESSION ====
+[26Nov2018:21:49:27] INFO> ## Testing metrics ##
+[26Nov2018:21:49:27] INFO> Calculating metrics
+[26Nov2018:21:49:27] INFO> Metric calculation started
+[26Nov2018:21:49:27] INFO> Calculating quality
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.0022699832916259766s)
+[26Nov2018:21:49:27] INFO> Calculating H-index
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.0036292076110839844s)
+[26Nov2018:21:49:27] INFO> Calculating centralities
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.020408153533935547s)
+[26Nov2018:21:49:27] INFO> Calculating knowledge
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.02352619171142578s)
+[26Nov2018:21:49:27] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.778 (0.703)
+num_claims: 2.222 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:49:27] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:49:27] INFO> Filing metrics started
+[26Nov2018:21:49:27] INFO> Filing metrics done (0.0009667873382568359s)
+[26Nov2018:21:49:27] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:49:27] INFO> Loaded 2000 documents from file query_data/uspc_mainclass_id:706.csv
+[26Nov2018:21:49:27] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:49:27] INFO> Generated network
+[26Nov2018:21:49:27] INFO> Calculating metrics
+[26Nov2018:21:49:27] INFO> Metric calculation started
+[26Nov2018:21:49:27] INFO> Calculating quality
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.04130101203918457s)
+[26Nov2018:21:49:27] INFO> Calculating H-index
+[26Nov2018:21:49:27] INFO> Metric calculation done (0.05843710899353027s)
+[26Nov2018:21:49:27] INFO> Calculating centralities
+[26Nov2018:21:49:30] INFO> Metric calculation done (2.2413690090179443s)
+[26Nov2018:21:49:30] INFO> Calculating knowledge
+[26Nov2018:21:49:30] INFO> Metric calculation done (2.5841970443725586s)
+[26Nov2018:21:49:30] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 896
+Number of edges: 1000
+Average in degree:   1.1161
+Average out degree:   1.1161
+Connected components: 24
+forward_cites: 0.307 (0.043)
+backward_cites: 0.985 (0.278)
+family_size: 2.59 (0.063)
+num_claims: 1.993 (0.019)
+h_index: 0.0 (0.0)
+custom_centrality: 0.407 (0.0)
+knowledge: 0.467 (0.014)
+====
+[26Nov2018:21:49:30] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:49:30] INFO> Filing metrics started
+[26Nov2018:21:49:30] INFO> Filing metrics done (0.010855913162231445s)
+[26Nov2018:21:50:28] INFO> ==== NEW SESSION ====
+[26Nov2018:21:50:28] INFO> ## Testing metrics ##
+[26Nov2018:21:50:28] INFO> Calculating metrics
+[26Nov2018:21:50:28] INFO> Metric calculation started
+[26Nov2018:21:50:28] INFO> Calculating quality
+[26Nov2018:21:50:28] INFO> Metric calculation done (0.0008287429809570312s)
+[26Nov2018:21:50:28] INFO> Calculating H-index
+[26Nov2018:21:50:28] INFO> Metric calculation done (0.0012879371643066406s)
+[26Nov2018:21:50:28] INFO> Calculating centralities
+[26Nov2018:21:50:28] INFO> Metric calculation done (0.011040925979614258s)
+[26Nov2018:21:50:28] INFO> Calculating knowledge
+[26Nov2018:21:50:28] INFO> Metric calculation done (0.01212167739868164s)
+[26Nov2018:21:50:28] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 1.778 (0.547)
+num_claims: 1.778 (0.278)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:50:28] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:50:28] INFO> Filing metrics started
+[26Nov2018:21:50:28] INFO> Filing metrics done (0.0005998611450195312s)
+[26Nov2018:21:50:28] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[26Nov2018:21:55:57] INFO> ==== NEW SESSION ====
+[26Nov2018:21:55:57] INFO> ## Testing metrics ##
+[26Nov2018:21:55:57] INFO> Calculating metrics
+[26Nov2018:21:55:57] INFO> Metric calculation started
+[26Nov2018:21:55:57] INFO> Calculating quality
+[26Nov2018:21:55:57] INFO> Metric calculation done (0.00046896934509277344s)
+[26Nov2018:21:55:57] INFO> Calculating H-index
+[26Nov2018:21:55:57] INFO> Metric calculation done (0.0007090568542480469s)
+[26Nov2018:21:55:57] INFO> Calculating centralities
+[26Nov2018:21:55:57] INFO> Metric calculation done (0.006072044372558594s)
+[26Nov2018:21:55:57] INFO> Calculating knowledge
+[26Nov2018:21:55:57] INFO> Metric calculation done (0.00687098503112793s)
+[26Nov2018:21:55:57] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.455)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:21:55:57] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:21:55:57] INFO> Filing metrics started
+[26Nov2018:21:55:57] INFO> Filing metrics done (0.0005331039428710938s)
+[26Nov2018:21:55:57] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[26Nov2018:21:59:40] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} done (222.57180094718933s)
+[26Nov2018:21:59:40] INFO> Parsing 25/13543 available docs to dataframe started
+[26Nov2018:21:59:40] INFO> Parsing 25/13543 available docs to dataframe done (0.004603862762451172s)
+[26Nov2018:21:59:40] INFO> Collected 1494/187400 available edges with query {'uspc_mainclass_id': '706'}
+[26Nov2018:21:59:40] INFO> Generating network from data (metadata=False, limit=None
+[26Nov2018:21:59:40] INFO> Generated network
+[26Nov2018:21:59:40] INFO> Calculating metrics
+[26Nov2018:21:59:40] INFO> Metric calculation started
+[26Nov2018:21:59:40] INFO> Calculating quality
+[26Nov2018:21:59:40] INFO> Metric calculation done (0.01689910888671875s)
+[26Nov2018:21:59:40] INFO> Calculating H-index
+[26Nov2018:21:59:40] INFO> Metric calculation done (0.026307106018066406s)
+[26Nov2018:21:59:40] INFO> Calculating centralities
+[26Nov2018:21:59:41] INFO> Metric calculation done (1.022264003753662s)
+[26Nov2018:21:59:41] INFO> Calculating knowledge
+[26Nov2018:21:59:41] INFO> Metric calculation done (1.1596131324768066s)
+[26Nov2018:21:59:41] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 1261
+Number of edges: 1494
+Average in degree:   1.1848
+Average out degree:   1.1848
+Connected components: 6
+forward_cites: 1.185 (0.041)
+backward_cites: 1.183 (0.303)
+family_size: 2.531 (0.052)
+num_claims: 1.997 (0.016)
+h_index: 0.956 (0.017)
+custom_centrality: 0.0 (0.0)
+knowledge: 0.0 (0.0)
+====
+[26Nov2018:21:59:41] INFO> Filing calculated metrics in sample.csv
+[26Nov2018:21:59:41] INFO> Filing metrics started
+[26Nov2018:21:59:41] INFO> Filing metrics done (0.010912895202636719s)
+[26Nov2018:22:00:54] INFO> ==== NEW SESSION ====
+[26Nov2018:22:00:54] INFO> ## Testing metrics ##
+[26Nov2018:22:00:54] INFO> Calculating metrics
+[26Nov2018:22:00:54] INFO> Metric calculation started
+[26Nov2018:22:00:54] INFO> Calculating quality
+[26Nov2018:22:00:54] INFO> Metric calculation done (0.0016608238220214844s)
+[26Nov2018:22:00:54] INFO> Calculating H-index
+[26Nov2018:22:00:54] INFO> Metric calculation done (0.002061605453491211s)
+[26Nov2018:22:00:54] INFO> Calculating centralities
+[26Nov2018:22:00:54] INFO> Metric calculation done (0.011586666107177734s)
+[26Nov2018:22:00:54] INFO> Calculating knowledge
+[26Nov2018:22:00:54] INFO> Metric calculation done (0.012044668197631836s)
+[26Nov2018:22:00:54] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.556 (0.444)
+num_claims: 1.667 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:22:00:54] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:22:00:54] INFO> Filing metrics started
+[26Nov2018:22:00:54] INFO> Filing metrics done (0.0011930465698242188s)
+[26Nov2018:22:00:54] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[26Nov2018:22:04:25] INFO> ==== NEW SESSION ====
+[26Nov2018:22:04:25] INFO> ## Testing metrics ##
+[26Nov2018:22:04:25] INFO> Calculating metrics
+[26Nov2018:22:04:25] INFO> Metric calculation started
+[26Nov2018:22:04:25] INFO> Calculating quality
+[26Nov2018:22:04:25] INFO> Metric calculation done (0.000438690185546875s)
+[26Nov2018:22:04:25] INFO> Calculating H-index
+[26Nov2018:22:04:25] INFO> Metric calculation done (0.00066375732421875s)
+[26Nov2018:22:04:25] INFO> Calculating centralities
+[26Nov2018:22:04:25] INFO> Metric calculation done (0.003841876983642578s)
+[26Nov2018:22:04:25] INFO> Calculating knowledge
+[26Nov2018:22:04:25] INFO> Metric calculation done (0.004303932189941406s)
+[26Nov2018:22:04:25] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.778 (0.878)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[26Nov2018:22:04:25] INFO> Filing calculated metrics in manual.csv
+[26Nov2018:22:04:25] INFO> Filing metrics started
+[26Nov2018:22:04:25] INFO> Filing metrics done (0.0004990100860595703s)
+[26Nov2018:22:04:25] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:08:45:58] INFO> ==== NEW SESSION ====
+[27Nov2018:08:45:58] INFO> ## Testing metrics ##
+[27Nov2018:08:45:58] INFO> Calculating metrics
+[27Nov2018:08:45:58] INFO> Metric calculation started
+[27Nov2018:08:45:58] INFO> Calculating quality
+[27Nov2018:08:45:58] INFO> Metric calculation done (0.001611948013305664s)
+[27Nov2018:08:45:58] INFO> Calculating H-index
+[27Nov2018:08:45:58] INFO> Metric calculation done (0.0024271011352539062s)
+[27Nov2018:08:45:58] INFO> Calculating centralities
+[27Nov2018:08:45:58] INFO> Metric calculation done (0.013716936111450195s)
+[27Nov2018:08:45:58] INFO> Calculating knowledge
+[27Nov2018:08:45:58] INFO> Metric calculation done (0.014589786529541016s)
+[27Nov2018:08:45:58] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.556 (0.766)
+num_claims: 2.111 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:08:45:58] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:08:45:58] INFO> Filing metrics started
+[27Nov2018:08:45:58] INFO> Filing metrics done (0.0015909671783447266s)
+[27Nov2018:08:45:58] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:20:03] INFO> ==== NEW SESSION ====
+[27Nov2018:11:20:03] INFO> ## Testing metrics ##
+[27Nov2018:11:20:03] INFO> Calculating metrics
+[27Nov2018:11:20:03] INFO> Metric calculation started
+[27Nov2018:11:20:03] INFO> Calculating quality
+[27Nov2018:11:20:03] INFO> Metric calculation done (0.0055959224700927734s)
+[27Nov2018:11:20:03] INFO> Calculating H-index
+[27Nov2018:11:20:03] INFO> Metric calculation done (0.008835077285766602s)
+[27Nov2018:11:20:03] INFO> Calculating centralities
+[27Nov2018:11:20:03] INFO> Metric calculation done (0.034361839294433594s)
+[27Nov2018:11:20:03] INFO> Calculating knowledge
+[27Nov2018:11:20:03] INFO> Metric calculation done (0.04139113426208496s)
+[27Nov2018:11:20:03] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.667 (0.707)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:20:03] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:20:03] INFO> Filing metrics started
+[27Nov2018:11:20:03] INFO> Filing metrics done (0.003973245620727539s)
+[27Nov2018:11:20:03] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:20:03] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:21:29] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} done (85.96862578392029s)
+[27Nov2018:11:22:00] INFO> ==== NEW SESSION ====
+[27Nov2018:11:22:00] INFO> ## Testing metrics ##
+[27Nov2018:11:22:00] INFO> Calculating metrics
+[27Nov2018:11:22:00] INFO> Metric calculation started
+[27Nov2018:11:22:00] INFO> Calculating quality
+[27Nov2018:11:22:00] INFO> Metric calculation done (0.001961946487426758s)
+[27Nov2018:11:22:00] INFO> Calculating H-index
+[27Nov2018:11:22:00] INFO> Metric calculation done (0.002515077590942383s)
+[27Nov2018:11:22:00] INFO> Calculating centralities
+[27Nov2018:11:22:00] INFO> Metric calculation done (0.014050006866455078s)
+[27Nov2018:11:22:00] INFO> Calculating knowledge
+[27Nov2018:11:22:00] INFO> Metric calculation done (0.015024900436401367s)
+[27Nov2018:11:22:00] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.222 (0.572)
+num_claims: 2.222 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:22:00] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:22:00] INFO> Filing metrics started
+[27Nov2018:11:22:00] INFO> Filing metrics done (0.0005850791931152344s)
+[27Nov2018:11:22:00] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:22:00] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:22:03] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} done (2.8070950508117676s)
+[27Nov2018:11:24:15] INFO> ==== NEW SESSION ====
+[27Nov2018:11:24:15] INFO> ## Testing metrics ##
+[27Nov2018:11:24:15] INFO> Calculating metrics
+[27Nov2018:11:24:15] INFO> Metric calculation started
+[27Nov2018:11:24:15] INFO> Calculating quality
+[27Nov2018:11:24:15] INFO> Metric calculation done (0.0008251667022705078s)
+[27Nov2018:11:24:15] INFO> Calculating H-index
+[27Nov2018:11:24:15] INFO> Metric calculation done (0.0012791156768798828s)
+[27Nov2018:11:24:15] INFO> Calculating centralities
+[27Nov2018:11:24:15] INFO> Metric calculation done (0.005662202835083008s)
+[27Nov2018:11:24:15] INFO> Calculating knowledge
+[27Nov2018:11:24:15] INFO> Metric calculation done (0.006591081619262695s)
+[27Nov2018:11:24:15] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 1.556 (0.412)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:24:15] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:24:15] INFO> Filing metrics started
+[27Nov2018:11:24:15] INFO> Filing metrics done (0.0005931854248046875s)
+[27Nov2018:11:24:15] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:24:15] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:25:53] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} done (97.76050114631653s)
+[27Nov2018:11:26:27] INFO> ==== NEW SESSION ====
+[27Nov2018:11:26:27] INFO> ## Testing metrics ##
+[27Nov2018:11:26:27] INFO> Calculating metrics
+[27Nov2018:11:26:27] INFO> Metric calculation started
+[27Nov2018:11:26:27] INFO> Calculating quality
+[27Nov2018:11:26:27] INFO> Metric calculation done (0.0007717609405517578s)
+[27Nov2018:11:26:27] INFO> Calculating H-index
+[27Nov2018:11:26:27] INFO> Metric calculation done (0.0012390613555908203s)
+[27Nov2018:11:26:27] INFO> Calculating centralities
+[27Nov2018:11:26:27] INFO> Metric calculation done (0.007228851318359375s)
+[27Nov2018:11:26:27] INFO> Calculating knowledge
+[27Nov2018:11:26:27] INFO> Metric calculation done (0.008394002914428711s)
+[27Nov2018:11:26:27] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.669)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:26:27] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:26:27] INFO> Filing metrics started
+[27Nov2018:11:26:27] INFO> Filing metrics done (0.0005660057067871094s)
+[27Nov2018:11:26:27] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:26:27] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:31:00] INFO> ==== NEW SESSION ====
+[27Nov2018:11:31:00] INFO> ## Testing metrics ##
+[27Nov2018:11:31:00] INFO> Calculating metrics
+[27Nov2018:11:31:00] INFO> Metric calculation started
+[27Nov2018:11:31:00] INFO> Calculating quality
+[27Nov2018:11:31:00] INFO> Metric calculation done (0.0008728504180908203s)
+[27Nov2018:11:31:00] INFO> Calculating H-index
+[27Nov2018:11:31:00] INFO> Metric calculation done (0.0013539791107177734s)
+[27Nov2018:11:31:00] INFO> Calculating centralities
+[27Nov2018:11:31:00] INFO> Metric calculation done (0.006314992904663086s)
+[27Nov2018:11:31:00] INFO> Calculating knowledge
+[27Nov2018:11:31:00] INFO> Metric calculation done (0.007269859313964844s)
+[27Nov2018:11:31:00] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.333 (0.764)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:31:00] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:31:00] INFO> Filing metrics started
+[27Nov2018:11:31:00] INFO> Filing metrics done (0.0006532669067382812s)
+[27Nov2018:11:31:00] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:31:00] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:32:48] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} done (108.15104389190674s)
+[27Nov2018:11:37:06] INFO> ==== NEW SESSION ====
+[27Nov2018:11:37:06] INFO> ## Testing metrics ##
+[27Nov2018:11:37:06] INFO> Calculating metrics
+[27Nov2018:11:37:06] INFO> Metric calculation started
+[27Nov2018:11:37:06] INFO> Calculating quality
+[27Nov2018:11:37:06] INFO> Metric calculation done (0.001850128173828125s)
+[27Nov2018:11:37:06] INFO> Calculating H-index
+[27Nov2018:11:37:06] INFO> Metric calculation done (0.002399921417236328s)
+[27Nov2018:11:37:06] INFO> Calculating centralities
+[27Nov2018:11:37:06] INFO> Metric calculation done (0.013664007186889648s)
+[27Nov2018:11:37:06] INFO> Calculating knowledge
+[27Nov2018:11:37:06] INFO> Metric calculation done (0.014549970626831055s)
+[27Nov2018:11:37:06] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.667 (0.577)
+num_claims: 2.222 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:37:06] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:37:06] INFO> Filing metrics started
+[27Nov2018:11:37:06] INFO> Filing metrics done (0.0006480216979980469s)
+[27Nov2018:11:37:06] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[27Nov2018:11:37:06] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:37:06] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:37:06] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:37:42] INFO> ==== NEW SESSION ====
+[27Nov2018:11:37:42] INFO> ## Testing metrics ##
+[27Nov2018:11:37:42] INFO> Calculating metrics
+[27Nov2018:11:37:42] INFO> Metric calculation started
+[27Nov2018:11:37:42] INFO> Calculating quality
+[27Nov2018:11:37:42] INFO> Metric calculation done (0.0010180473327636719s)
+[27Nov2018:11:37:42] INFO> Calculating H-index
+[27Nov2018:11:37:42] INFO> Metric calculation done (0.00152587890625s)
+[27Nov2018:11:37:42] INFO> Calculating centralities
+[27Nov2018:11:37:42] INFO> Metric calculation done (0.006855010986328125s)
+[27Nov2018:11:37:42] INFO> Calculating knowledge
+[27Nov2018:11:37:42] INFO> Metric calculation done (0.007735013961791992s)
+[27Nov2018:11:37:42] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.423)
+num_claims: 2.222 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:37:42] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:37:42] INFO> Filing metrics started
+[27Nov2018:11:37:42] INFO> Filing metrics done (0.000621795654296875s)
+[27Nov2018:11:37:42] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[27Nov2018:11:37:42] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:37:42] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:37:42] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:40:47] INFO> ==== NEW SESSION ====
+[27Nov2018:11:40:47] INFO> ## Testing metrics ##
+[27Nov2018:11:40:47] INFO> Calculating metrics
+[27Nov2018:11:40:47] INFO> Metric calculation started
+[27Nov2018:11:40:47] INFO> Calculating quality
+[27Nov2018:11:40:47] INFO> Metric calculation done (0.0004398822784423828s)
+[27Nov2018:11:40:47] INFO> Calculating H-index
+[27Nov2018:11:40:47] INFO> Metric calculation done (0.0006740093231201172s)
+[27Nov2018:11:40:47] INFO> Calculating centralities
+[27Nov2018:11:40:47] INFO> Metric calculation done (0.0042629241943359375s)
+[27Nov2018:11:40:47] INFO> Calculating knowledge
+[27Nov2018:11:40:47] INFO> Metric calculation done (0.004765033721923828s)
+[27Nov2018:11:40:47] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 1.444 (0.603)
+num_claims: 2.0 (0.236)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:40:47] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:40:47] INFO> Filing metrics started
+[27Nov2018:11:40:47] INFO> Filing metrics done (0.0005321502685546875s)
+[27Nov2018:11:40:47] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[27Nov2018:11:40:47] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:40:47] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:40:47] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:43:47] INFO> ==== NEW SESSION ====
+[27Nov2018:11:43:47] INFO> ## Testing metrics ##
+[27Nov2018:11:43:47] INFO> Calculating metrics
+[27Nov2018:11:43:47] INFO> Metric calculation started
+[27Nov2018:11:43:47] INFO> Calculating quality
+[27Nov2018:11:43:47] INFO> Metric calculation done (0.0016047954559326172s)
+[27Nov2018:11:43:47] INFO> Calculating H-index
+[27Nov2018:11:43:47] INFO> Metric calculation done (0.0019435882568359375s)
+[27Nov2018:11:43:47] INFO> Calculating centralities
+[27Nov2018:11:43:47] INFO> Metric calculation done (0.011319637298583984s)
+[27Nov2018:11:43:47] INFO> Calculating knowledge
+[27Nov2018:11:43:47] INFO> Metric calculation done (0.011746644973754883s)
+[27Nov2018:11:43:47] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.58)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:43:47] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:43:47] INFO> Filing metrics started
+[27Nov2018:11:43:47] INFO> Filing metrics done (0.0005543231964111328s)
+[27Nov2018:11:43:47] INFO> Munging data from query_data/uspc_mainclass_id:372.csv
+[27Nov2018:11:43:47] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:43:47] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:43:47] INFO> Sounding USPTO: {'uspc_mainclass_id': '372'} started
+[27Nov2018:11:45:12] INFO> ==== NEW SESSION ====
+[27Nov2018:11:45:12] INFO> ## Testing metrics ##
+[27Nov2018:11:45:12] INFO> Calculating metrics
+[27Nov2018:11:45:12] INFO> Metric calculation started
+[27Nov2018:11:45:12] INFO> Calculating quality
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.0014297962188720703s)
+[27Nov2018:11:45:12] INFO> Calculating H-index
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.0019948482513427734s)
+[27Nov2018:11:45:12] INFO> Calculating centralities
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.01620793342590332s)
+[27Nov2018:11:45:12] INFO> Calculating knowledge
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.0171051025390625s)
+[27Nov2018:11:45:12] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.0 (0.687)
+num_claims: 1.889 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:45:12] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:45:12] INFO> Filing metrics started
+[27Nov2018:11:45:12] INFO> Filing metrics done (0.00061798095703125s)
+[27Nov2018:11:45:12] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[27Nov2018:11:45:12] INFO> Loaded 2000 documents from file query_data/uspc_mainclass_id:706.csv
+[27Nov2018:11:45:12] INFO> Generating network from data (metadata=False, limit=None
+[27Nov2018:11:45:12] INFO> Generated network
+[27Nov2018:11:45:12] INFO> Calculating metrics
+[27Nov2018:11:45:12] INFO> Metric calculation started
+[27Nov2018:11:45:12] INFO> Calculating quality
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.02069091796875s)
+[27Nov2018:11:45:12] INFO> Calculating H-index
+[27Nov2018:11:45:12] INFO> Metric calculation done (0.03200197219848633s)
+[27Nov2018:11:45:12] INFO> Calculating centralities
+[27Nov2018:11:45:13] INFO> Metric calculation done (0.533862829208374s)
+[27Nov2018:11:45:13] INFO> Calculating knowledge
+[27Nov2018:11:45:13] INFO> Metric calculation done (0.5710039138793945s)
+[27Nov2018:11:45:13] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 896
+Number of edges: 1000
+Average in degree:   1.1161
+Average out degree:   1.1161
+Connected components: 24
+forward_cites: 0.307 (0.043)
+backward_cites: 0.985 (0.278)
+family_size: 2.595 (0.065)
+num_claims: 2.004 (0.019)
+h_index: 0.0 (0.0)
+custom_centrality: 0.407 (0.0)
+knowledge: 0.467 (0.014)
+====
+[27Nov2018:11:45:13] INFO> Filing calculated metrics in sample.csv
+[27Nov2018:11:45:13] INFO> Filing metrics started
+[27Nov2018:11:45:13] INFO> Filing metrics done (0.01865220069885254s)
+[27Nov2018:11:45:38] INFO> ==== NEW SESSION ====
+[27Nov2018:11:45:38] INFO> ## Testing metrics ##
+[27Nov2018:11:45:38] INFO> Calculating metrics
+[27Nov2018:11:45:38] INFO> Metric calculation started
+[27Nov2018:11:45:38] INFO> Calculating quality
+[27Nov2018:11:45:38] INFO> Metric calculation done (0.0006151199340820312s)
+[27Nov2018:11:45:38] INFO> Calculating H-index
+[27Nov2018:11:45:38] INFO> Metric calculation done (0.0009121894836425781s)
+[27Nov2018:11:45:38] INFO> Calculating centralities
+[27Nov2018:11:45:38] INFO> Metric calculation done (0.003948211669921875s)
+[27Nov2018:11:45:38] INFO> Calculating knowledge
+[27Nov2018:11:45:38] INFO> Metric calculation done (0.00436711311340332s)
+[27Nov2018:11:45:38] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.766)
+num_claims: 2.111 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:45:38] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:45:38] INFO> Filing metrics started
+[27Nov2018:11:45:38] INFO> Filing metrics done (0.0006017684936523438s)
+[27Nov2018:11:45:38] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[27Nov2018:11:45:38] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:45:38] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:11:45:38] INFO> Sounding USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:11:48:29] INFO> ==== NEW SESSION ====
+[27Nov2018:11:48:29] INFO> ## Testing metrics ##
+[27Nov2018:11:48:29] INFO> Calculating metrics
+[27Nov2018:11:48:29] INFO> Metric calculation started
+[27Nov2018:11:48:29] INFO> Calculating quality
+[27Nov2018:11:48:29] INFO> Metric calculation done (0.00045180320739746094s)
+[27Nov2018:11:48:29] INFO> Calculating H-index
+[27Nov2018:11:48:29] INFO> Metric calculation done (0.0006868839263916016s)
+[27Nov2018:11:48:29] INFO> Calculating centralities
+[27Nov2018:11:48:29] INFO> Metric calculation done (0.004065036773681641s)
+[27Nov2018:11:48:29] INFO> Calculating knowledge
+[27Nov2018:11:48:29] INFO> Metric calculation done (0.004500865936279297s)
+[27Nov2018:11:48:29] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.667 (0.553)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:48:29] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:48:29] INFO> Filing metrics started
+[27Nov2018:11:48:29] INFO> Filing metrics done (0.0005049705505371094s)
+[27Nov2018:11:48:29] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[27Nov2018:11:48:29] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:48:29] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:11:48:29] INFO> Sounding USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:11:55:30] INFO> Sounding USPTO: {'uspc_mainclass_id': '706'} done (420.88292598724365s)
+[27Nov2018:11:55:51] INFO> ==== NEW SESSION ====
+[27Nov2018:11:55:51] INFO> ## Testing metrics ##
+[27Nov2018:11:55:51] INFO> Calculating metrics
+[27Nov2018:11:55:51] INFO> Metric calculation started
+[27Nov2018:11:55:51] INFO> Calculating quality
+[27Nov2018:11:55:51] INFO> Metric calculation done (0.0004432201385498047s)
+[27Nov2018:11:55:51] INFO> Calculating H-index
+[27Nov2018:11:55:51] INFO> Metric calculation done (0.0006830692291259766s)
+[27Nov2018:11:55:51] INFO> Calculating centralities
+[27Nov2018:11:55:51] INFO> Metric calculation done (0.003948211669921875s)
+[27Nov2018:11:55:51] INFO> Calculating knowledge
+[27Nov2018:11:55:51] INFO> Metric calculation done (0.004364013671875s)
+[27Nov2018:11:55:51] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.778 (0.76)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:11:55:51] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:11:55:51] INFO> Filing metrics started
+[27Nov2018:11:55:51] INFO> Filing metrics done (0.0005290508270263672s)
+[27Nov2018:11:55:51] INFO> Munging data from query_data/uspc_mainclass_id:706.csv
+[27Nov2018:11:55:51] INFO> Missing query data file, querying USPTO
+[27Nov2018:11:55:51] INFO> Querying USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:11:55:51] INFO> Sounding USPTO: {'uspc_mainclass_id': '706'} started
+[27Nov2018:12:02:30] INFO> Sounding USPTO: {'uspc_mainclass_id': '706'} done (399.38912200927734s)
+[27Nov2018:12:02:30] DEBUG> 0/400
+[27Nov2018:12:04:03] INFO> ==== NEW SESSION ====
+[27Nov2018:12:04:03] INFO> ## Testing metrics ##
+[27Nov2018:12:04:03] INFO> Calculating metrics
+[27Nov2018:12:04:03] INFO> Metric calculation started
+[27Nov2018:12:04:03] INFO> Calculating quality
+[27Nov2018:12:04:03] INFO> Metric calculation done (0.0005011558532714844s)
+[27Nov2018:12:04:03] INFO> Calculating H-index
+[27Nov2018:12:04:03] INFO> Metric calculation done (0.0007290840148925781s)
+[27Nov2018:12:04:03] INFO> Calculating centralities
+[27Nov2018:12:04:03] INFO> Metric calculation done (0.003940105438232422s)
+[27Nov2018:12:04:03] INFO> Calculating knowledge
+[27Nov2018:12:04:03] INFO> Metric calculation done (0.004347324371337891s)
+[27Nov2018:12:04:03] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.0 (0.667)
+num_claims: 2.222 (0.222)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:12:04:03] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:12:04:03] INFO> Filing metrics started
+[27Nov2018:12:04:03] INFO> Filing metrics done (0.0009860992431640625s)
+[27Nov2018:12:04:03] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:12:04:03] INFO> Missing query data file, querying USPTO
+[27Nov2018:12:04:03] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:04:03] INFO> Sounding USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:05:00] INFO> ==== NEW SESSION ====
+[27Nov2018:12:05:00] INFO> ## Testing metrics ##
+[27Nov2018:12:05:00] INFO> Calculating metrics
+[27Nov2018:12:05:00] INFO> Metric calculation started
+[27Nov2018:12:05:00] INFO> Calculating quality
+[27Nov2018:12:05:00] INFO> Metric calculation done (0.0004761219024658203s)
+[27Nov2018:12:05:00] INFO> Calculating H-index
+[27Nov2018:12:05:00] INFO> Metric calculation done (0.0007479190826416016s)
+[27Nov2018:12:05:00] INFO> Calculating centralities
+[27Nov2018:12:05:00] INFO> Metric calculation done (0.004194021224975586s)
+[27Nov2018:12:05:00] INFO> Calculating knowledge
+[27Nov2018:12:05:00] INFO> Metric calculation done (0.004812955856323242s)
+[27Nov2018:12:05:00] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.222 (0.641)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:12:05:00] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:12:05:00] INFO> Filing metrics started
+[27Nov2018:12:05:00] INFO> Filing metrics done (0.0005009174346923828s)
+[27Nov2018:12:05:00] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:12:05:00] INFO> Missing query data file, querying USPTO
+[27Nov2018:12:05:00] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:05:00] INFO> Sounding USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:05:23] INFO> ==== NEW SESSION ====
+[27Nov2018:12:05:23] INFO> ## Testing metrics ##
+[27Nov2018:12:05:23] INFO> Calculating metrics
+[27Nov2018:12:05:23] INFO> Metric calculation started
+[27Nov2018:12:05:23] INFO> Calculating quality
+[27Nov2018:12:05:23] INFO> Metric calculation done (0.00045800209045410156s)
+[27Nov2018:12:05:23] INFO> Calculating H-index
+[27Nov2018:12:05:23] INFO> Metric calculation done (0.0006930828094482422s)
+[27Nov2018:12:05:23] INFO> Calculating centralities
+[27Nov2018:12:05:23] INFO> Metric calculation done (0.004244089126586914s)
+[27Nov2018:12:05:23] INFO> Calculating knowledge
+[27Nov2018:12:05:23] INFO> Metric calculation done (0.00468897819519043s)
+[27Nov2018:12:05:23] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 1.889 (0.676)
+num_claims: 2.0 (0.236)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:12:05:23] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:12:05:23] INFO> Filing metrics started
+[27Nov2018:12:05:23] INFO> Filing metrics done (0.0005002021789550781s)
+[27Nov2018:12:05:23] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:12:05:23] INFO> Missing query data file, querying USPTO
+[27Nov2018:12:05:23] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:05:23] INFO> Sounding USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:07:21] INFO> Sounding USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (117.66452312469482s)
+[27Nov2018:12:07:21] INFO> 10 total documents
+[27Nov2018:12:07:21] DEBUG> 0/1
+[27Nov2018:12:07:21] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (118.32554602622986s)
+[27Nov2018:12:07:21] INFO> Collected 0/716 edges with query {'cpc_subgroup_id': 'Y10S707/933'}
+[27Nov2018:12:07:21] INFO> Writing data to file query_data/cpc_subgroup_id:Y10S707/933.csv started
+[27Nov2018:12:14:38] INFO> ==== NEW SESSION ====
+[27Nov2018:12:14:38] INFO> ## Testing metrics ##
+[27Nov2018:12:14:38] INFO> Calculating metrics
+[27Nov2018:12:14:38] INFO> Metric calculation started
+[27Nov2018:12:14:38] INFO> Calculating quality
+[27Nov2018:12:14:38] INFO> Metric calculation done (0.0024309158325195312s)
+[27Nov2018:12:14:38] INFO> Calculating H-index
+[27Nov2018:12:14:38] INFO> Metric calculation done (0.0030138492584228516s)
+[27Nov2018:12:14:38] INFO> Calculating centralities
+[27Nov2018:12:14:38] INFO> Metric calculation done (0.016145944595336914s)
+[27Nov2018:12:14:38] INFO> Calculating knowledge
+[27Nov2018:12:14:38] INFO> Metric calculation done (0.01706385612487793s)
+[27Nov2018:12:14:38] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.556 (0.835)
+num_claims: 2.222 (0.222)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:12:14:38] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:12:14:38] INFO> Filing metrics started
+[27Nov2018:12:14:38] INFO> Filing metrics done (0.0012402534484863281s)
+[27Nov2018:12:14:38] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:12:14:38] INFO> Missing query data file, querying USPTO
+[27Nov2018:12:14:38] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:14:38] INFO> Sounding started
+[27Nov2018:12:17:36] INFO> ==== NEW SESSION ====
+[27Nov2018:12:17:36] INFO> ## Testing metrics ##
+[27Nov2018:12:17:36] INFO> Calculating metrics
+[27Nov2018:12:17:36] INFO> Metric calculation started
+[27Nov2018:12:17:36] INFO> Calculating quality
+[27Nov2018:12:17:36] INFO> Metric calculation done (0.0009200572967529297s)
+[27Nov2018:12:17:36] INFO> Calculating H-index
+[27Nov2018:12:17:36] INFO> Metric calculation done (0.0013928413391113281s)
+[27Nov2018:12:17:36] INFO> Calculating centralities
+[27Nov2018:12:17:36] INFO> Metric calculation done (0.006628751754760742s)
+[27Nov2018:12:17:36] INFO> Calculating knowledge
+[27Nov2018:12:17:36] INFO> Metric calculation done (0.0075109004974365234s)
+[27Nov2018:12:17:36] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.889 (0.455)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:12:17:36] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:12:17:36] INFO> Filing metrics started
+[27Nov2018:12:17:36] INFO> Filing metrics done (0.0006129741668701172s)
+[27Nov2018:12:17:36] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:12:17:36] INFO> Missing query data file, querying USPTO
+[27Nov2018:12:17:36] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:12:17:36] INFO> Sounding started
+[27Nov2018:12:21:14] INFO> Sounding done (217.83923196792603s)
+[27Nov2018:12:21:24] INFO> Collecting 10/10 docs in 1 pages
+[27Nov2018:12:21:24] DEBUG> 1/1
+[27Nov2018:13:10:13] INFO> ==== NEW SESSION ====
+[27Nov2018:13:10:13] INFO> ## Testing metrics ##
+[27Nov2018:13:10:13] INFO> Calculating metrics
+[27Nov2018:13:10:13] INFO> Metric calculation started
+[27Nov2018:13:10:13] INFO> Calculating quality
+[27Nov2018:13:10:13] INFO> Metric calculation done (0.0008780956268310547s)
+[27Nov2018:13:10:13] INFO> Calculating H-index
+[27Nov2018:13:10:13] INFO> Metric calculation done (0.0013358592987060547s)
+[27Nov2018:13:10:13] INFO> Calculating centralities
+[27Nov2018:13:10:13] INFO> Metric calculation done (0.006804943084716797s)
+[27Nov2018:13:10:13] INFO> Calculating knowledge
+[27Nov2018:13:10:13] INFO> Metric calculation done (0.007704973220825195s)
+[27Nov2018:13:10:13] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.484)
+num_claims: 1.889 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[27Nov2018:13:10:13] INFO> Filing calculated metrics in manual.csv
+[27Nov2018:13:10:13] INFO> Filing metrics started
+[27Nov2018:13:10:13] INFO> Filing metrics done (0.0014369487762451172s)
+[27Nov2018:13:10:13] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[27Nov2018:13:10:13] INFO> Missing query data file, querying USPTO
+[27Nov2018:13:10:13] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[27Nov2018:13:10:13] INFO> Sounding started
+[27Nov2018:13:16:25] INFO> Sounding done (371.0684220790863s)
+[27Nov2018:13:16:25] INFO> Collecting 10/10 docs in 1 pages
+[27Nov2018:13:16:25] DEBUG> Querying page 1/1
+[28Nov2018:20:02:07] INFO> ==== NEW SESSION ====
+[28Nov2018:20:02:07] INFO> ## Testing metrics ##
+[28Nov2018:20:02:07] INFO> Calculating metrics
+[28Nov2018:20:02:07] INFO> Metric calculation started
+[28Nov2018:20:02:07] INFO> Calculating quality
+[28Nov2018:20:02:07] INFO> Metric calculation done (0.0016980171203613281s)
+[28Nov2018:20:02:07] INFO> Calculating H-index
+[28Nov2018:20:02:07] INFO> Metric calculation done (0.002357959747314453s)
+[28Nov2018:20:02:07] INFO> Calculating centralities
+[28Nov2018:20:02:07] INFO> Metric calculation done (0.01895904541015625s)
+[28Nov2018:20:02:07] INFO> Calculating knowledge
+[28Nov2018:20:02:07] INFO> Metric calculation done (0.019737958908081055s)
+[28Nov2018:20:02:07] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.667 (0.553)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:02:07] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:02:07] INFO> Filing metrics started
+[28Nov2018:20:02:07] INFO> Filing metrics done (0.0014929771423339844s)
+[28Nov2018:20:02:07] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[28Nov2018:20:02:07] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:02:07] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[28Nov2018:20:02:07] INFO> Sounding started
+[28Nov2018:20:05:27] INFO> Sounding done (200.16488218307495s)
+[28Nov2018:20:05:27] INFO> Collecting 10/10 docs in 1 pages
+[28Nov2018:20:05:27] DEBUG> Querying page 1/1
+[28Nov2018:20:07:28] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (320.90058279037476s)
+[28Nov2018:20:07:28] INFO> Collected 0 edges
+[28Nov2018:20:07:28] INFO> Writing data to file query_data/cpc_subgroup_id:Y10S707/933.csv started
+[28Nov2018:20:13:52] INFO> ==== NEW SESSION ====
+[28Nov2018:20:13:52] INFO> ## Testing metrics ##
+[28Nov2018:20:13:52] INFO> Calculating metrics
+[28Nov2018:20:13:52] INFO> Metric calculation started
+[28Nov2018:20:13:52] INFO> Calculating quality
+[28Nov2018:20:13:52] INFO> Metric calculation done (0.001104116439819336s)
+[28Nov2018:20:13:52] INFO> Calculating H-index
+[28Nov2018:20:13:52] INFO> Metric calculation done (0.00162506103515625s)
+[28Nov2018:20:13:52] INFO> Calculating centralities
+[28Nov2018:20:13:52] INFO> Metric calculation done (0.008798837661743164s)
+[28Nov2018:20:13:52] INFO> Calculating knowledge
+[28Nov2018:20:13:52] INFO> Metric calculation done (0.009593963623046875s)
+[28Nov2018:20:13:52] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.667 (0.527)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:13:52] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:13:52] INFO> Filing metrics started
+[28Nov2018:20:13:52] INFO> Filing metrics done (0.00055694580078125s)
+[28Nov2018:20:13:52] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:13:52] INFO> Munging data from query_data/cpc_subgroup_id:Y10S707/933.csv
+[28Nov2018:20:13:52] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:13:52] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[28Nov2018:20:13:52] INFO> Sounding started
+[28Nov2018:20:15:44] INFO> ==== NEW SESSION ====
+[28Nov2018:20:15:44] INFO> ## Testing metrics ##
+[28Nov2018:20:15:44] INFO> Calculating metrics
+[28Nov2018:20:15:44] INFO> Metric calculation started
+[28Nov2018:20:15:44] INFO> Calculating quality
+[28Nov2018:20:15:44] INFO> Metric calculation done (0.0007882118225097656s)
+[28Nov2018:20:15:44] INFO> Calculating H-index
+[28Nov2018:20:15:44] INFO> Metric calculation done (0.0012631416320800781s)
+[28Nov2018:20:15:44] INFO> Calculating centralities
+[28Nov2018:20:15:44] INFO> Metric calculation done (0.007354021072387695s)
+[28Nov2018:20:15:44] INFO> Calculating knowledge
+[28Nov2018:20:15:44] INFO> Metric calculation done (0.008270025253295898s)
+[28Nov2018:20:15:44] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.444)
+num_claims: 1.778 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:15:44] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:15:44] INFO> Filing metrics started
+[28Nov2018:20:15:44] INFO> Filing metrics done (0.0006232261657714844s)
+[28Nov2018:20:16:00] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:16:45] INFO> ==== NEW SESSION ====
+[28Nov2018:20:16:45] INFO> ## Testing metrics ##
+[28Nov2018:20:16:45] INFO> Calculating metrics
+[28Nov2018:20:16:45] INFO> Metric calculation started
+[28Nov2018:20:16:45] INFO> Calculating quality
+[28Nov2018:20:16:45] INFO> Metric calculation done (0.0008571147918701172s)
+[28Nov2018:20:16:45] INFO> Calculating H-index
+[28Nov2018:20:16:45] INFO> Metric calculation done (0.001332998275756836s)
+[28Nov2018:20:16:45] INFO> Calculating centralities
+[28Nov2018:20:16:45] INFO> Metric calculation done (0.01125025749206543s)
+[28Nov2018:20:16:45] INFO> Calculating knowledge
+[28Nov2018:20:16:45] INFO> Metric calculation done (0.012221336364746094s)
+[28Nov2018:20:16:45] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.222 (0.741)
+num_claims: 2.0 (0.236)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:16:45] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:16:45] INFO> Filing metrics started
+[28Nov2018:20:16:45] INFO> Filing metrics done (0.0007040500640869141s)
+[28Nov2018:20:16:49] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:16:49] DEBUG> query_data/.csv
+[28Nov2018:20:18:09] INFO> ==== NEW SESSION ====
+[28Nov2018:20:18:09] INFO> ## Testing metrics ##
+[28Nov2018:20:18:09] INFO> Calculating metrics
+[28Nov2018:20:18:09] INFO> Metric calculation started
+[28Nov2018:20:18:09] INFO> Calculating quality
+[28Nov2018:20:18:09] INFO> Metric calculation done (0.0008847713470458984s)
+[28Nov2018:20:18:09] INFO> Calculating H-index
+[28Nov2018:20:18:09] INFO> Metric calculation done (0.0017898082733154297s)
+[28Nov2018:20:18:09] INFO> Calculating centralities
+[28Nov2018:20:18:09] INFO> Metric calculation done (0.010417699813842773s)
+[28Nov2018:20:18:09] INFO> Calculating knowledge
+[28Nov2018:20:18:09] INFO> Metric calculation done (0.01231694221496582s)
+[28Nov2018:20:18:09] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.778 (0.662)
+num_claims: 1.778 (0.222)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:18:09] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:18:09] INFO> Filing metrics started
+[28Nov2018:20:18:09] INFO> Filing metrics done (0.0005979537963867188s)
+[28Nov2018:20:18:09] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:18:09] DEBUG> /Users/Ryan/datamaster/git/datamaster/query_data.csv
+[28Nov2018:20:19:54] INFO> ==== NEW SESSION ====
+[28Nov2018:20:19:54] INFO> ## Testing metrics ##
+[28Nov2018:20:19:54] INFO> Calculating metrics
+[28Nov2018:20:19:54] INFO> Metric calculation started
+[28Nov2018:20:19:54] INFO> Calculating quality
+[28Nov2018:20:19:54] INFO> Metric calculation done (0.0008351802825927734s)
+[28Nov2018:20:19:54] INFO> Calculating H-index
+[28Nov2018:20:19:54] INFO> Metric calculation done (0.001329183578491211s)
+[28Nov2018:20:19:54] INFO> Calculating centralities
+[28Nov2018:20:19:54] INFO> Metric calculation done (0.008618354797363281s)
+[28Nov2018:20:19:54] INFO> Calculating knowledge
+[28Nov2018:20:19:54] INFO> Metric calculation done (0.009556293487548828s)
+[28Nov2018:20:19:54] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.333 (0.624)
+num_claims: 2.222 (0.222)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:19:54] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:19:54] INFO> Filing metrics started
+[28Nov2018:20:19:54] INFO> Filing metrics done (0.0007040500640869141s)
+[28Nov2018:20:19:54] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:19:54] DEBUG> /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707/933.csv
+[28Nov2018:20:20:57] INFO> ==== NEW SESSION ====
+[28Nov2018:20:20:57] INFO> ## Testing metrics ##
+[28Nov2018:20:20:57] INFO> Calculating metrics
+[28Nov2018:20:20:57] INFO> Metric calculation started
+[28Nov2018:20:20:57] INFO> Calculating quality
+[28Nov2018:20:20:57] INFO> Metric calculation done (0.0008909702301025391s)
+[28Nov2018:20:20:57] INFO> Calculating H-index
+[28Nov2018:20:20:57] INFO> Metric calculation done (0.0013849735260009766s)
+[28Nov2018:20:20:57] INFO> Calculating centralities
+[28Nov2018:20:20:57] INFO> Metric calculation done (0.007597208023071289s)
+[28Nov2018:20:20:57] INFO> Calculating knowledge
+[28Nov2018:20:20:57] INFO> Metric calculation done (0.008628129959106445s)
+[28Nov2018:20:20:57] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.0 (0.645)
+num_claims: 2.0 (0.0)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:20:57] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:20:57] INFO> Filing metrics started
+[28Nov2018:20:20:57] INFO> Filing metrics done (0.0005869865417480469s)
+[28Nov2018:20:20:57] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:20:57] DEBUG> /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:22:24] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:22:24] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:22:25] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:22:25] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[28Nov2018:20:22:25] INFO> Sounding started
+[28Nov2018:20:26:53] INFO> Sounding done (268.7532548904419s)
+[28Nov2018:20:26:53] INFO> Collecting 10/10 docs in 1 pages
+[28Nov2018:20:26:53] DEBUG> Querying page 1/1
+[28Nov2018:20:35:55] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (810.8991951942444s)
+[28Nov2018:20:35:55] INFO> Collected 0 edges
+[28Nov2018:20:35:55] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:35:55] INFO> Writing data to file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv started
+[28Nov2018:20:35:55] INFO> Writing data to file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv done (0.023588895797729492s)
+[28Nov2018:20:35:55] INFO> Generating network from data (metadata=False, limit=None
+[28Nov2018:20:35:56] INFO> Generated network
+[28Nov2018:20:35:56] INFO> Calculating metrics
+[28Nov2018:20:35:56] INFO> Metric calculation started
+[28Nov2018:20:35:56] INFO> Calculating quality
+[28Nov2018:20:35:56] INFO> Metric calculation done (0.002402782440185547s)
+[28Nov2018:20:35:56] INFO> Calculating H-index
+[28Nov2018:20:35:56] INFO> Metric calculation done (0.0043218135833740234s)
+[28Nov2018:20:35:56] INFO> Calculating centralities
+[28Nov2018:20:35:56] WARNING> Failed to calculate eigenvector centralities with error cannot compute centrality for the null graph
+[28Nov2018:20:37:49] INFO> ==== NEW SESSION ====
+[28Nov2018:20:37:49] INFO> ## Testing metrics ##
+[28Nov2018:20:37:49] INFO> Calculating metrics
+[28Nov2018:20:37:49] INFO> Metric calculation started
+[28Nov2018:20:37:49] INFO> Calculating quality
+[28Nov2018:20:37:49] INFO> Metric calculation done (0.0016858577728271484s)
+[28Nov2018:20:37:49] INFO> Calculating H-index
+[28Nov2018:20:37:49] INFO> Metric calculation done (0.002313852310180664s)
+[28Nov2018:20:37:49] INFO> Calculating centralities
+[28Nov2018:20:37:49] INFO> Metric calculation done (0.013054847717285156s)
+[28Nov2018:20:37:49] INFO> Calculating knowledge
+[28Nov2018:20:37:49] INFO> Metric calculation done (0.014053821563720703s)
+[28Nov2018:20:37:49] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.111 (0.588)
+num_claims: 1.889 (0.261)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:37:49] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:37:49] INFO> Filing metrics started
+[28Nov2018:20:37:49] INFO> Filing metrics done (0.0009601116180419922s)
+[28Nov2018:20:37:49] INFO> Processing step 1
+[28Nov2018:20:37:49] INFO> Processing step 2
+[28Nov2018:20:37:49] INFO> Processing step 3
+[28Nov2018:20:37:49] INFO> Processing step 4
+[28Nov2018:20:37:49] INFO> Processing step 5
+[28Nov2018:20:37:49] INFO> Processing step 6
+[28Nov2018:20:37:49] INFO> Processing step 7
+[28Nov2018:20:37:49] INFO> Processing step 8
+[28Nov2018:20:37:49] INFO> Processing step 9
+[28Nov2018:20:37:49] INFO> Processing step 10
+[28Nov2018:20:37:49] INFO> Processing step 11
+[28Nov2018:20:37:49] INFO> Processing step 12
+[28Nov2018:20:37:49] INFO> Processing step 13
+[28Nov2018:20:37:49] INFO> Processing step 14
+[28Nov2018:20:37:49] INFO> Processing step 15
+[28Nov2018:20:37:49] INFO> Processing step 16
+[28Nov2018:20:37:49] INFO> Processing step 17
+[28Nov2018:20:37:49] INFO> Processing step 18
+[28Nov2018:20:37:49] INFO> Processing step 19
+[28Nov2018:20:37:49] INFO> Processing step 20
+[28Nov2018:20:37:49] INFO> Processing step 21
+[28Nov2018:20:37:49] INFO> Processing step 22
+[28Nov2018:20:37:49] INFO> Processing step 23
+[28Nov2018:20:37:49] INFO> Processing step 24
+[28Nov2018:20:37:49] INFO> Processing step 25
+[28Nov2018:20:37:49] INFO> Processing step 26
+[28Nov2018:20:37:49] INFO> Processing step 27
+[28Nov2018:20:37:49] INFO> Processing step 28
+[28Nov2018:20:37:49] INFO> Processing step 29
+[28Nov2018:20:37:49] INFO> Processing step 30
+[28Nov2018:20:37:49] INFO> Processing step 31
+[28Nov2018:20:37:49] INFO> Processing step 32
+[28Nov2018:20:37:49] INFO> Processing step 33
+[28Nov2018:20:37:49] INFO> Processing step 34
+[28Nov2018:20:37:49] INFO> Processing step 35
+[28Nov2018:20:37:49] INFO> Processing step 36
+[28Nov2018:20:37:49] INFO> Processing step 37
+[28Nov2018:20:37:49] INFO> Processing step 38
+[28Nov2018:20:37:49] INFO> Processing step 39
+[28Nov2018:20:37:49] INFO> Processing step 40
+[28Nov2018:20:37:49] INFO> Processing step 41
+[28Nov2018:20:37:49] INFO> Processing step 42
+[28Nov2018:20:37:49] INFO> Processing step 43
+[28Nov2018:20:37:49] INFO> Processing step 44
+[28Nov2018:20:37:49] INFO> Processing step 45
+[28Nov2018:20:37:49] INFO> Processing step 46
+[28Nov2018:20:37:49] INFO> Processing step 47
+[28Nov2018:20:37:49] INFO> Processing step 48
+[28Nov2018:20:37:49] INFO> Processing step 49
+[28Nov2018:20:37:49] INFO> Processing step 50
+[28Nov2018:20:37:49] INFO> Processing step 51
+[28Nov2018:20:37:49] INFO> Processing step 52
+[28Nov2018:20:37:49] INFO> Processing step 53
+[28Nov2018:20:37:49] INFO> Processing step 54
+[28Nov2018:20:37:49] INFO> Processing step 55
+[28Nov2018:20:37:49] INFO> Processing step 56
+[28Nov2018:20:37:49] INFO> Processing step 57
+[28Nov2018:20:37:49] INFO> Processing step 58
+[28Nov2018:20:37:49] INFO> Processing step 59
+[28Nov2018:20:37:49] INFO> Processing step 60
+[28Nov2018:20:37:49] INFO> Processing step 61
+[28Nov2018:20:37:49] INFO> Processing step 62
+[28Nov2018:20:37:49] INFO> Processing step 63
+[28Nov2018:20:37:49] INFO> Processing step 64
+[28Nov2018:20:37:49] INFO> Processing step 65
+[28Nov2018:20:37:49] INFO> Processing step 66
+[28Nov2018:20:37:49] INFO> Processing step 67
+[28Nov2018:20:37:49] INFO> Processing step 68
+[28Nov2018:20:37:49] INFO> Processing step 69
+[28Nov2018:20:37:49] INFO> Processing step 70
+[28Nov2018:20:37:49] INFO> Processing step 71
+[28Nov2018:20:37:49] INFO> Processing step 72
+[28Nov2018:20:37:49] INFO> Processing step 73
+[28Nov2018:20:37:49] INFO> Processing step 74
+[28Nov2018:20:37:49] INFO> Processing step 75
+[28Nov2018:20:37:49] INFO> Processing step 76
+[28Nov2018:20:37:49] INFO> Processing step 77
+[28Nov2018:20:37:49] INFO> Processing step 78
+[28Nov2018:20:37:49] INFO> Processing step 79
+[28Nov2018:20:37:49] INFO> Processing step 80
+[28Nov2018:20:37:49] INFO> Processing step 81
+[28Nov2018:20:37:49] INFO> Processing step 82
+[28Nov2018:20:37:49] INFO> Processing step 83
+[28Nov2018:20:37:49] INFO> Processing step 84
+[28Nov2018:20:37:49] INFO> Processing step 85
+[28Nov2018:20:37:49] INFO> Processing step 86
+[28Nov2018:20:37:49] INFO> Processing step 87
+[28Nov2018:20:37:49] INFO> Processing step 88
+[28Nov2018:20:37:49] INFO> Processing step 89
+[28Nov2018:20:37:49] INFO> Processing step 90
+[28Nov2018:20:37:49] INFO> Processing step 91
+[28Nov2018:20:37:49] INFO> Processing step 92
+[28Nov2018:20:37:49] INFO> Processing step 93
+[28Nov2018:20:37:49] INFO> Processing step 94
+[28Nov2018:20:37:49] INFO> Processing step 95
+[28Nov2018:20:37:49] INFO> Processing step 96
+[28Nov2018:20:37:49] INFO> Processing step 97
+[28Nov2018:20:37:49] INFO> Processing step 98
+[28Nov2018:20:37:49] INFO> Processing step 99
+[28Nov2018:20:37:49] INFO> Processing step 100
+[28Nov2018:20:38:22] INFO> ==== NEW SESSION ====
+[28Nov2018:20:38:22] INFO> ## Testing metrics ##
+[28Nov2018:20:38:22] INFO> Calculating metrics
+[28Nov2018:20:38:22] INFO> Metric calculation started
+[28Nov2018:20:38:22] INFO> Calculating quality
+[28Nov2018:20:38:22] INFO> Metric calculation done (0.0004489421844482422s)
+[28Nov2018:20:38:22] INFO> Calculating H-index
+[28Nov2018:20:38:22] INFO> Metric calculation done (0.0006871223449707031s)
+[28Nov2018:20:38:22] INFO> Calculating centralities
+[28Nov2018:20:38:22] INFO> Metric calculation done (0.005652904510498047s)
+[28Nov2018:20:38:22] INFO> Calculating knowledge
+[28Nov2018:20:38:22] INFO> Metric calculation done (0.007279157638549805s)
+[28Nov2018:20:38:22] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.444 (0.603)
+num_claims: 2.111 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:38:22] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:38:22] INFO> Filing metrics started
+[28Nov2018:20:38:22] INFO> Filing metrics done (0.0006318092346191406s)
+[28Nov2018:20:38:22] INFO> Processing step 1
+[28Nov2018:20:38:23] INFO> Processing step 2
+[28Nov2018:20:38:24] INFO> Processing step 3
+[28Nov2018:20:38:25] INFO> Processing step 4
+[28Nov2018:20:38:26] INFO> Processing step 5
+[28Nov2018:20:38:27] INFO> Processing step 6
+[28Nov2018:20:38:28] INFO> Processing step 7
+[28Nov2018:20:38:29] INFO> Processing step 8
+[28Nov2018:20:38:30] INFO> Processing step 9
+[28Nov2018:20:38:31] INFO> Processing step 10
+[28Nov2018:20:38:32] INFO> Processing step 11
+[28Nov2018:20:38:33] INFO> Processing step 12
+[28Nov2018:20:38:34] INFO> Processing step 13
+[28Nov2018:20:38:35] INFO> Processing step 14
+[28Nov2018:20:38:36] INFO> Processing step 15
+[28Nov2018:20:38:37] INFO> Processing step 16
+[28Nov2018:20:38:38] INFO> Processing step 17
+[28Nov2018:20:38:39] INFO> Processing step 18
+[28Nov2018:20:38:40] INFO> Processing step 19
+[28Nov2018:20:38:41] INFO> Processing step 20
+[28Nov2018:20:38:42] INFO> Processing step 21
+[28Nov2018:20:42:03] INFO> ==== NEW SESSION ====
+[28Nov2018:20:42:03] INFO> ## Testing metrics ##
+[28Nov2018:20:42:03] INFO> Calculating metrics
+[28Nov2018:20:42:03] INFO> Metric calculation started
+[28Nov2018:20:42:03] INFO> Calculating quality
+[28Nov2018:20:42:03] INFO> Metric calculation done (0.002476930618286133s)
+[28Nov2018:20:42:03] INFO> Calculating H-index
+[28Nov2018:20:42:03] INFO> Metric calculation done (0.003186941146850586s)
+[28Nov2018:20:42:03] INFO> Calculating centralities
+[28Nov2018:20:42:03] INFO> Metric calculation done (0.042656898498535156s)
+[28Nov2018:20:42:03] INFO> Calculating knowledge
+[28Nov2018:20:42:03] INFO> Metric calculation done (0.043260812759399414s)
+[28Nov2018:20:42:03] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.556 (0.503)
+num_claims: 1.667 (0.236)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:42:03] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:42:03] INFO> Filing metrics started
+[28Nov2018:20:42:03] INFO> Filing metrics done (0.0008840560913085938s)
+[28Nov2018:20:42:03] INFO> Processing step 1
+[28Nov2018:20:42:04] INFO> Processing step 2
+[28Nov2018:20:42:05] INFO> Processing step 3
+[28Nov2018:20:42:06] INFO> Processing step 4
+[28Nov2018:20:42:07] INFO> Processing step 5
+[28Nov2018:20:42:08] INFO> Processing step 6
+[28Nov2018:20:42:09] INFO> Processing step 7
+[28Nov2018:20:42:10] INFO> Processing step 8
+[28Nov2018:20:46:23] INFO> ==== NEW SESSION ====
+[28Nov2018:20:46:23] INFO> ## Testing metrics ##
+[28Nov2018:20:46:23] INFO> Calculating metrics
+[28Nov2018:20:46:23] INFO> Metric calculation started
+[28Nov2018:20:46:23] INFO> Calculating quality
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.0014510154724121094s)
+[28Nov2018:20:46:23] INFO> Calculating H-index
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.002103090286254883s)
+[28Nov2018:20:46:23] INFO> Calculating centralities
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.012115955352783203s)
+[28Nov2018:20:46:23] INFO> Calculating knowledge
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.013041973114013672s)
+[28Nov2018:20:46:23] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.222 (0.83)
+num_claims: 1.889 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:46:23] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:46:23] INFO> Filing metrics started
+[28Nov2018:20:46:23] INFO> Filing metrics done (0.0008039474487304688s)
+[28Nov2018:20:46:23] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:46:23] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:46:23] INFO> Loaded 0 documents from file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:46:23] INFO> Generating network from data (metadata=False, limit=None
+[28Nov2018:20:46:23] INFO> Generated network
+[28Nov2018:20:46:23] INFO> Calculating metrics
+[28Nov2018:20:46:23] INFO> Metric calculation started
+[28Nov2018:20:46:23] INFO> Calculating quality
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.00018286705017089844s)
+[28Nov2018:20:46:23] INFO> Calculating H-index
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.00033092498779296875s)
+[28Nov2018:20:46:23] INFO> Calculating centralities
+[28Nov2018:20:46:23] WARNING> Failed to calculate eigenvector centralities with error cannot compute centrality for the null graph
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.0008246898651123047s)
+[28Nov2018:20:46:23] INFO> Calculating knowledge
+[28Nov2018:20:46:23] INFO> Metric calculation done (0.001271963119506836s)
+[28Nov2018:20:46:23] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 0
+Number of edges: 0
+
+Connected components: 0
+forward_cites: nan (nan)
+backward_cites: nan (nan)
+family_size: nan (nan)
+num_claims: nan (nan)
+h_index: nan (nan)
+custom_centrality: nan (nan)
+knowledge: nan (nan)
+====
+[28Nov2018:20:46:23] INFO> Filing calculated metrics in sample.csv
+[28Nov2018:20:46:23] INFO> Filing metrics started
+[28Nov2018:20:46:23] INFO> Filing metrics done (0.0004048347473144531s)
+[28Nov2018:20:47:21] INFO> ==== NEW SESSION ====
+[28Nov2018:20:47:21] INFO> ## Testing metrics ##
+[28Nov2018:20:47:21] INFO> Calculating metrics
+[28Nov2018:20:47:21] INFO> Metric calculation started
+[28Nov2018:20:47:21] INFO> Calculating quality
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.00043392181396484375s)
+[28Nov2018:20:47:21] INFO> Calculating H-index
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.0009090900421142578s)
+[28Nov2018:20:47:21] INFO> Calculating centralities
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.004356861114501953s)
+[28Nov2018:20:47:21] INFO> Calculating knowledge
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.004787921905517578s)
+[28Nov2018:20:47:21] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.484)
+num_claims: 2.111 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:47:21] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:47:21] INFO> Filing metrics started
+[28Nov2018:20:47:21] INFO> Filing metrics done (0.0006029605865478516s)
+[28Nov2018:20:47:21] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:47:21] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:47:21] INFO> Loaded 0 documents from file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:47:21] INFO> Generating network from data (metadata=False, limit=None
+[28Nov2018:20:47:21] INFO> Generated network
+[28Nov2018:20:47:21] INFO> Calculating metrics
+[28Nov2018:20:47:21] INFO> Metric calculation started
+[28Nov2018:20:47:21] INFO> Calculating quality
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.00020003318786621094s)
+[28Nov2018:20:47:21] INFO> Calculating H-index
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.00035500526428222656s)
+[28Nov2018:20:47:21] INFO> Calculating centralities
+[28Nov2018:20:47:21] WARNING> Failed to calculate eigenvector centralities with error cannot compute centrality for the null graph
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.0007491111755371094s)
+[28Nov2018:20:47:21] INFO> Calculating knowledge
+[28Nov2018:20:47:21] INFO> Metric calculation done (0.0009160041809082031s)
+[28Nov2018:20:47:21] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 0
+Number of edges: 0
+
+Connected components: 0
+forward_cites: nan (nan)
+backward_cites: nan (nan)
+family_size: nan (nan)
+num_claims: nan (nan)
+h_index: nan (nan)
+custom_centrality: nan (nan)
+knowledge: nan (nan)
+====
+[28Nov2018:20:47:21] INFO> Filing calculated metrics in sample.csv
+[28Nov2018:20:47:21] INFO> Filing metrics started
+[28Nov2018:20:47:21] INFO> Filing metrics done (0.0003981590270996094s)
+[28Nov2018:20:47:30] INFO> ==== NEW SESSION ====
+[28Nov2018:20:47:30] INFO> ## Testing metrics ##
+[28Nov2018:20:47:30] INFO> Calculating metrics
+[28Nov2018:20:47:30] INFO> Metric calculation started
+[28Nov2018:20:47:30] INFO> Calculating quality
+[28Nov2018:20:47:30] INFO> Metric calculation done (0.0014429092407226562s)
+[28Nov2018:20:47:30] INFO> Calculating H-index
+[28Nov2018:20:47:30] INFO> Metric calculation done (0.002568960189819336s)
+[28Nov2018:20:47:30] INFO> Calculating centralities
+[28Nov2018:20:47:30] INFO> Metric calculation done (0.011595010757446289s)
+[28Nov2018:20:47:30] INFO> Calculating knowledge
+[28Nov2018:20:47:30] INFO> Metric calculation done (0.01305699348449707s)
+[28Nov2018:20:47:30] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.0 (0.471)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:47:30] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:47:30] INFO> Filing metrics started
+[28Nov2018:20:47:30] INFO> Filing metrics done (0.0012638568878173828s)
+[28Nov2018:20:47:37] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:47:37] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:47:37] INFO> Loaded 0 documents from file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:48:04] INFO> ==== NEW SESSION ====
+[28Nov2018:20:48:04] INFO> ## Testing metrics ##
+[28Nov2018:20:48:04] INFO> Calculating metrics
+[28Nov2018:20:48:04] INFO> Metric calculation started
+[28Nov2018:20:48:04] INFO> Calculating quality
+[28Nov2018:20:48:04] INFO> Metric calculation done (0.00046706199645996094s)
+[28Nov2018:20:48:04] INFO> Calculating H-index
+[28Nov2018:20:48:04] INFO> Metric calculation done (0.0007069110870361328s)
+[28Nov2018:20:48:04] INFO> Calculating centralities
+[28Nov2018:20:48:04] INFO> Metric calculation done (0.004932880401611328s)
+[28Nov2018:20:48:04] INFO> Calculating knowledge
+[28Nov2018:20:48:04] INFO> Metric calculation done (0.0053861141204833984s)
+[28Nov2018:20:48:04] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.222 (0.494)
+num_claims: 1.889 (0.111)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:48:04] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:48:04] INFO> Filing metrics started
+[28Nov2018:20:48:04] INFO> Filing metrics done (0.0005249977111816406s)
+[28Nov2018:20:48:04] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:48:04] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:48:04] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:48:04] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[28Nov2018:20:48:04] INFO> Sounding started
+[28Nov2018:20:49:25] INFO> Sounding done (81.32242035865784s)
+[28Nov2018:20:49:25] INFO> Collecting 10/10 docs in 1 pages
+[28Nov2018:20:49:25] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (81.44745588302612s)
+[28Nov2018:20:49:25] INFO> Collected 0 edges
+[28Nov2018:20:49:25] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:49:25] INFO> Writing data to file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv started
+[28Nov2018:20:49:25] INFO> Writing data to file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv done (0.0024271011352539062s)
+[28Nov2018:20:49:25] INFO> Generating network from data (metadata=False, limit=None
+[28Nov2018:20:49:25] INFO> Generated network
+[28Nov2018:20:49:25] INFO> Calculating metrics
+[28Nov2018:20:49:25] INFO> Metric calculation started
+[28Nov2018:20:49:25] INFO> Calculating quality
+[28Nov2018:20:49:25] INFO> Metric calculation done (0.0003502368927001953s)
+[28Nov2018:20:49:25] INFO> Calculating H-index
+[28Nov2018:20:49:25] INFO> Metric calculation done (0.0005691051483154297s)
+[28Nov2018:20:49:25] INFO> Calculating centralities
+[28Nov2018:20:49:25] WARNING> Failed to calculate eigenvector centralities with error cannot compute centrality for the null graph
+[28Nov2018:20:49:25] INFO> Metric calculation done (0.0010542869567871094s)
+[28Nov2018:20:49:25] INFO> Calculating knowledge
+[28Nov2018:20:49:25] INFO> Metric calculation done (0.0013060569763183594s)
+[28Nov2018:20:49:25] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 0
+Number of edges: 0
+
+Connected components: 0
+forward_cites: nan (nan)
+backward_cites: nan (nan)
+family_size: nan (nan)
+num_claims: nan (nan)
+h_index: nan (nan)
+custom_centrality: nan (nan)
+knowledge: nan (nan)
+====
+[28Nov2018:20:49:25] INFO> Filing calculated metrics in sample.csv
+[28Nov2018:20:49:25] INFO> Filing metrics started
+[28Nov2018:20:49:25] INFO> Filing metrics done (0.0007948875427246094s)
+[28Nov2018:20:50:09] INFO> ==== NEW SESSION ====
+[28Nov2018:20:50:09] INFO> ## Testing metrics ##
+[28Nov2018:20:50:09] INFO> Calculating metrics
+[28Nov2018:20:50:09] INFO> Metric calculation started
+[28Nov2018:20:50:09] INFO> Calculating quality
+[28Nov2018:20:50:09] INFO> Metric calculation done (0.000988006591796875s)
+[28Nov2018:20:50:09] INFO> Calculating H-index
+[28Nov2018:20:50:09] INFO> Metric calculation done (0.0015149116516113281s)
+[28Nov2018:20:50:09] INFO> Calculating centralities
+[28Nov2018:20:50:09] INFO> Metric calculation done (0.010455131530761719s)
+[28Nov2018:20:50:09] INFO> Calculating knowledge
+[28Nov2018:20:50:09] INFO> Metric calculation done (0.011909008026123047s)
+[28Nov2018:20:50:09] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.0 (0.553)
+num_claims: 2.222 (0.147)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:50:09] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:50:09] INFO> Filing metrics started
+[28Nov2018:20:50:09] INFO> Filing metrics done (0.0007302761077880859s)
+[28Nov2018:20:50:09] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:50:09] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv
+[28Nov2018:20:50:09] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:50:09] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} started
+[28Nov2018:20:50:09] INFO> Sounding started
+[28Nov2018:20:51:14] INFO> Sounding done (65.32535099983215s)
+[28Nov2018:20:51:14] INFO> Collecting 10/10 docs in 1 pages
+[28Nov2018:20:52:45] INFO> Querying USPTO: {'cpc_subgroup_id': 'Y10S707/933'} done (156.56722211837769s)
+[28Nov2018:20:52:45] INFO> Collected 0 edges
+[28Nov2018:20:52:59] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:53:00] INFO> Writing data to file /Users/Ryan/datamaster/git/datamaster/query_data/cpc_subgroup_id:Y10S707933.csv started
+[28Nov2018:20:54:35] INFO> ==== NEW SESSION ====
+[28Nov2018:20:54:35] INFO> ## Testing metrics ##
+[28Nov2018:20:54:35] INFO> Calculating metrics
+[28Nov2018:20:54:35] INFO> Metric calculation started
+[28Nov2018:20:54:35] INFO> Calculating quality
+[28Nov2018:20:54:35] INFO> Metric calculation done (0.0007278919219970703s)
+[28Nov2018:20:54:35] INFO> Calculating H-index
+[28Nov2018:20:54:35] INFO> Metric calculation done (0.0011489391326904297s)
+[28Nov2018:20:54:35] INFO> Calculating centralities
+[28Nov2018:20:54:35] INFO> Metric calculation done (0.0047910213470458984s)
+[28Nov2018:20:54:35] INFO> Calculating knowledge
+[28Nov2018:20:54:35] INFO> Metric calculation done (0.005219936370849609s)
+[28Nov2018:20:54:35] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.611)
+num_claims: 2.0 (0.167)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:54:35] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:54:35] INFO> Filing metrics started
+[28Nov2018:20:54:35] INFO> Filing metrics done (0.0004942417144775391s)
+[28Nov2018:20:54:35] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:54:35] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/uspc_mainclass_id:372.csv
+[28Nov2018:20:54:35] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:54:35] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[28Nov2018:20:54:35] INFO> Sounding started
+[28Nov2018:20:56:43] INFO> ==== NEW SESSION ====
+[28Nov2018:20:56:43] INFO> ## Testing metrics ##
+[28Nov2018:20:56:43] INFO> Calculating metrics
+[28Nov2018:20:56:43] INFO> Metric calculation started
+[28Nov2018:20:56:43] INFO> Calculating quality
+[28Nov2018:20:56:43] INFO> Metric calculation done (0.0004918575286865234s)
+[28Nov2018:20:56:43] INFO> Calculating H-index
+[28Nov2018:20:56:43] INFO> Metric calculation done (0.0007641315460205078s)
+[28Nov2018:20:56:43] INFO> Calculating centralities
+[28Nov2018:20:56:43] INFO> Metric calculation done (0.007061004638671875s)
+[28Nov2018:20:56:43] INFO> Calculating knowledge
+[28Nov2018:20:56:43] INFO> Metric calculation done (0.008149862289428711s)
+[28Nov2018:20:56:43] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 2.889 (0.676)
+num_claims: 2.0 (0.236)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:20:56:43] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:20:56:43] INFO> Filing metrics started
+[28Nov2018:20:56:43] INFO> Filing metrics done (0.0007431507110595703s)
+[28Nov2018:20:56:43] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:20:56:43] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/uspc_mainclass_id:372.csv
+[28Nov2018:20:56:43] INFO> Missing query data file, querying USPTO
+[28Nov2018:20:56:43] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[28Nov2018:20:56:43] INFO> Sounding started
+[28Nov2018:20:59:03] INFO> Sounding done (139.83731889724731s)
+[28Nov2018:20:59:03] INFO> Collecting 1000/21834 docs in 10 pages
+[28Nov2018:21:09:02] INFO> ==== NEW SESSION ====
+[28Nov2018:21:09:02] INFO> ## Testing metrics ##
+[28Nov2018:21:09:02] INFO> Calculating metrics
+[28Nov2018:21:09:02] INFO> Metric calculation started
+[28Nov2018:21:09:02] INFO> Calculating quality
+[28Nov2018:21:09:02] INFO> Metric calculation done (0.0055158138275146484s)
+[28Nov2018:21:09:02] INFO> Calculating H-index
+[28Nov2018:21:09:02] INFO> Metric calculation done (0.00602412223815918s)
+[28Nov2018:21:09:02] INFO> Calculating centralities
+[28Nov2018:21:09:02] INFO> Metric calculation done (0.09473896026611328s)
+[28Nov2018:21:09:02] INFO> Calculating knowledge
+[28Nov2018:21:09:02] INFO> Metric calculation done (0.09815096855163574s)
+[28Nov2018:21:09:02] INFO> 
+== CN Summary ==
+Name: 
+Type: DiGraph
+Number of nodes: 9
+Number of edges: 8
+Average in degree:   0.8889
+Average out degree:   0.8889
+Connected components: 1
+forward_cites: 0.889 (0.2)
+backward_cites: 0.889 (0.423)
+family_size: 3.556 (0.377)
+num_claims: 1.889 (0.2)
+h_index: 0.444 (0.176)
+custom_centrality: 0.205 (0.0)
+knowledge: 0.334 (0.051)
+====
+[28Nov2018:21:09:02] INFO> Filing calculated metrics in manual.csv
+[28Nov2018:21:09:02] INFO> Filing metrics started
+[28Nov2018:21:09:02] INFO> Filing metrics done (0.0022649765014648438s)
+[28Nov2018:21:09:02] DEBUG> /Users/Ryan/datamaster/git/datamaster
+[28Nov2018:21:09:02] INFO> Munging data from /Users/Ryan/datamaster/git/datamaster/query_data/uspc_mainclass_id:372.csv
+[28Nov2018:21:09:02] INFO> Missing query data file, querying USPTO
+[28Nov2018:21:09:02] INFO> Querying USPTO: {'uspc_mainclass_id': '372'} started
+[28Nov2018:21:09:02] INFO> Sounding started

@@ -91,29 +91,28 @@ class CitationNetwork:
         ]
         try:
             centralities.append(nx.eigenvector_centrality_numpy(self.G))
+            # Local vals
+            for centrality in centralities:
+                c['+'].append(centrality[max(centrality, key=centrality.get)])
+                c['-'].append(centrality[min(centrality, key=centrality.get)])
+                c['var'].append(np.var([val for key, val in centrality.items()]))
+
+            # Centrality metric
+            var_t = sum(c['var'])
+            s_optimums = []
+            for node in self.G:
+                for key in ['-', '+']:
+                    s_optimums.append(np.sqrt(
+                        np.sum(
+                            [
+                                c['var'][i] * (centralities[i][node] - c[key][i] / var_t) ** 2
+                                for i in range(len(centralities))
+                            ]
+                        )
+                    ))
+                custom_centralities[node] = s_optimums[0] / (s_optimums[0] + s_optimums[1])
         except Exception as e:
             logger.warn("Failed to calculate eigenvector centralities with error {}".format(e))
-
-        # Local vals
-        for centrality in centralities:
-            c['+'].append(centrality[max(centrality, key=centrality.get)])
-            c['-'].append(centrality[min(centrality, key=centrality.get)])
-            c['var'].append(np.var([val for key, val in centrality.items()]))
-
-        # Centrality metric
-        var_t = sum(c['var'])
-        s_optimums = []
-        for node in self.G:
-            for key in ['-', '+']:
-                s_optimums.append(np.sqrt(
-                    np.sum(
-                        [
-                            c['var'][i] * (centralities[i][node] - c[key][i] / var_t) ** 2
-                            for i in range(len(centralities))
-                        ]
-                    )
-                ))
-            custom_centralities[node] = s_optimums[0] / (s_optimums[0] + s_optimums[1])
 
         nx.set_node_attributes(self.G, custom_centralities, 'custom_centrality')
 

@@ -3,7 +3,10 @@ import numpy as np
 import networkx as nx
 import requests
 import os
+import math
 import json
+import enlighten
+import time
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -11,42 +14,93 @@ from app.lib.helpers import Timer
 
 class Munger:
 
+    query_fields = ["patent_number", "cited_patent_number", "citedby_patent_number"]
+
     def __init__(self, limit=Config.DOC_LIMIT):
         self.limit = limit
         self.df = None
 
-    def load_data_from_query(self, query):
-        try:
-            self.load_data_from_file(self.make_query_filename(query))
-        except (FileNotFoundError, DataFormatError):
-            t = Timer("Munging data from query {}".format(query))
-            r = requests.post(
-                'http://www.patentsview.org/api/patents/query',
-                json={
-                    "q": query,
-                    "f": ["patent_number", "cited_patent_number", "citedby_patent_number"]
-                }
-            )
-            info = r.json()
-            t.log()
+    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=100):
+        if cache:
+            try:
+                self.load_data_from_file(self.make_query_filename(query))
+                return self
+            except (FileNotFoundError, DataFormatError) as e:
+                if isinstance(e, FileNotFoundError):
+                    logger.info("Missing query data file, querying USPTO")
+                if isinstance(e, DataFormatError):
+                    logger.info("Problem loading data file, querying USPTO")
 
-            t.reset(name="Parsing {} docs to dataframe".format(len(info['patents'])))
-            data = set()
-            for patent in info['patents']:
-                for bcite in patent.get('cited_patents'):
-                    edge = (patent['patent_number'], bcite['cited_patent_number'])
-                    if None not in edge: data.add(edge)
-                for fcite in patent.get('citedby_patents'):
-                    edge = (fcite['citedby_patent_number'], patent['patent_number'])
-                    if None not in edge: data.add(edge)
-            df = pd.DataFrame(list(data), columns=self.get_citation_keys())
-            self.df = df
-            t.log()
+        t = Timer("Querying USPTO: {}".format(query))
+        count_patents = self.query_sounding(query)
+        count_to_collect = self.limit if self.limit is not None and self.limit < count_patents else count_patents
+        pages = math.ceil(count_to_collect / per_page)
+        logger.info("Collecting {}/{} docs in {} page{}".format(
+            count_to_collect,
+            count_patents,
+            pages,
+            "s" if pages > 0 else ""
+        ))
 
+        self.df = pd.DataFrame(columns=self.get_citation_keys())
+
+        manager = enlighten.get_manager()
+        ticker = manager.counter(total=pages, desc='Ticks', unit='ticks')
+        for i in range(pages):
+            self.df.append(self.query_paginated(query, per_page))
+            ticker.update()
+        t.log()
+
+        logger.info("Collected {} edges".format(self.df.shape[0]))
+
+        self.ensure_data()
+
+        if Config.USE_CACHED_QUERIES:
             self.write_data_to_file(self.make_query_filename(query))
-            logger.info("Collected {} edges with query {}".format(df.shape[0], query))
-            self.ensure_data()
+
         return self
+
+    def query_paginated(self, query, per_page):
+        r = requests.post(
+            'http://www.patentsview.org/api/patents/query',
+            json={
+                "q": query,
+                "f": self.query_fields,
+                "o": {
+                    "per_page": str(per_page)
+                }
+            }
+        )
+        info = r.json()
+
+        data = set()
+        for patent in info['patents']:
+            for bcite in patent.get('cited_patents'):
+                edge = (patent['patent_number'], bcite['cited_patent_number'])
+                if None not in edge: data.add(edge)
+            for fcite in patent.get('citedby_patents'):
+                edge = (fcite['citedby_patent_number'], patent['patent_number'])
+                if None not in edge: data.add(edge)
+        df = pd.DataFrame(list(data), columns=self.get_citation_keys())
+
+        return df
+
+    def query_sounding(self, query):
+        t = Timer("Sounding")
+        r = requests.post(
+            'http://www.patentsview.org/api/patents/query',
+            json={
+                "q": query,
+                "f": [self.query_fields[0]],
+                "o": {
+                    "per_page": "1",
+                    "include_subentity_total_counts": "true"
+                }
+            }
+        )
+        info = r.json()
+        t.log()
+        return info['total_patent_count'] #, info['total_citedby_patent_count'], info['total_cited_patent_count']
 
     def write_data_to_file(self, filename):
         t = Timer("Writing data to file {}".format(filename))
@@ -57,14 +111,15 @@ class Munger:
     @staticmethod
     def make_query_filename(query):
         file_string = json.dumps(query)
-        for c in '"{} ':
+        logger.debug(os.getcwd())
+        for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return "{}.csv".format(os.path.join("query_data", file_string))
+        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
 
     def load_data_from_file(self, datafile):
         logger.info("Munging data from {}".format(datafile))
         self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit) if self.limit is not None else pd.read_csv(datafile, delimiter='\t')
-        logger.info("Loaded {} documents from dataframe {}".format(self.df.size, datafile))
+        logger.info("Loaded {} documents from file {}".format(self.df.size, datafile))
         self.ensure_data()
         return self
 

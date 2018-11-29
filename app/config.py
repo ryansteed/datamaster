@@ -11,6 +11,8 @@ class Config:
 
     DOC_LIMIT = 1000
 
+    USE_CACHED_QUERIES = True
+
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):
