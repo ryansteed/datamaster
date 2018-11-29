@@ -47,6 +47,8 @@ class Munger:
         manager = enlighten.get_manager()
         ticker = manager.counter(total=pages, desc='Ticks', unit='ticks')
         for i in range(pages):
+            if Config.ENV_NAME != "local":
+                logger.info("{}/{}".format(i, pages))
             self.df.append(self.query_paginated(query, per_page))
             ticker.update()
         t.log()
