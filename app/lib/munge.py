@@ -20,7 +20,7 @@ class Munger:
         self.limit = limit
         self.df = None
 
-    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=100):
+    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=10):
         if cache:
             try:
                 self.load_data_from_file(self.make_query_filename(query))
@@ -42,14 +42,16 @@ class Munger:
             "s" if pages > 0 else ""
         ))
 
-        self.df = pd.DataFrame(columns=self.get_citation_keys())
-
         manager = enlighten.get_manager()
         ticker = manager.counter(total=pages, desc='Ticks', unit='ticks')
         for i in range(pages):
             if Config.ENV_NAME != "local":
                 logger.info("{}/{}".format(i, pages))
-            self.df.append(self.query_paginated(query, per_page))
+            page_df = self.query_paginated(query, per_page)
+            if self.df is None:
+                self.df = page_df
+            else:
+                self.df = self.df.append(page_df, ignore_index=True)
             ticker.update()
         t.log()
 
