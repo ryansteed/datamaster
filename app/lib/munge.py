@@ -20,7 +20,7 @@ class Munger:
         self.limit = limit
         self.df = None
 
-    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=10):
+    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=100):
         if cache:
             try:
                 self.load_data_from_file(self.make_query_filename(query))
