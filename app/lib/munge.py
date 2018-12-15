@@ -129,7 +129,7 @@ class Munger:
         return self
 
     def get_network(self, metadata=False, limit=None):
-        logger.info("Generating network from data (metadata={}, limit={}".format(metadata, limit))
+        logger.info("Generating network from data (metadata={}, limit={})".format(metadata, limit))
         df_edges = self.get_edges()
         if limit is not None:
             df_edges = df_edges.head(limit)
@@ -149,7 +149,7 @@ class Munger:
                 except KeyError:
                     logger.error("Couldn't find network entry for {}".format(entry['patent_number']))
 
-        logger.info("Generated network")
+        logger.info("Generated network with {} nodes and {} edges".format(len(G.nodes), len(G.edges)))
         return G
 
     def get_edges(self):

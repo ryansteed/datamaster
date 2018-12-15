@@ -176,7 +176,6 @@ def h_index(m):
 
 def test(G, name="test"):
     cn = CitationNetwork(G)
-    # cn.print_custom_metrics()
     cn.eval_all()
     cn.summary()
     cn.file_custom_metrics(name)
