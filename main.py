@@ -4,9 +4,10 @@ import app.lib.metrics
 from app.config import logger
 
 
-## endpoints
+# endpoints
 def metrics_test():
     app.lib.metrics.main()
+
 
 def query_test():
     app.lib.munge.test_query()

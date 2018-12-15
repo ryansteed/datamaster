@@ -47,7 +47,7 @@ class Munger:
         for i in range(pages):
             if Config.ENV_NAME != "local":
                 logger.info("{}/{}".format(i, pages))
-            page_df = self.query_paginated(query, per_page)
+            page_df = self.query_paginated(query, i+1, per_page)
             if self.df is None:
                 self.df = page_df
             else:
@@ -64,13 +64,14 @@ class Munger:
 
         return self
 
-    def query_paginated(self, query, per_page):
+    def query_paginated(self, query, page, per_page):
         r = requests.post(
             'http://www.patentsview.org/api/patents/query',
             json={
                 "q": query,
                 "f": self.query_fields,
                 "o": {
+                    "page": page,
                     "per_page": str(per_page)
                 }
             }
@@ -135,9 +136,10 @@ class Munger:
 
         # for key in self.get_citation_keys():
         #     df_edges[key] = df_edges[key].str.strip()
-
         G = nx.from_pandas_edgelist(df_edges, source='patent_id', target='citation_id', create_using=nx.DiGraph())
 
+        logger.debug(np.unique(df_edges['patent_id']).size)
+        logger.debug(np.unique(df_edges['citation_id']).size)
         if metadata:
             self.ensure_meta()
             for entry in self.df_meta.to_dict(orient='records'):

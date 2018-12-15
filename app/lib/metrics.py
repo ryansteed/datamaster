@@ -12,7 +12,7 @@ class CitationNetwork:
     attributes = ['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality',
                   'knowledge']
 
-    def __init__(self, G, weighting_method="custom_centrality"):
+    def __init__(self, G, weighting_method="forward_cites"):
         self.G = G
         self.weighting_method = weighting_method
 
@@ -158,7 +158,6 @@ class CitationNetwork:
         return total_k
 
     def p(self, root, node):
-        test = self.G.in_degree(node)
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
 
@@ -189,6 +188,6 @@ def main():
     G.add_nodes_from(['a', 'b', 'c', 'd', 'e', 'f', 'i', 'g', 'h'])
     G.add_edges_from([('a', 'f'), ('f', 'i'), ('f', 'h'), ('b', 'g'), ('c', 'g'), ('d', 'g'), ('e', 'h'), ('g', 'h')])
     # nx.draw_networkx(G, pos=nx.spring_layout(G))
-    test(G, "manual")
+    # test(G, "manual")
     G = munge.test(limit=Config.DOC_LIMIT).get_network()
     test(G, "sample")
