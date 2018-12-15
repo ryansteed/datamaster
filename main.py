@@ -22,7 +22,7 @@ def query_test():
     munger = Munger(limit=Config.DOC_LIMIT)
     munger.load_data_from_query(query)
     G = munger.get_network()
-    cn = CitationNetwork(G)
+    cn = CitationNetwork(G, custom_centrality=False)
     cn.eval_all()
     cn.summary()
     cn.file_custom_metrics(munger.make_query_filename(sys.argv[2].strip("json")))

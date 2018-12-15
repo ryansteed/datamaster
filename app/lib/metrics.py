@@ -9,18 +9,32 @@ from app.lib.helpers import Timer
 
 
 class CitationNetwork:
-    attributes = ['forward_cites', 'backward_cites', 'family_size', 'num_claims', 'h_index', 'custom_centrality',
-                  'knowledge']
 
-    def __init__(self, G, weighting_method="forward_cites"):
+    def __init__(
+            self, G, weighting_method="forward_cites",
+            quality=True, h_index=True, custom_centrality=True, knowledge=True
+            ):
         self.G = G
         self.weighting_method = weighting_method
+        self.quality = quality
+        self.h_index = h_index
+        self.custom_centrality = custom_centrality
+        self.knowledge = knowledge
+        self.attributes = []
+        if quality:
+            self.attributes += ['forward_cites', 'backward_cites', 'family_size', 'num_claims']
+        if h_index:
+            self.attributes.append("h_index")
+        if custom_centrality:
+            self.attributes.append("custom_centrality")
+        if knowledge:
+            self.attributes.append("knowledge")
 
-    def summary(self, attributes=tuple(attributes)):
+    def summary(self):
         custom = ""
         custom += "Connected components: {}\n".format(nx.number_connected_components(self.G.to_undirected()))
         # average metrics
-        for key, values in {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in attributes}.items():
+        for key, values in {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in self.attributes}.items():
             custom += "{}: {} ({})\n".format(key, round(np.average(values), 3), round(sem(values), 3))
         logger.info("\n== CN Summary ==\n{}\n{}====".format(nx.info(self.G), custom))
 
@@ -46,21 +60,22 @@ class CitationNetwork:
         logger.info("Calculating metrics")
         t = Timer("Metric calculation")
 
-        logger.info("Calculating quality")
-        self.eval_quality()
-        t.log()
-
-        logger.info("Calculating H-index")
-        self.eval_h()
-        t.log()
-
-        logger.info("Calculating centralities")
-        self.eval_centrality()
-        t.log()
-
-        logger.info("Calculating knowledge")
-        self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
-        t.log()
+        if self.quality:
+            logger.info("Calculating quality")
+            self.eval_quality()
+            t.log()
+        if self.h_index:
+            logger.info("Calculating H-index")
+            self.eval_h()
+            t.log()
+        if self.custom_centrality:
+            logger.info("Calculating centralities")
+            self.eval_centrality()
+            t.log()
+        if self.knowledge:
+            logger.info("Calculating knowledge")
+            self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
+            t.log()
 
     def eval_h(self):
         h_indices = {}
