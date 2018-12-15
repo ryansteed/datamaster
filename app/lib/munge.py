@@ -19,6 +19,7 @@ class Munger:
     def __init__(self, limit=Config.DOC_LIMIT):
         self.limit = limit
         self.df = None
+        self.df_meta = None
 
     def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=100):
         if cache:
