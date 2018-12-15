@@ -21,7 +21,7 @@ def query_test():
         query = json.load(f)
     munger = Munger(limit=Config.DOC_LIMIT)
     munger.load_data_from_query(query)
-    G = munger.get_network(metadata=True)
+    G = munger.get_network()
     cn = CitationNetwork(G)
     cn.eval_all()
     cn.summary()
