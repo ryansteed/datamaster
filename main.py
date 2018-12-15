@@ -25,7 +25,7 @@ def query_test():
     cn = CitationNetwork(G)
     cn.eval_all()
     cn.summary()
-    cn.file_custom_metrics(munger.make_query_filename(query))
+    cn.file_custom_metrics(munger.make_query_filename(sys.argv[2].strip("json")))
 
     # Possible queries:
     # test from https://ropensci.github.io/patentsview/articles/citation-networks.html

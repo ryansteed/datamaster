@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
-python main.py metrics
+python main.py query json/artificial_intelligence.json
