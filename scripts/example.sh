@@ -9,4 +9,5 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
+source activate datamaster
 python main.py query json/example.json

@@ -9,4 +9,6 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
+source activate datamaster
+conda info --envs
 python main.py query json/coherent_light.json
