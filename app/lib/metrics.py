@@ -3,6 +3,7 @@ import numpy as np
 from scipy.stats import sem
 import app.lib.munge as munge
 import csv
+import matplotlib.pyplot as plt
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -37,6 +38,10 @@ class CitationNetwork:
         for key, values in {attribute: list(nx.get_node_attributes(self.G, attribute).values()) for attribute in self.attributes}.items():
             custom += "{}: {} ({})\n".format(key, round(np.average(values), 3), round(sem(values), 3))
         logger.info("\n== CN Summary ==\n{}\n{}====".format(nx.info(self.G), custom))
+
+    def draw(self):
+        nx.draw_networkx(self.G, pos=nx.kamada_kawai_layout(self.G))
+        plt.show()
 
     def print_custom_metrics(self):
         logger.info("== Calculated Metrics ==")

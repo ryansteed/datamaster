@@ -6,7 +6,6 @@ import os
 import math
 import json
 import enlighten
-import time
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -16,97 +15,22 @@ class Munger:
 
     query_fields = ["patent_number", "cited_patent_number", "citedby_patent_number"]
 
-    def __init__(self, limit=Config.DOC_LIMIT):
+    def __init__(self, limit):
         self.limit = limit
         self.df = None
         self.df_meta = None
+        self.load_data()
 
-    def load_data_from_query(self, query, cache=Config.USE_CACHED_QUERIES, per_page=100):
-        if cache:
-            try:
-                self.load_data_from_file(self.make_query_filename(query))
-                return self
-            except (FileNotFoundError, DataFormatError) as e:
-                if isinstance(e, FileNotFoundError):
-                    logger.info("Missing query data file, querying USPTO")
-                if isinstance(e, DataFormatError):
-                    logger.info("Problem loading data file, querying USPTO")
+    def load_data(self):
+        raise NotImplementedError
 
-        t = Timer("Querying USPTO: {}".format(query))
-        count_patents = self.query_sounding(query)
-        count_to_collect = self.limit if self.limit is not None and self.limit < count_patents else count_patents
-        pages = math.ceil(count_to_collect / per_page)
-        logger.info("Collecting {}/{} docs in {} page{}".format(
-            count_to_collect,
-            count_patents,
-            pages,
-            "s" if pages > 0 else ""
-        ))
-
-        manager = enlighten.get_manager()
-        ticker = manager.counter(total=pages, desc='Ticks', unit='ticks')
-        for i in range(pages):
-            if Config.ENV_NAME != "local":
-                logger.info("{}/{}".format(i, pages))
-            page_df = self.query_paginated(query, i+1, per_page)
-            if self.df is None:
-                self.df = page_df
-            else:
-                self.df = self.df.append(page_df, ignore_index=True)
-            ticker.update()
-        t.log()
-
-        logger.info("Collected {} edges".format(self.df.shape[0]))
-
-        self.ensure_data()
-
-        if Config.USE_CACHED_QUERIES:
-            self.write_data_to_file(self.make_query_filename(query))
-
-        return self
-
-    def query_paginated(self, query, page, per_page):
+    @staticmethod
+    def query(json_query):
         r = requests.post(
             'http://www.patentsview.org/api/patents/query',
-            json={
-                "q": query,
-                "f": self.query_fields,
-                "o": {
-                    "page": page,
-                    "per_page": str(per_page)
-                }
-            }
+            json=json_query
         )
-        info = r.json()
-
-        data = set()
-        for patent in info['patents']:
-            for bcite in patent.get('cited_patents'):
-                edge = (patent['patent_number'], bcite['cited_patent_number'])
-                if None not in edge: data.add(edge)
-            for fcite in patent.get('citedby_patents'):
-                edge = (fcite['citedby_patent_number'], patent['patent_number'])
-                if None not in edge: data.add(edge)
-        df = pd.DataFrame(list(data), columns=self.get_citation_keys())
-
-        return df
-
-    def query_sounding(self, query):
-        t = Timer("Sounding")
-        r = requests.post(
-            'http://www.patentsview.org/api/patents/query',
-            json={
-                "q": query,
-                "f": [self.query_fields[0]],
-                "o": {
-                    "per_page": "1",
-                    "include_subentity_total_counts": "true"
-                }
-            }
-        )
-        info = r.json()
-        t.log()
-        return info['total_patent_count'] #, info['total_citedby_patent_count'], info['total_cited_patent_count']
+        return r.json()
 
     def write_data_to_file(self, filename):
         t = Timer("Writing data to file {}".format(filename))
@@ -114,17 +38,22 @@ class Munger:
             self.df.to_csv(file, index=False, sep='\t')
         t.log()
 
-    @staticmethod
-    def make_query_filename(query):
-        file_string = json.dumps(query)
-        logger.debug(os.getcwd())
-        for c in '"{} /':
-            file_string = file_string.replace(c, '')
-        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
+    def query_to_dataframe(self, info, bcites=True):
+        data = set()
+        for patent in info['patents']:
+            if bcites:
+                for bcite in patent.get('cited_patents'):
+                    edge = (patent['patent_number'], bcite['cited_patent_number'])
+                    if None not in edge: data.add(edge)
+            for fcite in patent.get('citedby_patents'):
+                edge = (fcite['citedby_patent_number'], patent['patent_number'])
+                if None not in edge: data.add(edge)
+        return pd.DataFrame(list(data), columns=self.get_citation_keys())
 
     def load_data_from_file(self, datafile):
         logger.info("Munging data from {}".format(datafile))
-        self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit) if self.limit is not None else pd.read_csv(datafile, delimiter='\t')
+        self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit) if self.limit is not None \
+            else pd.read_csv(datafile, delimiter='\t')
         logger.info("Loaded {} documents from file {}".format(self.df.size, datafile))
         self.ensure_data()
         return self
@@ -167,14 +96,10 @@ class Munger:
         nodes = np.unique(pd.concat([self.df[key] for key in self.get_citation_keys()]))
 
         for i, chunk in enumerate(chunks(nodes, 25)):
-            r = requests.post(
-                'http://www.patentsview.org/api/patents/query',
-                json={
-                    "q": {"patent_number": [str(num) for num in chunk]},
-                    "f": ["patent_number", "patent_title", "assignee_id", "cpc_category", "nber_category_title"]
-                }
-            )
-            info = r.json()
+            info = self.query({
+                "q": {"patent_number": [str(num) for num in chunk]},
+                "f": ["patent_number", "patent_title", "assignee_id", "cpc_category", "nber_category_title"]
+            })
             if i == 0:
                 self.df_meta = pd.DataFrame(info['patents'])
                 continue
@@ -198,14 +123,143 @@ class Munger:
             raise DataFormatError("Missing patent and citation columns in dataset")
 
 
+class QueryMunger(Munger):
+    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=100):
+        self.query_json = query_json
+        self.cache = cache
+        self.per_page = per_page
+        super().__init__(limit)
+
+    def load_data(self):
+        if self.cache:
+            try:
+                self.load_data_from_file(self.make_query_filename(self.query))
+                return self
+            except (FileNotFoundError, DataFormatError) as e:
+                if isinstance(e, FileNotFoundError):
+                    logger.info("Missing query data file, querying USPTO")
+                if isinstance(e, DataFormatError):
+                    logger.info("Problem loading data file, querying USPTO")
+
+        t = Timer("Querying USPTO: {}".format(self.query_json))
+        count_patents = self.query_sounding(self.query_json)
+        count_to_collect = self.limit if self.limit is not None and self.limit < count_patents else count_patents
+        pages = math.ceil(count_to_collect / self.per_page)
+        logger.info("Collecting {}/{} docs in {} page{}".format(
+            count_to_collect,
+            count_patents,
+            pages,
+            "s" if pages > 0 else ""
+        ))
+
+        manager = enlighten.get_manager()
+        ticker = manager.counter(total=pages, desc='Ticks', unit='ticks')
+        for i in range(pages):
+            if Config.ENV_NAME != "local":
+                logger.info("{}/{}".format(i, pages))
+            page_df = self.query_paginated(self.query, i+1, self.per_page)
+            if self.df is None:
+                self.df = page_df
+            else:
+                self.df = self.df.append(page_df, ignore_index=True)
+            ticker.update()
+        t.log()
+
+        logger.info("Collected {} edges".format(self.df.shape[0]))
+
+        self.ensure_data()
+
+        if Config.USE_CACHED_QUERIES:
+            self.write_data_to_file(self.make_query_filename(self.query))
+
+        return self
+
+    def query_paginated(self, query, page, per_page):
+
+        info = query({
+            "q": query,
+            "f": self.query_fields,
+            "o": {
+                "page": page,
+                "per_page": str(per_page)
+            }
+        })
+
+        return self.query_to_dataframe(info)
+
+    def query_sounding(self, query_json):
+        t = Timer("Sounding")
+        info = self.query({
+            "q": query_json,
+            "f": [self.query_fields[0]],
+            "o": {
+                "per_page": "1",
+                "include_subentity_total_counts": "true"
+            }
+        })
+        t.log()
+        return info['total_patent_count'] #, info['total_citedby_patent_count'], info['total_cited_patent_count']
+
+    @staticmethod
+    def make_query_filename(query_json):
+        file_string = json.dumps(query_json)
+        logger.debug(os.getcwd())
+        for c in '"{} /':
+            file_string = file_string.replace(c, '')
+        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
+
+
+class RootMunger(Munger):
+
+    def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT):
+        self.patent_number = patent_number
+        self.depth = depth
+        self.completed_branches = 0
+        super().__init__(limit)
+
+    def load_data(self):
+        logger.debug(self.patent_number)
+        self.get_children(self.patent_number, 0)
+        return self
+
+    def get_children(self, curr_num, curr_depth):
+        # logger.debug("At depth {}/{}".format(curr_depth, self.depth))
+        if curr_depth > self.depth:
+            self.completed_branches += 1
+            # logger.debug("Finished branch {}".format(self.completed_branches))
+            return
+        info = self.query({
+            "q": {"patent_number": curr_num},
+            "f": self.query_fields
+        })
+        if curr_depth == 0:
+            logger.debug("Exploring {} branches".format(len(info['patents'][0]['citedby_patents'])))
+        if info.get('patents') is not None:
+            df = self.query_to_dataframe(info, bcites=False)
+            if self.df is None:
+                self.df = df
+            else:
+                self.df = self.df.append(df, ignore_index=True)
+            # iterate through all children, recursively
+            for patent in info['patents']:
+                for fcite in patent.get('citedby_patents'):
+                    self.get_children(fcite['citedby_patent_number'], curr_depth+1)
+
+
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
 
+class DataFormatError(Exception):
+    pass
+
+
+# TESTS
+
 def test(limit=Config.DOC_LIMIT):
-    munger = Munger(limit=limit)
+    munger = QueryMunger(limit=limit)
 
     # from uspto file
     # munger.load_data_from_file(Config.DATA_PATH+'/uspatentcitation.tsv')
@@ -214,21 +268,16 @@ def test(limit=Config.DOC_LIMIT):
     # munger.load_data_from_query({"cpc_subgroup_id": "Y10S707/933"})
 
     # test from https://link.springer.com/article/10.1007/s11192-017-2252-y
-    munger.load_data_from_query({"uspc_mainclass_id": "372"})
+    munger.load_data({"uspc_mainclass_id": "372"})
 
     # artificial intelligence
     # munger.load_data_from_query({"uspc_mainclass_id": "706"})
 
     return munger
 
-
-class DataFormatError(Exception):
-    pass
-
-
 def test_query():
-    munger = Munger()
-    print(munger.load_data_from_query({"cpc_subgroup_id": "Y10S707/933"}))
+    munger = QueryMunger()
+    print(munger.load_data({"cpc_subgroup_id": "Y10S707/933"}))
 
 
 def main():
