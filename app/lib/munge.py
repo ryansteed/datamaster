@@ -145,7 +145,7 @@ class Munger:
 
     @staticmethod
     def get_filename_from_stem(file_string):
-        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
+        return "{}.csv".format(os.path.abspath(os.path.join("./data/query", file_string)))
 
 
 class QueryMunger(Munger):

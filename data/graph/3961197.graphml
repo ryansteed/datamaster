@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="date" attr.type="string" for="edge" id="d0" />
+  <graph edgedefault="directed">
+    <node id="6972421" />
+    <node id="3961197" />
+    <node id="6452199" />
+    <node id="7247870" />
+    <node id="7346093" />
+    <node id="7309871" />
+    <node id="8461560" />
+    <node id="8075732" />
+    <node id="7482609" />
+    <node id="5892810" />
+    <node id="7589337" />
+    <edge source="6972421" target="3961197">
+      <data key="d0">2005-12-06</data>
+    </edge>
+    <edge source="6452199" target="3961197">
+      <data key="d0">2002-09-17</data>
+    </edge>
+    <edge source="7247870" target="3961197">
+      <data key="d0">2007-07-24</data>
+    </edge>
+    <edge source="7346093" target="3961197">
+      <data key="d0">2008-03-18</data>
+    </edge>
+    <edge source="7309871" target="3961197">
+      <data key="d0">2007-12-18</data>
+    </edge>
+    <edge source="8461560" target="3961197">
+      <data key="d0">2013-06-11</data>
+    </edge>
+    <edge source="8075732" target="3961197">
+      <data key="d0">2011-12-13</data>
+    </edge>
+    <edge source="7482609" target="3961197">
+      <data key="d0">2009-01-27</data>
+    </edge>
+    <edge source="5892810" target="3961197">
+      <data key="d0">1999-04-06</data>
+    </edge>
+    <edge source="7589337" target="3961197">
+      <data key="d0">2009-09-15</data>
+    </edge>
+  </graph>
+</graphml>

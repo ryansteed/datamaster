@@ -5,6 +5,7 @@ import app.lib.munge as munge
 import csv
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import os
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -43,6 +44,9 @@ class CitationNetwork:
     def draw(self):
         nx.draw_networkx(self.G, pos=nx.kamada_kawai_layout(self.G))
         plt.show()
+
+    def write_graphml(self, name):
+        nx.write_graphml(self.G, "{}.graphml".format(os.path.abspath(os.path.join("./data/graph", name))))
 
     def print_custom_metrics(self):
         logger.info("== Calculated Metrics ==")
@@ -96,6 +100,7 @@ class CitationNetwork:
                 edge for edge in self.G.edges
                 if self.str_to_datetime(self.G.edges[edge]['date']) > min(dates) + i * bin_size or self.str_to_datetime(self.G.edges[edge]['date']) < min(dates) + (i+1)*bin_size
             ])
+            # TODO: only evaluate root node, rather than all nodes2
             # self.eval_all(weighting_key=weighting_key)
             logger.debug("{}, {}".format(self.G.size(), full_G.size()))
             self.G = full_G.copy()

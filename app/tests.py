@@ -18,6 +18,7 @@ def root_test():
     munger = RootMunger(patent, depth=1, limit=Config.DOC_LIMIT)
     # eval_and_sum(munger)
     cn = CitationNetwork(munger.get_network())
+    cn.write_graphml(str(patent))
     cn.eval_binned(20)
     cn.summary()
 
