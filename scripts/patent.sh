@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
-python main.py root 3961197 4
+python main.py root 3961197 10
