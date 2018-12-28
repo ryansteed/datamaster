@@ -87,7 +87,7 @@ class Munger:
 
         # for key in self.get_citation_keys():
         #     df_edges[key] = df_edges[key].str.strip()
-        G = nx.from_pandas_edgelist(df_edges, source='patent_id', target='citation_id', edge_attr="date", create_using=nx.DiGraph())
+        G = nx.from_pandas_edgelist(df_edges, source='citation_id', target='patent_id', edge_attr="date", create_using=nx.DiGraph())
 
         logger.debug(np.unique(df_edges['patent_id']).size)
         logger.debug(np.unique(df_edges['citation_id']).size)
@@ -105,7 +105,7 @@ class Munger:
 
     def get_edges(self):
         self.ensure_data()
-        return self.df[self.get_citation_keys()+['date']]
+        return self.df[self.get_citation_keys()+['date']].astype(str)
 
     @staticmethod
     def get_citation_keys():

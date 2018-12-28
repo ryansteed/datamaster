@@ -6,6 +6,7 @@ import csv
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import os
+from overrides import overrides
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -87,24 +88,6 @@ class CitationNetwork:
             self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
             t.log()
 
-    def eval_binned(self, bin_size_weeks, weighting_key=None):
-        bin_size = timedelta(weeks=bin_size_weeks)
-        full_G = self.G.copy()
-        logger.debug(self.str_to_datetime('2015-01-01'))
-        dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
-        logger.debug("Range: {}".format(max(dates)-min(dates)))
-        # TODO: this is inefficient; create a hashtable and store edges that way, then generate the network from the hash tables
-        for i in range(int((max(dates)-min(dates))/bin_size)):
-            logger.debug("{} to {}".format(min(dates) + i * bin_size, min(dates) + (i+1)*bin_size))
-            self.G.remove_edges_from([
-                edge for edge in self.G.edges
-                if self.str_to_datetime(self.G.edges[edge]['date']) > min(dates) + i * bin_size or self.str_to_datetime(self.G.edges[edge]['date']) < min(dates) + (i+1)*bin_size
-            ])
-            # TODO: only evaluate root node, rather than all nodes2
-            # self.eval_all(weighting_key=weighting_key)
-            logger.debug("{}, {}".format(self.G.size(), full_G.size()))
-            self.G = full_G.copy()
-
     @staticmethod
     def str_to_datetime(date):
         return datetime.strptime(date, '%Y-%M-%d')
@@ -166,12 +149,12 @@ class CitationNetwork:
     def eval_quality(self):
         nx.set_node_attributes(
             self.G,
-            {node: int(out_degree * (len(self.G) - 1)) for node, out_degree in nx.out_degree_centrality(self.G).items()},
+            {node: int(out_degree * (len(self.G) - 1)) for node, out_degree in self.G.out_degree()},
             'forward_cites'
         )
         nx.set_node_attributes(
             self.G,
-            {node: int(in_degree * (len(self.G) - 1)) for node, in_degree in nx.in_degree_centrality(self.G).items()},
+            {node: int(in_degree * (len(self.G) - 1)) for node, in_degree in self.G.in_degree()},
             'backward_cites'
         )
         nx.set_node_attributes(
@@ -206,6 +189,70 @@ class CitationNetwork:
 
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
+
+
+class TreeCitationNetwork(CitationNetwork):
+    def __init__(
+            self, G, root, weighting_method="forward_cites",
+            quality=True, h_index=True, custom_centrality=True, knowledge=True
+    ):
+        super().__init__(
+            G,
+            weighting_method=weighting_method,
+            quality=quality,
+            h_index=h_index,
+            custom_centrality=custom_centrality,
+            knowledge=knowledge
+        )
+        self.root = root
+
+    def eval_binned(self, bin_size_weeks, weighting_key=None):
+        bin_size = timedelta(weeks=bin_size_weeks)
+        full_G = self.G.copy()
+        logger.debug(self.str_to_datetime('2015-01-01'))
+        dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
+        logger.debug("Range: {}".format(max(dates) - min(dates)))
+
+        k = []
+        # TODO: this is inefficient; create a hashtable and store edges that way, then generate the network from the hash tables
+        for i in range(int((max(dates) - min(dates)) / bin_size)):
+            date_min = min(dates)
+            date_max = min(dates) + (i + 1) * bin_size
+            logger.debug("{} to {}".format(date_min, date_max))
+            remove = []
+            for edge in self.G.edges:
+                date = self.str_to_datetime(self.G.edges[edge]['date'])
+                if date < date_min or date > date_max:
+                    remove.append(edge)
+            self.G.remove_edges_from(remove)
+            # TODO: only evaluate root node, rather than all nodes
+            self.eval_all()
+            k.append(self.G.nodes[self.root]["knowledge"])
+            logger.debug("{}/{}".format(self.G.size(), full_G.size()))
+
+            self.G = full_G.copy()
+
+        logger.debug(k)
+        plt.plot(k)
+        plt.show()
+
+    @overrides
+    def eval_k(self, weighting_key):
+        nx.set_node_attributes(
+            self.G,
+            {self.root: self.k(self.root, self.root, weighting_key)},
+            'knowledge'
+        )
+
+    @overrides
+    def summary(self):
+        custom = ""
+        custom += "Connected components: {}\n".format(nx.number_connected_components(self.G.to_undirected()))
+        # average metrics
+        for key, values in {attribute: self.G.nodes[self.root][attribute] for attribute in
+                            self.attributes}.items():
+            custom += "{}: {} ({})\n".format(key, round(np.average(values), 3), round(sem(values), 3))
+        logger.info("\n== CN Summary ==\n{}\n{}====".format(nx.info(self.G), custom))
 
 
 # h-index calculation

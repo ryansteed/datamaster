@@ -1,4 +1,4 @@
-from app.lib.metrics import CitationNetwork
+from app.lib.metrics import CitationNetwork, TreeCitationNetwork
 import app.lib.metrics
 from app.lib.munge import QueryMunger, RootMunger
 from app.config import Config
@@ -14,13 +14,13 @@ def metrics_test():
 
 def root_test():
     check_args(4, "root [patent_number] [depth]")
-    patent = int(sys.argv[2])
+    patent = sys.argv[2]
     depth = int(sys.argv[3])
     munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
     # eval_and_sum(munger)
-    cn = CitationNetwork(munger.get_network())
+    cn = TreeCitationNetwork(munger.get_network(), patent)
     cn.write_graphml("{}_{}".format(patent, depth))
-    # cn.eval_binned(20)
+    cn.eval_binned(50)
     # cn.summary()
 
 
