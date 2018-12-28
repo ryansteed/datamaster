@@ -6,6 +6,7 @@ import os
 import math
 import json
 import enlighten
+from overrides import overrides
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -13,15 +14,35 @@ from app.lib.helpers import Timer
 
 class Munger:
 
-    query_fields = ["patent_number", "cited_patent_number", "citedby_patent_number"]
+    query_fields = ["patent_number", "cited_patent_number", "cited_patent_date", "citedby_patent_number", "citedby_patent_date"]
 
-    def __init__(self, limit):
+    def __init__(self, limit, cache):
         self.limit = limit
+        self.cache = cache
         self.df = None
         self.df_meta = None
         self.load_data()
 
     def load_data(self):
+        if self.cache:
+            try:
+                self.load_data_from_file(self.make_filename())
+                return self
+            except (FileNotFoundError, DataFormatError) as e:
+                if isinstance(e, FileNotFoundError):
+                    logger.info("Missing data file, querying USPTO")
+                if isinstance(e, DataFormatError):
+                    logger.info("Problem loading data file, querying USPTO")
+        self.query_data()
+        self.ensure_data()
+        if Config.USE_CACHED_QUERIES:
+            self.write_data_to_file(self.make_filename())
+        return self
+
+    def query_data(self):
+        raise NotImplementedError
+
+    def make_filename(self):
         raise NotImplementedError
 
     @staticmethod
@@ -43,12 +64,12 @@ class Munger:
         for patent in info['patents']:
             if bcites:
                 for bcite in patent.get('cited_patents'):
-                    edge = (patent['patent_number'], bcite['cited_patent_number'])
+                    edge = (patent['patent_number'], bcite['cited_patent_number'], bcite['cited_patent_date'])
                     if None not in edge: data.add(edge)
             for fcite in patent.get('citedby_patents'):
-                edge = (fcite['citedby_patent_number'], patent['patent_number'])
+                edge = (fcite['citedby_patent_number'], patent['patent_number'], fcite['citedby_patent_date'])
                 if None not in edge: data.add(edge)
-        return pd.DataFrame(list(data), columns=self.get_citation_keys())
+        return pd.DataFrame(list(data), columns=self.get_citation_keys()+['date'])
 
     def load_data_from_file(self, datafile):
         logger.info("Munging data from {}".format(datafile))
@@ -66,7 +87,7 @@ class Munger:
 
         # for key in self.get_citation_keys():
         #     df_edges[key] = df_edges[key].str.strip()
-        G = nx.from_pandas_edgelist(df_edges, source='patent_id', target='citation_id', create_using=nx.DiGraph())
+        G = nx.from_pandas_edgelist(df_edges, source='patent_id', target='citation_id', edge_attr="date", create_using=nx.DiGraph())
 
         logger.debug(np.unique(df_edges['patent_id']).size)
         logger.debug(np.unique(df_edges['citation_id']).size)
@@ -84,7 +105,7 @@ class Munger:
 
     def get_edges(self):
         self.ensure_data()
-        return self.df[self.get_citation_keys()]
+        return self.df[self.get_citation_keys()+['date']]
 
     @staticmethod
     def get_citation_keys():
@@ -122,25 +143,19 @@ class Munger:
         if not {'patent_id', 'citation_id'}.issubset(self.df.columns):
             raise DataFormatError("Missing patent and citation columns in dataset")
 
+    @staticmethod
+    def get_filename_from_stem(file_string):
+        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
+
 
 class QueryMunger(Munger):
     def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=100):
         self.query_json = query_json
-        self.cache = cache
         self.per_page = per_page
-        super().__init__(limit)
+        super().__init__(limit, cache)
 
-    def load_data(self):
-        if self.cache:
-            try:
-                self.load_data_from_file(self.make_query_filename(self.query))
-                return self
-            except (FileNotFoundError, DataFormatError) as e:
-                if isinstance(e, FileNotFoundError):
-                    logger.info("Missing query data file, querying USPTO")
-                if isinstance(e, DataFormatError):
-                    logger.info("Problem loading data file, querying USPTO")
-
+    @overrides
+    def query_data(self):
         t = Timer("Querying USPTO: {}".format(self.query_json))
         count_patents = self.query_sounding(self.query_json)
         count_to_collect = self.limit if self.limit is not None and self.limit < count_patents else count_patents
@@ -157,7 +172,7 @@ class QueryMunger(Munger):
         for i in range(pages):
             if Config.ENV_NAME != "local":
                 logger.info("{}/{}".format(i, pages))
-            page_df = self.query_paginated(self.query, i+1, self.per_page)
+            page_df = self.query_paginated(self.query, i + 1, self.per_page)
             if self.df is None:
                 self.df = page_df
             else:
@@ -167,15 +182,7 @@ class QueryMunger(Munger):
 
         logger.info("Collected {} edges".format(self.df.shape[0]))
 
-        self.ensure_data()
-
-        if Config.USE_CACHED_QUERIES:
-            self.write_data_to_file(self.make_query_filename(self.query))
-
-        return self
-
     def query_paginated(self, query, page, per_page):
-
         info = query({
             "q": query,
             "f": self.query_fields,
@@ -184,7 +191,6 @@ class QueryMunger(Munger):
                 "per_page": str(per_page)
             }
         })
-
         return self.query_to_dataframe(info)
 
     def query_sounding(self, query_json):
@@ -200,33 +206,39 @@ class QueryMunger(Munger):
         t.log()
         return info['total_patent_count'] #, info['total_citedby_patent_count'], info['total_cited_patent_count']
 
-    @staticmethod
-    def make_query_filename(query_json):
-        file_string = json.dumps(query_json)
-        logger.debug(os.getcwd())
+    @overrides
+    def make_filename(self):
+        file_string = json.dumps(self.query)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return "{}.csv".format(os.path.abspath(os.path.join("./query_data", file_string)))
+        return self.get_filename_from_stem("QUERY_{}".format(file_string))
 
 
 class RootMunger(Munger):
 
-    def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT):
+    def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES):
         self.patent_number = patent_number
         self.depth = depth
         self.completed_branches = 0
-        super().__init__(limit)
+        super().__init__(limit, cache)
 
-    def load_data(self):
+    @overrides
+    def make_filename(self):
+        filename = self.get_filename_from_stem("PATENT_{}".format(str(self.patent_number)))
+        return filename
+
+    @overrides
+    def query_data(self):
         logger.debug(self.patent_number)
+        t = Timer("Fetching children recursively")
         self.get_children(self.patent_number, 0)
-        return self
+        t.log()
 
     def get_children(self, curr_num, curr_depth):
         # logger.debug("At depth {}/{}".format(curr_depth, self.depth))
         if curr_depth > self.depth:
             self.completed_branches += 1
-            # logger.debug("Finished branch {}".format(self.completed_branches))
+            logger.debug("Finished branch {}".format(self.completed_branches))
             return
         info = self.query({
             "q": {"patent_number": curr_num},
@@ -244,7 +256,6 @@ class RootMunger(Munger):
             for patent in info['patents']:
                 for fcite in patent.get('citedby_patents'):
                     self.get_children(fcite['citedby_patent_number'], curr_depth+1)
-
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""

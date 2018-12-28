@@ -4,6 +4,7 @@ from scipy.stats import sem
 import app.lib.munge as munge
 import csv
 import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
@@ -81,6 +82,27 @@ class CitationNetwork:
             logger.info("Calculating knowledge")
             self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
             t.log()
+
+    def eval_binned(self, bin_size_weeks, weighting_key=None):
+        bin_size = timedelta(weeks=bin_size_weeks)
+        full_G = self.G.copy()
+        logger.debug(self.str_to_datetime('2015-01-01'))
+        dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
+        logger.debug("Range: {}".format(max(dates)-min(dates)))
+        # TODO: this is inefficient; create a hashtable and store edges that way, then generate the network from the hash tables
+        for i in range(int((max(dates)-min(dates))/bin_size)):
+            logger.debug("{} to {}".format(min(dates) + i * bin_size, min(dates) + (i+1)*bin_size))
+            self.G.remove_edges_from([
+                edge for edge in self.G.edges
+                if self.str_to_datetime(self.G.edges[edge]['date']) > min(dates) + i * bin_size or self.str_to_datetime(self.G.edges[edge]['date']) < min(dates) + (i+1)*bin_size
+            ])
+            # self.eval_all(weighting_key=weighting_key)
+            logger.debug("{}, {}".format(self.G.size(), full_G.size()))
+            self.G = full_G.copy()
+
+    @staticmethod
+    def str_to_datetime(date):
+        return datetime.strptime(date, '%Y-%M-%d')
 
     def eval_h(self):
         h_indices = {}

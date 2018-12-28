@@ -16,7 +16,11 @@ def root_test():
     check_args(3, "root [patent_number]")
     patent = int(sys.argv[2])
     munger = RootMunger(patent, depth=1, limit=Config.DOC_LIMIT)
-    eval_and_sum(munger)
+    # eval_and_sum(munger)
+    cn = CitationNetwork(munger.get_network())
+    cn.eval_binned(20)
+    cn.summary()
+
 
     # sample patents
     # 3961197
