@@ -13,14 +13,15 @@ def metrics_test():
 
 
 def root_test():
-    check_args(3, "root [patent_number]")
+    check_args(4, "root [patent_number] [depth]")
     patent = int(sys.argv[2])
-    munger = RootMunger(patent, depth=1, limit=Config.DOC_LIMIT)
+    depth = int(sys.argv[3])
+    munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
     # eval_and_sum(munger)
     cn = CitationNetwork(munger.get_network())
-    cn.write_graphml(str(patent))
-    cn.eval_binned(20)
-    cn.summary()
+    cn.write_graphml("{}_{}".format(patent, depth))
+    # cn.eval_binned(20)
+    # cn.summary()
 
 
     # sample patents

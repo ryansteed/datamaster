@@ -75,7 +75,7 @@ class Munger:
         logger.info("Munging data from {}".format(datafile))
         self.df = pd.read_csv(datafile, delimiter='\t', nrows=self.limit) if self.limit is not None \
             else pd.read_csv(datafile, delimiter='\t')
-        logger.info("Loaded {} documents from file {}".format(self.df.size, datafile))
+        logger.info("Loaded {} documents from file {}".format(self.df.shape[0], datafile))
         self.ensure_data()
         return self
 
@@ -224,7 +224,7 @@ class RootMunger(Munger):
 
     @overrides
     def make_filename(self):
-        filename = self.get_filename_from_stem("PATENT_{}".format(str(self.patent_number)))
+        filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth))
         return filename
 
     @overrides
@@ -232,14 +232,14 @@ class RootMunger(Munger):
         logger.debug(self.patent_number)
         t = Timer("Fetching children recursively")
         self.get_children(self.patent_number, 0)
+        logger.debug("Examined {} branches".format(self.completed_branches))
         t.log()
 
     def get_children(self, curr_num, curr_depth):
         # logger.debug("At depth {}/{}".format(curr_depth, self.depth))
-        if curr_depth > self.depth:
+        if curr_depth == 1:
             self.completed_branches += 1
-            logger.debug("Finished branch {}".format(self.completed_branches))
-            return
+            logger.info("Branch {}".format(self.completed_branches))
         info = self.query({
             "q": {"patent_number": curr_num},
             "f": self.query_fields
@@ -247,15 +247,17 @@ class RootMunger(Munger):
         if curr_depth == 0:
             logger.debug("Exploring {} branches".format(len(info['patents'][0]['citedby_patents'])))
         if info.get('patents') is not None:
+            # TODO: include bcites, and recurse once more to get bcites for the leaves but not fcites
             df = self.query_to_dataframe(info, bcites=False)
             if self.df is None:
                 self.df = df
             else:
                 self.df = self.df.append(df, ignore_index=True)
             # iterate through all children, recursively
-            for patent in info['patents']:
-                for fcite in patent.get('citedby_patents'):
-                    self.get_children(fcite['citedby_patent_number'], curr_depth+1)
+            if curr_depth+1 < self.depth:
+                for patent in info['patents']:
+                    for fcite in patent.get('citedby_patents'):
+                        self.get_children(fcite['citedby_patent_number'], curr_depth+1)
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
