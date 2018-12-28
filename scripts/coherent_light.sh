@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J main
+#SBATCH -J coherent_light
 #SBATCH -o slurm/main.out
 #SBATCH -e slurm/main.err
 #SBATCH -p defq

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J artificial_intelligence
+#SBATCH -J patent
 #SBATCH -o slurm/main.out
 #SBATCH -e slurm/main.err
 #SBATCH -p defq
@@ -9,5 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
-source activate datamaster
-python main.py query json/artificial_intelligence.json
+python main.py root 3961197 4
