@@ -12,12 +12,12 @@ def metrics_test():
     app.lib.metrics.main()
 
 
-def root_test(patent, depth):
+def root_test(patent, depth, plot=False):
     munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
     # eval_and_sum(munger)
     cn = TreeCitationNetwork(munger.get_network(), patent)
-    cn.write_graphml("{}_{}".format(patent, depth))
-    cn.eval_binned(20)
+    cn.eval_binned(20, plot=plot)
+    return cn
     # cn.summary()
 
     # sample patents
@@ -28,10 +28,12 @@ def root_test_single():
     check_args(4, "root [patent_number] [depth]")
     patent = sys.argv[2]
     depth = int(sys.argv[3])
-    root_test(patent, depth)
+    cn = root_test(patent, depth, plot=True)
+    cn.write_graphml("{}_{}".format(patent, depth))
 
 
 def root_test_multiple():
+    # TODO: build this as a function of the full network, handling empty root networks automatically - then build a full dataframe and save to file
     check_args(4, "root_all [query json file] [limit]")
     G = get_query_munger(sys.argv[2]).get_network()
     patents = [i for i in G.nodes][:int(sys.argv[3])]

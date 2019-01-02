@@ -214,7 +214,7 @@ class TreeCitationNetwork(CitationNetwork):
         )
         self.root = root
 
-    def eval_binned(self, bin_size_weeks, weighting_key=None):
+    def eval_binned(self, bin_size_weeks, plot=False, weighting_key=None):
         bin_size = timedelta(weeks=bin_size_weeks)
         full_G = self.G.copy()
         logger.debug(self.str_to_datetime('2015-01-01'))
@@ -241,8 +241,9 @@ class TreeCitationNetwork(CitationNetwork):
             self.G = full_G.copy()
 
         logger.debug(k)
-        plt.plot(k)
-        plt.show()
+        if plot:
+            plt.plot(k)
+            plt.show()
 
     @overrides
     def eval_k(self, weighting_key):
