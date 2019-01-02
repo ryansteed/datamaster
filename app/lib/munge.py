@@ -207,11 +207,11 @@ class QueryMunger(Munger):
         return info['total_patent_count'] #, info['total_citedby_patent_count'], info['total_cited_patent_count']
 
     @overrides
-    def make_filename(self):
+    def make_filename(self, prefix="QUERY"):
         file_string = json.dumps(self.query_json)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return self.get_filename_from_stem("QUERY_{}".format(file_string))
+        return self.get_filename_from_stem("{}_{}".format(prefix, file_string))
 
 
 class RootMunger(Munger):

@@ -6,6 +6,7 @@ import csv
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import os
+import pandas as pd
 from overrides import overrides
 
 from app.config import Config, logger
@@ -199,14 +200,25 @@ class CitationNetwork:
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
-    def root_analysis(self, depth, limit=Config.DOC_LIMIT):
-        patents = [i for i in self.G.nodes][:limit]
+    def root_analysis(self, depth, filename, limit=Config.DOC_LIMIT):
+        df = None
+        patents = [i for i in self.G.nodes][:limit+1]
         for patent in patents:
             munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
             # eval_and_sum(munger)
             cn = TreeCitationNetwork(munger.get_network(), patent)
             if not cn.is_empty():
-                cn.eval_binned(20, plot=False)
+                data = cn.eval_binned(20, plot=False)
+                if df is None:
+                    df = pd.DataFrame(data=list(enumerate(data)))
+                else:
+                    df_new = pd.DataFrame(data=list(enumerate(data)))
+                    df = df.append(df_new, ignore_index=True)
+        logger.debug(df)
+        t = Timer("Writing data to file {}".format(filename))
+        with open(filename, "w+") as file:
+            df.to_csv(file, index=False, sep='\t')
+        t.log()
 
 
 class TreeCitationNetwork(CitationNetwork):
@@ -257,6 +269,8 @@ class TreeCitationNetwork(CitationNetwork):
         if plot:
             plt.plot(k)
             plt.show()
+
+        return k
 
     @overrides
     def eval_k(self, weighting_key):
