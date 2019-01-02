@@ -214,11 +214,10 @@ class CitationNetwork:
                 else:
                     df_new = pd.DataFrame(data=list(enumerate(data)))
                     df = df.append(df_new, ignore_index=True)
-        logger.debug(df)
-        t = Timer("Writing data to file {}".format(filename))
-        with open(filename, "w+") as file:
-            df.to_csv(file, index=False, sep='\t')
-        t.log()
+                t = Timer("Writing data to file {}".format(filename))
+                with open(filename, "w+") as file:
+                    df.to_csv(file, index=False, sep='\t')
+                t.log()
 
 
 class TreeCitationNetwork(CitationNetwork):
