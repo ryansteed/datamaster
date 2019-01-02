@@ -17,4 +17,7 @@ if __name__ == "__main__":
         query_test()
 
     if test == "root":
-        root_test()
+        root_test_single()
+
+    if test == "root_all":
+        root_test_multiple()

@@ -172,7 +172,7 @@ class QueryMunger(Munger):
         for i in range(pages):
             if Config.ENV_NAME != "local":
                 logger.info("{}/{}".format(i, pages))
-            page_df = self.query_paginated(self.query, i + 1, self.per_page)
+            page_df = self.query_paginated(self.query_json, i + 1, self.per_page)
             if self.df is None:
                 self.df = page_df
             else:
@@ -182,9 +182,9 @@ class QueryMunger(Munger):
 
         logger.info("Collected {} edges".format(self.df.shape[0]))
 
-    def query_paginated(self, query, page, per_page):
-        info = query({
-            "q": query,
+    def query_paginated(self, query_json, page, per_page):
+        info = self.query({
+            "q": query_json,
             "f": self.query_fields,
             "o": {
                 "page": page,
@@ -208,7 +208,7 @@ class QueryMunger(Munger):
 
     @overrides
     def make_filename(self):
-        file_string = json.dumps(self.query)
+        file_string = json.dumps(self.query_json)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
         return self.get_filename_from_stem("QUERY_{}".format(file_string))

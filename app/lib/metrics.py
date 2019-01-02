@@ -67,26 +67,34 @@ class CitationNetwork:
         t.log()
 
     # Analytics #
-    def eval_all(self, weighting_key=None):
-        logger.info("Calculating metrics")
-        t = Timer("Metric calculation")
-
+    def eval_all(self, weighting_key=None, verbose=True):
+        if verbose:
+            logger.info("Calculating metrics")
+            t = Timer("Metric calculation")
         if self.quality:
-            logger.info("Calculating quality")
+            if verbose:
+                logger.info("Calculating quality")
             self.eval_quality()
-            t.log()
+            if verbose:
+                t.log()
         if self.h_index:
-            logger.info("Calculating H-index")
+            if verbose:
+                logger.info("Calculating H-index")
             self.eval_h()
-            t.log()
+            if verbose:
+                t.log()
         if self.custom_centrality:
-            logger.info("Calculating centralities")
+            if verbose:
+                logger.info("Calculating centralities")
             self.eval_centrality()
-            t.log()
+            if verbose:
+                t.log()
         if self.knowledge:
-            logger.info("Calculating knowledge")
+            if verbose:
+                logger.info("Calculating knowledge")
             self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
-            t.log()
+            if verbose:
+                t.log()
 
     @staticmethod
     def str_to_datetime(date):
@@ -214,11 +222,12 @@ class TreeCitationNetwork(CitationNetwork):
         logger.debug("Range: {}".format(max(dates) - min(dates)))
 
         k = []
+        bins = int((max(dates) - min(dates)) / bin_size)
         # TODO: this is inefficient; create a hashtable and store edges that way, then generate the network from the hash tables
-        for i in range(int((max(dates) - min(dates)) / bin_size)):
+        for i in range(bins):
             date_min = min(dates)
             date_max = min(dates) + (i + 1) * bin_size
-            logger.debug("{} to {}".format(date_min, date_max))
+            # logger.debug("{} to {}".format(date_min, date_max))
             remove = []
             for edge in self.G.edges:
                 date = self.str_to_datetime(self.G.edges[edge]['date'])
@@ -226,10 +235,9 @@ class TreeCitationNetwork(CitationNetwork):
                     remove.append(edge)
             self.G.remove_edges_from(remove)
             # TODO: only evaluate root node, rather than all nodes
-            self.eval_all()
+            self.eval_all(weighting_key=weighting_key, verbose=False)
             k.append(self.G.nodes[self.root]["knowledge"])
-            logger.debug("{}/{}".format(self.G.size(), full_G.size()))
-
+            logger.debug("Bin {}/{}".format(i+1, bins))
             self.G = full_G.copy()
 
         logger.debug(k)

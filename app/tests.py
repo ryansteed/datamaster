@@ -12,27 +12,36 @@ def metrics_test():
     app.lib.metrics.main()
 
 
-def root_test():
-    check_args(4, "root [patent_number] [depth]")
-    patent = sys.argv[2]
-    depth = int(sys.argv[3])
+def root_test(patent, depth):
     munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
     # eval_and_sum(munger)
     cn = TreeCitationNetwork(munger.get_network(), patent)
     cn.write_graphml("{}_{}".format(patent, depth))
-    cn.eval_binned(50)
+    cn.eval_binned(20)
     # cn.summary()
-
 
     # sample patents
     # 3961197
 
 
+def root_test_single():
+    check_args(4, "root [patent_number] [depth]")
+    patent = sys.argv[2]
+    depth = int(sys.argv[3])
+    root_test(patent, depth)
+
+
+def root_test_multiple():
+    check_args(4, "root_all [query json file] [limit]")
+    G = get_query_munger(sys.argv[2]).get_network()
+    patents = [i for i in G.nodes][:int(sys.argv[3])]
+    for patent in patents:
+        root_test(str(patent), 2)
+
+
 def query_test():
     check_args(3, "query [json file]")
-    with open(sys.argv[2], 'r') as f:
-        query = json.load(f)
-    munger = QueryMunger(query, limit=Config.DOC_LIMIT)
+    munger = get_query_munger(sys.argv[2])
     eval_and_sum(munger)
     # Possible queries:
     # test from https://ropensci.github.io/patentsview/articles/citation-networks.html
@@ -57,3 +66,9 @@ def eval_and_sum(munger):
 def check_args(num, usage):
     if len(sys.argv) < num:
         raise ValueError("No query passed.\n USAGE: python main.py {}".format(usage))
+
+
+def get_query_munger(query_file):
+    with open(query_file, 'r') as f:
+        query = json.load(f)
+    return QueryMunger(query, limit=Config.DOC_LIMIT)
