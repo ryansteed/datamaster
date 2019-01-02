@@ -10,6 +10,7 @@ from overrides import overrides
 
 from app.config import Config, logger
 from app.lib.helpers import Timer
+from app.lib.munge import RootMunger
 
 
 class CitationNetwork:
@@ -198,6 +199,15 @@ class CitationNetwork:
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
+    def root_analysis(self, depth, limit=Config.DOC_LIMIT):
+        patents = [i for i in self.G.nodes][:limit]
+        for patent in patents:
+            munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
+            # eval_and_sum(munger)
+            cn = TreeCitationNetwork(munger.get_network(), patent)
+            if not cn.is_empty():
+                cn.eval_binned(20, plot=False)
+
 
 class TreeCitationNetwork(CitationNetwork):
     def __init__(
@@ -213,6 +223,9 @@ class TreeCitationNetwork(CitationNetwork):
             knowledge=knowledge
         )
         self.root = root
+
+    def is_empty(self):
+        return self.G.size() == 0
 
     def eval_binned(self, bin_size_weeks, plot=False, weighting_key=None):
         bin_size = timedelta(weeks=bin_size_weeks)
