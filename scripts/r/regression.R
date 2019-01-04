@@ -21,8 +21,11 @@ for (i in 1:nrow(dat)) {
     if (i>1) {
       fit = lm(log(k) ~ t, data=dat[c(k:i),])
       coeff = coefficients(fit)
-      # print(coeff)
-      if(i==2) {
+      if (coeff['t']>.36) {
+        print("Found max")
+        plot(dat[c(k:i),'t'], dat[c(k:i),'k'])
+      }
+      if(j==0) {
         coeffs = coeff
       }
       else {
@@ -36,3 +39,4 @@ for (i in 1:nrow(dat)) {
 head(coeffs)
 summary(coeffs[,'t'])
 hist(coeffs[,'t'])
+max(coeffs[,'t'])
