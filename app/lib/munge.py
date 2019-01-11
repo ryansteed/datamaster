@@ -236,7 +236,8 @@ class RootMunger(Munger):
                 "ipc_main_group",
                 "nber_category_id",
                 "nber_subcategory_id",
-                "patent_abstract",
+                # TODO handle the abstract
+                # "patent_abstract",
                 "patent_date",
                 "patent_num_claims",
                 "patent_num_cited_by_us_patents",

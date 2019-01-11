@@ -212,12 +212,12 @@ class CitationNetwork:
                 if df is None:
                     df = pd.DataFrame(
                         data=[[x, i]+list(munger.features.values()) for i,x in enumerate(data)],
-                        columns=["t", "k"]+munger.features.keys()
+                        columns=["t", "k"]+list(munger.features.keys())
                     )
                 else:
                     df_new = pd.DataFrame(
-                        data=list(enumerate(data) + munger.features.values()),
-                        columns=["k", "t"]+list(munger.features.keys())
+                        data=[[x, i] + list(munger.features.values()) for i, x in enumerate(data)],
+                        columns=["t", "k"] + list(munger.features.keys())
                     )
                     df = df.append(df_new, ignore_index=True)
                 t = Timer("Writing data to file {}".format(filename))
