@@ -6,6 +6,7 @@ import os
 import math
 import json
 import enlighten
+from collections import defaultdict
 from overrides import overrides
 
 from app.config import Config, logger
@@ -220,6 +221,41 @@ class RootMunger(Munger):
         self.patent_number = patent_number
         self.depth = depth
         self.completed_branches = 0
+        t = Timer("Fetching root features")
+        features = self.query({
+            "q": {"patent_number": self.patent_number},
+            "f": [
+                "cpc_category",
+                "cpc_group_id",
+                "assignee_type",
+                "assignee_total_num_patents",
+                "assignee_id",
+                "inventor_id",
+                "inventor_total_num_patents",
+                "ipc_class",
+                "ipc_main_group",
+                "nber_category_id",
+                "nber_subcategory_id",
+                "patent_abstract",
+                "patent_date",
+                "patent_num_claims",
+                "patent_num_cited_by_us_patents",
+                "patent_processing_time",
+                "uspc_mainclass_id",
+                "uspc_subclass_id",
+                "wipo_field_id"
+            ]
+        }).get('patents')[0]
+        # TODO - unnest the return to self.features - should be flat dict
+        features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
+        self.features = {key: val for key, val in features.items() if key not in features_categorical}
+        for category in features_categorical:
+            unpacked = defaultdict(list)
+            for item in features[category]:
+                for key, val in item.items():
+                    unpacked[key].append(val)
+            self.features.update(unpacked)
+        t.log()
         super().__init__(limit, cache)
 
     @overrides
@@ -231,6 +267,7 @@ class RootMunger(Munger):
     def query_data(self):
         logger.debug(self.patent_number)
         t = Timer("Fetching children recursively")
+        # TODO - also query patent features and include as attributes in network
         self.get_children(self.patent_number, 0)
         logger.debug("Examined {} branches".format(self.completed_branches))
         t.log()
