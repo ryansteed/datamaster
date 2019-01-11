@@ -22,13 +22,13 @@ def root_test_single():
     cn.write_graphml("{}_{}".format(patent, depth))
 
 
-def root_test_multiple():
+def root_test_multiple(bin_size=20):
     # TODO: build this as a function of the full network, handling empty root networks automatically - then build a full dataframe and save to file
     check_args(4, "root_all [query json file] [limit]")
     munger = get_query_munger(sys.argv[2])
     G = munger.get_network()
     cn = CitationNetwork(G, custom_centrality=False)
-    cn.root_analysis(2, munger.make_filename(prefix="TIME-DATA"), limit=int(sys.argv[3]))
+    cn.root_analysis(2, munger.make_filename(prefix="TIME-DATA"), limit=int(sys.argv[3]), bin_size=bin_size)
 
 
 def query_test():

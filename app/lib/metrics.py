@@ -200,7 +200,7 @@ class CitationNetwork:
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
-    def root_analysis(self, depth, filename, limit=Config.DOC_LIMIT):
+    def root_analysis(self, depth, filename, limit=Config.DOC_LIMIT, bin_size=20):
         df = None
         patents = [i for i in self.G.nodes][:limit+1]
         for patent in patents:
@@ -208,7 +208,7 @@ class CitationNetwork:
             # eval_and_sum(munger)
             cn = TreeCitationNetwork(munger.get_network(), patent)
             if not cn.is_empty():
-                data = cn.eval_binned(20, plot=False)
+                data = cn.eval_binned(bin_size, plot=False)
                 if df is None:
                     df = pd.DataFrame(
                         data=[[x, i]+list(munger.features.values()) for i,x in enumerate(data)],
@@ -245,18 +245,18 @@ class TreeCitationNetwork(CitationNetwork):
         return self.G.size() == 0
 
     def eval_binned(self, bin_size_weeks, plot=False, weighting_key=None):
-        bin_size = timedelta(weeks=bin_size_weeks)
+        bin_size = timedelta(weeks=bin_size_weeks) if bin_size_weeks is not None else None
         full_G = self.G.copy()
         logger.debug(self.str_to_datetime('2015-01-01'))
         dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
         logger.debug("Range: {}".format(max(dates) - min(dates)))
 
         k = []
-        bins = int((max(dates) - min(dates)) / bin_size)
+        bins = int((max(dates) - min(dates)) / bin_size) if bin_size is not None else 1
         # TODO: this is inefficient; create a hashtable and store edges that way, then generate the network from the hash tables
         for i in range(bins):
             date_min = min(dates)
-            date_max = min(dates) + (i + 1) * bin_size
+            date_max = min(dates) + (i + 1) * bin_size if bin_size is not None else max(dates)
             # logger.debug("{} to {}".format(date_min, date_max))
             remove = []
             for edge in self.G.edges:
