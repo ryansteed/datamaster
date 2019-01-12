@@ -222,7 +222,7 @@ class CitationNetwork:
                     df = df.append(df_new, ignore_index=True)
                 t = Timer("Writing data to file {}".format(filename))
                 with open(filename, "w+") as file:
-                    df.to_csv(file, index=False, sep='\t')
+                    df.to_csv(file, index=False, sep='\t', header=True)
                 t.log()
 
 

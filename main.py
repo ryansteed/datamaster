@@ -21,3 +21,6 @@ if __name__ == "__main__":
 
     if test == "root_all":
         root_test_multiple()
+
+    if test == "features":
+        root_test_multiple(bin_size=None)

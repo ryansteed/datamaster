@@ -28,7 +28,7 @@ def root_test_multiple(bin_size=20):
     munger = get_query_munger(sys.argv[2])
     G = munger.get_network()
     cn = CitationNetwork(G, custom_centrality=False)
-    cn.root_analysis(2, munger.make_filename(prefix="TIME-DATA"), limit=int(sys.argv[3]), bin_size=bin_size)
+    cn.root_analysis(2, munger.make_filename(prefix="TIME-DATA_{}".format(sys.argv[3])), limit=int(sys.argv[3]), bin_size=bin_size)
 
 
 def query_test():
