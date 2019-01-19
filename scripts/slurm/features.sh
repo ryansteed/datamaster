@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
-python main.py features scripts/json/coherent_light.json 3000
+python main.py features scripts/json/all.json 3000
