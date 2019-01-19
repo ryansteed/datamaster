@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J patents_all
+#SBATCH -J features
 #SBATCH -o slurm/patents_all.out
 #SBATCH -e slurm/patents_all.err
 #SBATCH -p defq
@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/prep.sh
-python main.py features json/coherent_light.json 3000
+python main.py features scripts/json/coherent_light.json 3000
