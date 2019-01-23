@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ../scripts/prep.sh
-python main.py features scripts/json/aia-after.json 10000
+python main.py features scripts/json/aia-after.json 5000
