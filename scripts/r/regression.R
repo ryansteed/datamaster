@@ -2,8 +2,8 @@ setwd("/Users/Ryan/datamaster/data")
 dat = read.table("colonial/FEATURES-TIME-DATA_12Jan19.tsv", sep="\t", skip=1)
 head(dat)
 colnames(dat) = c(
-  "k", 
-  "t", 
+  "k",
+  "t",
   "t_0", 
   "patent_num_claims", 
   "patent_num_citedby_us", 
@@ -15,7 +15,7 @@ colnames(dat) = c(
   "assignee_total_num_patents", 
   "assignee_id", 
   "assignee_key_id", 
-  "cpc_category", 
+  "cpc_category",
   "cpc_group_id", 
   "nber_category_id", 
   "nber_subcat_id", 
@@ -31,7 +31,7 @@ dat[,"t_0"] = as.Date(dat[,"t_0"])
 dat[,"t_0"] = as.numeric(dat[,"t_0"] - min(dat[,"t_0"]), units="weeks")
 head(dat)
 
-# plot(dat['t'] + dat['t']^2, log(dat['k']))
+plot(dat[,'t'] + dat[,'t']^2 + dat[,'t']^3, log(dat[,'k']))
 fit = lm(
   log(k) ~ t + t_0 + patent_num_citedby_us + patent_processing_time + patent_num_claims, 
   data=dat
