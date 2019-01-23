@@ -8,5 +8,5 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryansteed@gwu.edu
 
-./scripts/prep.sh
+../scripts/prep.sh
 python main.py features scripts/json/coherent_light.json 10000
