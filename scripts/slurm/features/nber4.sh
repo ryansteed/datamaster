@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J features
+#SBATCH -J features-nber4
 #SBATCH -o slurm/nber4.out
 #SBATCH -e slurm/nber4.err
 #SBATCH -p defq

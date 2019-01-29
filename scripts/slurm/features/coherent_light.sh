@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J features
+#SBATCH -J features-coherent_light
 #SBATCH -o slurm/coherent_light.out
 #SBATCH -e slurm/coherent_light.err
 #SBATCH -p defq

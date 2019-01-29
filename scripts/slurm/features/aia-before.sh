@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J features
+#SBATCH -J features-aia-before
 #SBATCH -o slurm/aia-before.out
 #SBATCH -e slurm/aia-before.err
 #SBATCH -p defq
