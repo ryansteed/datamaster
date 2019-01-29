@@ -8,5 +8,5 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryansteed@gwu.edu
 
-./scripts/prep.sh
+./scripts/slurm/prep.sh
 python main.py features scripts/json/aia-before.json 5000
