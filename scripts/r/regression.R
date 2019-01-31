@@ -28,7 +28,7 @@ colnames(dat) = c(
 # process dates
 dat[,"t_0"] = as.Date(dat[,"t_0"])
 ## center dates and convert to diff time in weeks since min
-dat[,"t_0"] = as.numeric(dat[,"t_0"] - min(dat[,"t_0"]), units="weeks")
+dat[,"t_0_center"] = as.numeric(dat[,"t_0"] - min(dat[,"t_0"]), units="weeks")
 head(dat)
 
 plot(dat[,'t'] + dat[,'t']^2 + dat[,'t']^3, log(dat[,'k']))
@@ -81,9 +81,25 @@ max(coeffs[,'t'])
 
 # viewing the patents without a time dimension - using only final knowledge impact score
 dat2 = dat[dat_final,]
-summary(dat2[,"t_0"])
+summary(dat2[,"t_0_center"])
 fit = lm(
-  log(k) ~ t + t_0 + patent_num_citedby_us,
+  log(k) ~ t + t_0_center + patent_num_citedby_us,
   data=dat2
+)
+summary(fit)
+
+# subsample for aia implementation
+dat2_before = dat2[dat2$t_0 > "2011-09-16",]
+dat2_after = dat2[dat2$t_0 < "2011-09-16",]
+summary(dat2_before[,"t_0_center"])
+fit = lm(
+  log(k) ~ t + t_0_center + patent_num_citedby_us,
+  data=dat2_before
+)
+summary(fit)
+summary(dat2_after[,"t_0_center"])
+fit = lm(
+  log(k) ~ t + t_0_center + patent_num_citedby_us,
+  data=dat2_after
 )
 summary(fit)
