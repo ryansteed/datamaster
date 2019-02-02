@@ -3,7 +3,7 @@ application_data.*
 .idea
 app/lib/__pycache__
 app/__pycache__
-app/config.py
 data/query
 data/graph
 logs
+app/config.py
