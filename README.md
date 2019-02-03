@@ -2,9 +2,11 @@
 **The Effects of Patent Filing Acceleration on the Evolution of Technological Innovation**
 
 Author: [Ryan Steed](https://rbsteed.com)  
+
 [DataMASTER Fellowship](https://math.columbian.gwu.edu/data-master) 2018-19  
 
-Acknowledgement and thanks to:
+---
+*Acknowledgement and thanks to:*
 - [Professor Rahul Simha](https://www.seas.gwu.edu/rahul-simha) for research mentorship and guidance
 - [George Washington University Colonial One High Performance Computing](https://colonialone.gwu.edu/) for compute resources and data storage
 - [PatentsView](http://www.patentsview.org) for easy public API access to USPTO patent data
@@ -16,7 +18,7 @@ To investigate these effects, I intend to 1) identify key properties of the pate
 
 The topological structure of the citation network alone may provide useful insight into the effects of the AIA on patent filing behavior. I hypothesize that many new prolific firms and inventors (as measured by H-indices) will become prominent in a denser citation network while already-prolific firms will not change output significantly, resulting in a more modular network. Beyond static topological analysis, I anticipate that the AIA has a catalyzing effect on network evolution, increasing rates of technology proliferation and mimicry in the citation network.
 
-View the full project proposal [here](docs/RyanSteed_ProjectProposal.pdf).
+View the full project proposal [here](https://rbsteed.com/docs/datamaster/proposal.pdf).
 
 ## Index
 
