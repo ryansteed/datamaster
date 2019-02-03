@@ -1,5 +1,4 @@
-# DataMASTER 2018-19
-**The Effects of Patent Filing Acceleration on the Evolution of Technological Innovation**
+# The Evolution of Technological Innovation in Patent Citation Networks
 
 Author: [Ryan Steed](https://rbsteed.com)  
 [DataMASTER Fellowship](https://math.columbian.gwu.edu/data-master) 2018-19  

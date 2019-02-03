@@ -10,7 +10,7 @@ DataMASTER Documentation
    :maxdepth: 2
    :glob:
 
-   README
+   docs
 
    modules
 
