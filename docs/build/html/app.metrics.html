@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>app.metrics module &mdash; datamaster 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="app.munge module" href="app.munge.html" />
+    <link rel="prev" title="app.helpers module" href="app.helpers.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> datamaster
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">DataMASTER 2018-19</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">app</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="app.html">app package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="app.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="app.config.html">app.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.helpers.html">app.helpers module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">app.metrics module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.munge.html">app.munge module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.tests.html">app.tests module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#module-app">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">datamaster</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">app</a> &raquo;</li>
+        
+          <li><a href="app.html">app package</a> &raquo;</li>
+        
+      <li>app.metrics module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/app.metrics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-app.metrics">
+<span id="app-metrics-module"></span><h1>app.metrics module<a class="headerlink" href="#module-app.metrics" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="app.metrics.CitationNetwork">
+<em class="property">class </em><code class="descclassname">app.metrics.</code><code class="descname">CitationNetwork</code><span class="sig-paren">(</span><em>G</em>, <em>weighting_method='forward_cites'</em>, <em>quality=True</em>, <em>h_index=True</em>, <em>custom_centrality=True</em>, <em>knowledge=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tracks the graph and meta-attributes for any citation network</p>
+<p>Initializes the CitationNetwork</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>G</strong> – the citation graph</li>
+<li><strong>weighting_method</strong> – the primary importance weighting method for the knowledge impact metric</li>
+<li><strong>quality</strong> – whether to use the quality metric</li>
+<li><strong>h_index</strong> – whether to use the h_index</li>
+<li><strong>custom_centrality</strong> – whether to use custom_centrality</li>
+<li><strong>knowledge</strong> – whether to calculate knowledge impact</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.eval_all">
+<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates all custom metrics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>weighting_key</strong> – the preferred weighting key to use for knowledge impact</li>
+<li><strong>verbose</strong> – whether or not to log progress</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.eval_centrality">
+<code class="descname">eval_centrality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_centrality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_centrality" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the centrality and set it as a node attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.eval_h">
+<code class="descname">eval_h</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_h"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the h_index and set it as a node attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.eval_k">
+<code class="descname">eval_k</code><span class="sig-paren">(</span><em>weighting_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the knowledge impact metric for every node and saves as node attribute
+:param weighting_key: the quality metric to use as a weight</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.eval_quality">
+<code class="descname">eval_quality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_quality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_quality" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines patent quality with established metrics; saves metrics as node attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.file_custom_metrics">
+<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.file_custom_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Files the calculated metrics in a CSV
+:param prefix: the filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.k">
+<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively calculates the knowledge impact for a single node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>root</strong> – the root node</li>
+<li><strong>node</strong> – the current node</li>
+<li><strong>weighting_key</strong> – the quality weighting key to use for knowledge impact</li>
+<li><strong>verbose</strong> – whether or not to print progress to stdout</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the total knowledge impact</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.p">
+<code class="descname">p</code><span class="sig-paren">(</span><em>root</em>, <em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.print_custom_metrics">
+<code class="descname">print_custom_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.print_custom_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.print_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize the calculated metrics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.root_analysis">
+<code class="descname">root_analysis</code><span class="sig-paren">(</span><em>depth</em>, <em>filename</em>, <em>limit=None</em>, <em>bin_size=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.root_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.root_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instead of evaluating knowledge impact within the network (breadth-first), conducts a depth-first calculation
+for every node in the network up to some limit.
+Then, calculate knowledge impact in bins of a given size by time.
+Write time-series results to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>depth</strong> – the depth of the search (how many generations of children to examine)</li>
+<li><strong>filename</strong> – the filename to save results</li>
+<li><strong>limit</strong> – the maximum number of nodes to evaluate</li>
+<li><strong>bin_size</strong> – the size of the time bins in weeks</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="app.metrics.CitationNetwork.str_to_datetime">
+<em class="property">static </em><code class="descname">str_to_datetime</code><span class="sig-paren">(</span><em>date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.str_to_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.str_to_datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.summary">
+<code class="descname">summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints summary statistics for the graph metrics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.CitationNetwork.write_graphml">
+<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.write_graphml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the graph to a graphml file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="app.metrics.TreeCitationNetwork">
+<em class="property">class </em><code class="descclassname">app.metrics.</code><code class="descname">TreeCitationNetwork</code><span class="sig-paren">(</span><em>G</em>, <em>root</em>, <em>weighting_method='forward_cites'</em>, <em>quality=True</em>, <em>h_index=True</em>, <em>custom_centrality=True</em>, <em>knowledge=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#TreeCitationNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.TreeCitationNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#app.metrics.CitationNetwork" title="app.metrics.CitationNetwork"><code class="xref py py-class docutils literal notranslate"><span class="pre">app.metrics.CitationNetwork</span></code></a></p>
+<p>A special variation on the CitationNetwork built specifically to track the descendants of a single patent.</p>
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_all">
+<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates all custom metrics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>weighting_key</strong> – the preferred weighting key to use for knowledge impact</li>
+<li><strong>verbose</strong> – whether or not to log progress</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_binned">
+<code class="descname">eval_binned</code><span class="sig-paren">(</span><em>bin_size_weeks</em>, <em>plot=False</em>, <em>weighting_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#TreeCitationNetwork.eval_binned"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_binned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates knowledge impact in time-based bins.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bin_size_weeks</strong> – the bin size in weeks</li>
+<li><strong>plot</strong> – whether or not to display a plot of knowledge over time</li>
+<li><strong>weighting_key</strong> – the weighting key for knowledge impact calculation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of knowledge impact metrics, one for each bin</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_centrality">
+<code class="descname">eval_centrality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_centrality" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the centrality and set it as a node attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_h">
+<code class="descname">eval_h</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the h_index and set it as a node attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_k">
+<code class="descname">eval_k</code><span class="sig-paren">(</span><em>weighting_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#TreeCitationNetwork.eval_k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the knowledge impact metric for every node and saves as node attribute
+:param weighting_key: the quality metric to use as a weight</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.eval_quality">
+<code class="descname">eval_quality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_quality" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines patent quality with established metrics; saves metrics as node attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.file_custom_metrics">
+<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Files the calculated metrics in a CSV
+:param prefix: the filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.is_empty">
+<code class="descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#TreeCitationNetwork.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.TreeCitationNetwork.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.k">
+<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively calculates the knowledge impact for a single node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>root</strong> – the root node</li>
+<li><strong>node</strong> – the current node</li>
+<li><strong>weighting_key</strong> – the quality weighting key to use for knowledge impact</li>
+<li><strong>verbose</strong> – whether or not to print progress to stdout</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the total knowledge impact</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.p">
+<code class="descname">p</code><span class="sig-paren">(</span><em>root</em>, <em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.print_custom_metrics">
+<code class="descname">print_custom_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.print_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize the calculated metrics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.root_analysis">
+<code class="descname">root_analysis</code><span class="sig-paren">(</span><em>depth</em>, <em>filename</em>, <em>limit=None</em>, <em>bin_size=20</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.root_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instead of evaluating knowledge impact within the network (breadth-first), conducts a depth-first calculation
+for every node in the network up to some limit.
+Then, calculate knowledge impact in bins of a given size by time.
+Write time-series results to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>depth</strong> – the depth of the search (how many generations of children to examine)</li>
+<li><strong>filename</strong> – the filename to save results</li>
+<li><strong>limit</strong> – the maximum number of nodes to evaluate</li>
+<li><strong>bin_size</strong> – the size of the time bins in weeks</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="app.metrics.TreeCitationNetwork.str_to_datetime">
+<em class="property">static </em><code class="descname">str_to_datetime</code><span class="sig-paren">(</span><em>date</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.str_to_datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.summary">
+<code class="descname">summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#TreeCitationNetwork.summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.TreeCitationNetwork.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints summary statistics for the graph metrics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="app.metrics.TreeCitationNetwork.write_graphml">
+<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the graph to a graphml file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="app.metrics.h_index">
+<code class="descclassname">app.metrics.</code><code class="descname">h_index</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#h_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.h_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the h index for a list of values
+:param m: list of values
+:return: the h-index</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="app.munge.html" class="btn btn-neutral float-right" title="app.munge module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="app.helpers.html" class="btn btn-neutral" title="app.helpers module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright Ryan Steed
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

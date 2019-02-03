@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>app.munge &mdash; datamaster 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> datamaster
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DataMASTER 2018-19</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">app</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">datamaster</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>app.munge</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for app.munge</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">enlighten</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">overrides</span> <span class="k">import</span> <span class="n">overrides</span>
+
+<span class="kn">from</span> <span class="nn">app.config</span> <span class="k">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">app.helpers</span> <span class="k">import</span> <span class="n">Timer</span>
+
+
+<div class="viewcode-block" id="Munger"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger">[docs]</a><span class="k">class</span> <span class="nc">Munger</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collects patent data into a graph by querying the USPTO.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;patent_number&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cited_patent_number&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cited_patent_date&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;citedby_patent_number&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;citedby_patent_date&quot;</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a munger.</span>
+<span class="sd">        :param limit: the maximum number of patents to process and query</span>
+<span class="sd">        :param cache: whether or not to use data cached in a csv file or make a fresh query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Munger.load_data"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads data from query or file to a dataframe.</span>
+<span class="sd">        :return: the instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_data_from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">make_filename</span><span class="p">())</span>
+                <span class="k">return</span> <span class="bp">self</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="n">DataFormatError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Missing data file, querying USPTO&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">DataFormatError</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Problem loading data file, querying USPTO&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">USE_CACHED_QUERIES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_data_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">make_filename</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Munger.query_data"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.query_data">[docs]</a>    <span class="k">def</span> <span class="nf">query_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Queries data from the USPTO to dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Munger.make_filename"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.make_filename">[docs]</a>    <span class="k">def</span> <span class="nf">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a filename to under which to store the munged data.</span>
+<span class="sd">        :return: the filename</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Munger.query"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.query">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">json_query</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a query to the USPTO using a JSON attributes object.</span>
+<span class="sd">        :param json_query: the json query according to the PatentsView API.</span>
+<span class="sd">        :return: the return query in JSON format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s1">&#39;http://www.patentsview.org/api/patents/query&#39;</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">json_query</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Munger.write_data_to_file"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.write_data_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_data_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the data collected to a file</span>
+<span class="sd">        :param filename: the name of the file, typically the query name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;Writing data to file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">log</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Munger.query_to_dataframe"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.query_to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">query_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">bcites</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the JSON query results from PatentsView to an edge list dataframe.</span>
+<span class="sd">        :param info: the query json output</span>
+<span class="sd">        :param bcites: whether or not to include backward citations</span>
+<span class="sd">        :return: the dataframe containing an edge list wtih the query results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">patent</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;patents&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">bcites</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">bcite</span> <span class="ow">in</span> <span class="n">patent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cited_patents&#39;</span><span class="p">):</span>
+                    <span class="n">edge</span> <span class="o">=</span> <span class="p">(</span><span class="n">patent</span><span class="p">[</span><span class="s1">&#39;patent_number&#39;</span><span class="p">],</span> <span class="n">bcite</span><span class="p">[</span><span class="s1">&#39;cited_patent_number&#39;</span><span class="p">],</span> <span class="n">bcite</span><span class="p">[</span><span class="s1">&#39;cited_patent_date&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge</span><span class="p">:</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fcite</span> <span class="ow">in</span> <span class="n">patent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;citedby_patents&#39;</span><span class="p">):</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="p">(</span><span class="n">fcite</span><span class="p">[</span><span class="s1">&#39;citedby_patent_number&#39;</span><span class="p">],</span> <span class="n">patent</span><span class="p">[</span><span class="s1">&#39;patent_number&#39;</span><span class="p">],</span> <span class="n">fcite</span><span class="p">[</span><span class="s1">&#39;citedby_patent_date&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge</span><span class="p">:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_citation_keys</span><span class="p">()</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Munger.load_data_from_file"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.load_data_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">load_data_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datafile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from file for this query (using the unique make_filename function)</span>
+<span class="sd">        :param datafile: the file to search for</span>
+<span class="sd">        :return: this instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Munging data from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datafile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">datafile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+            <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">datafile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loaded </span><span class="si">{}</span><span class="s2"> documents from file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">datafile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Munger.get_network"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.get_network">[docs]</a>    <span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a citation network from the edge list.</span>
+<span class="sd">        :param metadata: whether or not to include metadata</span>
+<span class="sd">        :param limit: a limit to the number of documents to return</span>
+<span class="sd">        :return: the NetworkX graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating network from data (metadata=</span><span class="si">{}</span><span class="s2">, limit=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">limit</span><span class="p">))</span>
+        <span class="n">df_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_edges</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df_edges</span> <span class="o">=</span> <span class="n">df_edges</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="c1"># for key in self.get_citation_keys():</span>
+        <span class="c1">#     df_edges[key] = df_edges[key].str.strip()</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span>
+            <span class="n">df_edges</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="s1">&#39;citation_id&#39;</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="s1">&#39;patent_id&#39;</span><span class="p">,</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span>
+            <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">df_edges</span><span class="p">[</span><span class="s1">&#39;patent_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">df_edges</span><span class="p">[</span><span class="s1">&#39;citation_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensure_meta</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;patent_number&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                        <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;patent_number&#39;</span><span class="p">})</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find network entry for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;patent_number&#39;</span><span class="p">]))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generated network with </span><span class="si">{}</span><span class="s2"> nodes and </span><span class="si">{}</span><span class="s2"> edges&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">G</span></div>
+
+<div class="viewcode-block" id="Munger.get_edges"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.get_edges">[docs]</a>    <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the edges from this query, if it has been made; else, load data</span>
+<span class="sd">        :return: the edge list in a dataframe, including date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_citation_keys</span><span class="p">()</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Munger.get_citation_keys"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.get_citation_keys">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_citation_keys</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;patent_id&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_id&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Munger.load_metadata"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.load_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query for metadata about each patent and add to dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_citation_keys</span><span class="p">()]))</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="mi">25</span><span class="p">)):</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">({</span>
+                <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;patent_number&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">chunk</span><span class="p">]},</span>
+                <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;patent_number&quot;</span><span class="p">,</span> <span class="s2">&quot;patent_title&quot;</span><span class="p">,</span> <span class="s2">&quot;assignee_id&quot;</span><span class="p">,</span> <span class="s2">&quot;cpc_category&quot;</span><span class="p">,</span> <span class="s2">&quot;nber_category_title&quot;</span><span class="p">]</span>
+            <span class="p">})</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;patents&#39;</span><span class="p">])</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;patents&#39;</span><span class="p">]),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_integrity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Munger.summary"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Summarize the edge list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Munger.summary_meta"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.summary_meta">[docs]</a>    <span class="k">def</span> <span class="nf">summary_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Summarize the metadata</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_meta</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span><span class="o">.</span><span class="n">info</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Munger.ensure_meta"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.ensure_meta">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that metadata has been loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_metadata</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Munger.ensure_data"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.ensure_data">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that edge list has been minimally loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please load data first.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s1">&#39;patent_id&#39;</span><span class="p">,</span> <span class="s1">&#39;citation_id&#39;</span><span class="p">}</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DataFormatError</span><span class="p">(</span><span class="s2">&quot;Missing patent and citation columns in dataset&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Munger.get_filename_from_stem"><a class="viewcode-back" href="../../app.munge.html#app.munge.Munger.get_filename_from_stem">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_filename_from_stem</span><span class="p">(</span><span class="n">file_string</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./data/query&quot;</span><span class="p">,</span> <span class="n">file_string</span><span class="p">)))</span></div></div>
+
+
+<div class="viewcode-block" id="QueryMunger"><a class="viewcode-back" href="../../app.munge.html#app.munge.QueryMunger">[docs]</a><span class="k">class</span> <span class="nc">QueryMunger</span><span class="p">(</span><span class="n">Munger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A special munger designed to make a specific query to the PatentsView API</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_json</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_CACHED_QUERIES</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the query munger</span>
+<span class="sd">        :param query_json: the JSON for the query</span>
+<span class="sd">        :param limit: the maximum number of documents to munge</span>
+<span class="sd">        :param cache: whether or not to use cached query data</span>
+<span class="sd">        :param per_page: the number of patents to request in each individual query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_json</span> <span class="o">=</span> <span class="n">query_json</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+
+<div class="viewcode-block" id="QueryMunger.query_data"><a class="viewcode-back" href="../../app.munge.html#app.munge.QueryMunger.query_data">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">query_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;Querying USPTO: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_json</span><span class="p">))</span>
+        <span class="n">count_patents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_sounding</span><span class="p">()</span>
+        <span class="n">count_to_collect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">&lt;</span> <span class="n">count_patents</span> <span class="k">else</span> <span class="n">count_patents</span>
+        <span class="n">pages</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">count_to_collect</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Collecting </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> docs in </span><span class="si">{}</span><span class="s2"> page</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">count_to_collect</span><span class="p">,</span>
+            <span class="n">count_patents</span><span class="p">,</span>
+            <span class="n">pages</span><span class="p">,</span>
+            <span class="s2">&quot;s&quot;</span> <span class="k">if</span> <span class="n">pages</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">))</span>
+
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">enlighten</span><span class="o">.</span><span class="n">get_manager</span><span class="p">()</span>
+        <span class="n">ticker</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">counter</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">pages</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Ticks&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ticks&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">ENV_NAME</span> <span class="o">!=</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pages</span><span class="p">))</span>
+            <span class="n">page_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_paginated</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">page_df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">page_df</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ticker</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Collected </span><span class="si">{}</span><span class="s2"> edges&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="QueryMunger.query_paginated"><a class="viewcode-back" href="../../app.munge.html#app.munge.QueryMunger.query_paginated">[docs]</a>    <span class="k">def</span> <span class="nf">query_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iteratively queries the PatentsView API (so as not to receive a timeout, and to gather data to file over time)</span>
+<span class="sd">        :param page: the current page number to query</span>
+<span class="sd">        :param per_page: the number of patents per query</span>
+<span class="sd">        :return: a dataframe containing the query page results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">({</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_json</span><span class="p">,</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_fields</span><span class="p">,</span>
+            <span class="s2">&quot;o&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+                <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">per_page</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_to_dataframe</span><span class="p">(</span><span class="n">info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QueryMunger.query_sounding"><a class="viewcode-back" href="../../app.munge.html#app.munge.QueryMunger.query_sounding">[docs]</a>    <span class="k">def</span> <span class="nf">query_sounding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a sounding query to establish the number of documents to scrape</span>
+<span class="sd">        :return: the number of patents to scrape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;Sounding&quot;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">({</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_json</span><span class="p">,</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="s2">&quot;o&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;include_subentity_total_counts&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+            <span class="p">}</span>
+        <span class="p">})</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;total_patent_count&#39;</span><span class="p">]</span>  <span class="c1"># , info[&#39;total_citedby_patent_count&#39;], info[&#39;total_cited_patent_count&#39;]</span></div>
+
+<div class="viewcode-block" id="QueryMunger.make_filename"><a class="viewcode-back" href="../../app.munge.html#app.munge.QueryMunger.make_filename">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;QUERY&quot;</span><span class="p">):</span>
+        <span class="n">file_string</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_json</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1"> /&#39;</span><span class="p">:</span>
+            <span class="n">file_string</span> <span class="o">=</span> <span class="n">file_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filename_from_stem</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">file_string</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="RootMunger"><a class="viewcode-back" href="../../app.munge.html#app.munge.RootMunger">[docs]</a><span class="k">class</span> <span class="nc">RootMunger</span><span class="p">(</span><span class="n">Munger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A special munger to fetch the descendants of a given patent number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patent_number</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_CACHED_QUERIES</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the root munger</span>
+<span class="sd">        :param patent_number: the root patent number</span>
+<span class="sd">        :param depth: the depth of the search (the number of generations of children)</span>
+<span class="sd">        :param limit: a document limit</span>
+<span class="sd">        :param cache: whether to use a cached query in the filesystem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patent_number</span> <span class="o">=</span> <span class="n">patent_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed_branches</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;Fetching root features&quot;</span><span class="p">)</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">({</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;patent_number&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">patent_number</span><span class="p">},</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;cpc_category&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cpc_group_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;assignee_type&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;assignee_total_num_patents&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;assignee_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;inventor_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;inventor_total_num_patents&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ipc_class&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ipc_main_group&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nber_category_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nber_subcategory_id&quot;</span><span class="p">,</span>
+                <span class="c1"># TODO handle the abstract</span>
+                <span class="c1"># &quot;patent_abstract&quot;,</span>
+                <span class="s2">&quot;patent_date&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;patent_num_claims&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;patent_num_cited_by_us_patents&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;patent_processing_time&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;uspc_mainclass_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;uspc_subclass_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;wipo_field_id&quot;</span>
+            <span class="p">]</span>
+        <span class="p">})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;patents&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># TODO - unnest the return to self.features - should be flat dict</span>
+        <span class="n">features_categorical</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;inventors&quot;</span><span class="p">,</span> <span class="s2">&quot;assignees&quot;</span><span class="p">,</span> <span class="s2">&quot;cpcs&quot;</span><span class="p">,</span> <span class="s2">&quot;nbers&quot;</span><span class="p">,</span> <span class="s2">&quot;uspcs&quot;</span><span class="p">,</span> <span class="s2">&quot;IPCs&quot;</span><span class="p">,</span> <span class="s2">&quot;wipos&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">features_categorical</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">features_categorical</span><span class="p">:</span>
+            <span class="n">unpacked</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">features</span><span class="p">[</span><span class="n">category</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">unpacked</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">unpacked</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RootMunger.make_filename"><a class="viewcode-back" href="../../app.munge.html#app.munge.RootMunger.make_filename">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filename_from_stem</span><span class="p">(</span><span class="s2">&quot;PATENT_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patent_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">filename</span></div>
+
+<div class="viewcode-block" id="RootMunger.query_data"><a class="viewcode-back" href="../../app.munge.html#app.munge.RootMunger.query_data">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">query_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patent_number</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;Fetching children recursively&quot;</span><span class="p">)</span>
+        <span class="c1"># TODO - also query patent features and include as attributes in network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patent_number</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Examined </span><span class="si">{}</span><span class="s2"> branches&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">completed_branches</span><span class="p">))</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">log</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RootMunger.get_children"><a class="viewcode-back" href="../../app.munge.html#app.munge.RootMunger.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curr_num</span><span class="p">,</span> <span class="n">curr_depth</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively fetches the children of the current patent up to the maximum depth and add to the edge list</span>
+<span class="sd">        :param curr_num: the current patent being munged</span>
+<span class="sd">        :param curr_depth: the current depth away from the root patent number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># logger.debug(&quot;At depth {}/{}&quot;.format(curr_depth, self.depth))</span>
+        <span class="k">if</span> <span class="n">curr_depth</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completed_branches</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Branch </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">completed_branches</span><span class="p">))</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">({</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;patent_number&quot;</span><span class="p">:</span> <span class="n">curr_num</span><span class="p">},</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_fields</span>
+        <span class="p">})</span>
+        <span class="k">if</span> <span class="n">curr_depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exploring </span><span class="si">{}</span><span class="s2"> branches&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;patents&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;citedby_patents&#39;</span><span class="p">])))</span>
+        <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;patents&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># TODO: include bcites, and recurse once more to get bcites for the leaves but not fcites</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_to_dataframe</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">bcites</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># iterate through all children, recursively</span>
+            <span class="k">if</span> <span class="n">curr_depth</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">patent</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;patents&#39;</span><span class="p">]:</span>
+                    <span class="k">for</span> <span class="n">fcite</span> <span class="ow">in</span> <span class="n">patent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;citedby_patents&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="n">fcite</span><span class="p">[</span><span class="s1">&#39;citedby_patent_number&#39;</span><span class="p">],</span> <span class="n">curr_depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="chunks"><a class="viewcode-back" href="../../app.munge.html#app.munge.chunks">[docs]</a><span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yields successive n-sized chunks from l.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFormatError"><a class="viewcode-back" href="../../app.munge.html#app.munge.DataFormatError">[docs]</a><span class="k">class</span> <span class="nc">DataFormatError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright Ryan Steed
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
