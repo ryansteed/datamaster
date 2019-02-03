@@ -7,3 +7,4 @@ data/query
 data/graph
 logs
 app/config.py
+docs/build
