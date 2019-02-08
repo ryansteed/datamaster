@@ -2,8 +2,8 @@
 #SBATCH -J features-aia-after
 #SBATCH -o slurm/aia-after.out
 #SBATCH -e slurm/aia-after.err
-#SBATCH -p short
-#SBATCH -t 2-00:00:00
+#SBATCH -p defq
+#SBATCH -t 14-00:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryansteed@gwu.edu
 

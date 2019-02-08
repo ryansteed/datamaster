@@ -2,8 +2,8 @@
 #SBATCH -J features-nber5
 #SBATCH -o slurm/nber5.out
 #SBATCH -e slurm/nber5.err
-#SBATCH -p short
-#SBATCH -t 2-00:00:00
+#SBATCH -p defq
+#SBATCH -t 14-00:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryansteed@gwu.edu
 
