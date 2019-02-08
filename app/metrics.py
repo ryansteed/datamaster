@@ -266,7 +266,7 @@ class CitationNetwork:
         """
         df = None
         patents = [i for i in self.G.nodes][:limit+1]
-        for patent in patents:
+        for i, patent in enumerate(patents):
             munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
             # eval_and_sum(munger)
             cn = TreeCitationNetwork(munger.get_network(), patent)
@@ -283,7 +283,7 @@ class CitationNetwork:
                         columns=["t", "k"] + list(munger.features.keys())
                     )
                     df = df.append(df_new, ignore_index=True)
-                t = Timer("Writing data to file {}".format(filename))
+                t = Timer("Patent {}/{} - writing data to file {}".format(i, len(patents), filename))
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, sep='\t', header=True)
                 t.log()
@@ -321,9 +321,9 @@ class TreeCitationNetwork(CitationNetwork):
         """
         bin_size = timedelta(weeks=bin_size_weeks) if bin_size_weeks is not None else None
         full_G = self.G.copy()
-        logger.debug(self.str_to_datetime('2015-01-01'))
+        # logger.debug(self.str_to_datetime('2015-01-01'))
         dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
-        logger.debug("Range: {}".format(max(dates) - min(dates)))
+        # logger.debug("Range: {}".format(max(dates) - min(dates)))
 
         k = []
         bins = int((max(dates) - min(dates)) / bin_size) if bin_size is not None else 1
@@ -342,10 +342,10 @@ class TreeCitationNetwork(CitationNetwork):
             # TODO: only evaluate root node, rather than all nodes
             self.eval_all(weighting_key=weighting_key, verbose=False)
             k.append(self.G.nodes[self.root]["knowledge"])
-            logger.debug("Bin {}/{}".format(i+1, bins))
+            if bins>1:
+                logger.debug("Bin {}/{}".format(i+1, bins))
             self.G = full_G.copy()
 
-        logger.debug(k)
         if plot:
             plt.plot(k)
             plt.show()

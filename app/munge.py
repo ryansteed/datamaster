@@ -4,6 +4,7 @@ import networkx as nx
 import requests
 import os
 import math
+import time
 import json
 import enlighten
 from collections import defaultdict
@@ -70,17 +71,34 @@ class Munger:
         """
         raise NotImplementedError
 
-    @staticmethod
-    def query(json_query):
+    def query(self, json_query):
         """
         Makes a query to the USPTO using a JSON attributes object.
         :param json_query: the json query according to the PatentsView API.
         :return: the return query in JSON format
         """
+        error = None
+        for i in range(10):
+            try:
+                info = self.post_request(json_query)
+            except json.JSONDecodeError as e:
+                error = e
+                time.sleep(10)
+                continue
+            return info
+        raise QueryError("Tried receiving response several times, repeated JSONDecodeError:\n{}".format(error))
+
+    @staticmethod
+    def post_request(json_query):
         r = requests.post(
             'http://www.patentsview.org/api/patents/query',
             json=json_query
         )
+        if not r.ok:
+            try:
+                r.raise_for_status()
+            except Exception as e:
+                raise QueryError("Bad response", e)
         return r.json()
 
     def write_data_to_file(self, filename):
@@ -148,8 +166,8 @@ class Munger:
             create_using=nx.DiGraph()
         )
 
-        logger.debug(np.unique(df_edges['patent_id']).size)
-        logger.debug(np.unique(df_edges['citation_id']).size)
+        # logger.debug(np.unique(df_edges['patent_id']).size)
+        # logger.debug(np.unique(df_edges['citation_id']).size)
         if metadata:
             self.ensure_meta()
             for entry in self.df_meta.to_dict(orient='records'):
@@ -230,7 +248,7 @@ class QueryMunger(Munger):
     """
     A special munger designed to make a specific query to the PatentsView API
     """
-    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=100):
+    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000):
         """
         Initializes the query munger
         :param query_json: the JSON for the query
@@ -372,7 +390,7 @@ class RootMunger(Munger):
 
     @overrides
     def query_data(self):
-        logger.debug(self.patent_number)
+        # logger.debug(self.patent_number)
         t = Timer("Fetching children recursively")
         # TODO - also query patent features and include as attributes in network
         self.get_children(self.patent_number, 0)
@@ -388,7 +406,6 @@ class RootMunger(Munger):
         # logger.debug("At depth {}/{}".format(curr_depth, self.depth))
         if curr_depth == 1:
             self.completed_branches += 1
-            logger.info("Branch {}".format(self.completed_branches))
         info = self.query({
             "q": {"patent_number": curr_num},
             "f": self.query_fields
@@ -416,4 +433,7 @@ def chunks(l, n):
 
 
 class DataFormatError(Exception):
+    pass
+
+class QueryError(Exception):
     pass
