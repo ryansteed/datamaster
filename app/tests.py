@@ -34,7 +34,6 @@ def root_test_multiple(bin_size=20):
     cn.root_analysis(
         3,
         munger.make_filename(prefix="TIME-DATA_{}".format(sys.argv[3])),
-        limit=int(sys.argv[3]),
         bin_size=bin_size
     )
 
