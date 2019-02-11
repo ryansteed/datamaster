@@ -77,14 +77,14 @@ class CitationNetwork:
             logger.info(self.G.nodes[node])
         logger.info("====")
 
-    def file_custom_metrics(self, prefix):
+    def file_custom_metrics(self, filename):
         """
         Files the calculated metrics in a CSV
-        :param prefix: the filename
+        :param filename: the filename
         """
-        logger.info("Filing calculated metrics in {}.csv".format(prefix))
+        logger.info("Filing calculated metrics in {}".format(filename))
         t = Timer("Filing metrics")
-        with open(Config.DATA_PATH+'/'+prefix+'.csv', 'w') as csv_file:
+        with open(filename, 'w') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
             writer.writerow(['node']+self.attributes)
             for node in self.G.nodes:
