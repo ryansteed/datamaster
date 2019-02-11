@@ -240,8 +240,8 @@ class Munger:
             raise DataFormatError("Missing patent and citation columns in dataset")
 
     @staticmethod
-    def get_filename_from_stem(file_string):
-        return "{}.csv".format(os.path.abspath(os.path.join("./data/query", file_string)))
+    def get_filename_from_stem(file_string, dir_name):
+        return "{}.csv".format(os.path.abspath(os.path.join("./data/{}".format(dir_name), file_string)))
 
 
 class QueryMunger(Munger):
@@ -323,11 +323,11 @@ class QueryMunger(Munger):
         return info['total_patent_count']  # , info['total_citedby_patent_count'], info['total_cited_patent_count']
 
     @overrides
-    def make_filename(self, prefix="QUERY"):
+    def make_filename(self, prefix="QUERY", dirname="query"):
         file_string = json.dumps(self.query_json)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return self.get_filename_from_stem("{}_{}".format(prefix, file_string))
+        return self.get_filename_from_stem("{}_{}".format(prefix, file_string), dirname)
 
 
 class RootMunger(Munger):
@@ -384,8 +384,8 @@ class RootMunger(Munger):
         super().__init__(limit, cache)
 
     @overrides
-    def make_filename(self):
-        filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth))
+    def make_filename(self, dirname="query"):
+        filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth), dirname)
         return filename
 
     @overrides

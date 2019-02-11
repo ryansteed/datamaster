@@ -66,7 +66,7 @@ class CitationNetwork:
 
     def write_graphml(self, name):
         """Writes the graph to a graphml file"""
-        nx.write_graphml(self.G, "{}.graphml".format(os.path.abspath(os.path.join("./data/graph", name))))
+        nx.write_graphml(self.G, "{}.graphml".format(os.path.abspath(os.path.join("./data/graph", name))).strip(".csv"))
 
     def print_custom_metrics(self):
         """

@@ -55,6 +55,12 @@ if __name__ == "__main__":
             type=str,
             help="path to a JSON file containing the query to be queried"
         )
+        job.parser.add_argument(
+            '-g',
+            '--write_graph',
+            action='store_true',
+            help="whether or not to write the network to a graph ml file"
+        )
     if test == "root":
         job.set_test(app.tests.root_test_single)
         job.parser.add_argument(
