@@ -327,7 +327,7 @@ class QueryMunger(Munger):
         file_string = json.dumps(self.query_json)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return self.get_filename_from_stem("{}_{}".format(prefix, file_string), dirname)
+        return self.get_filename_from_stem("{}_{}_{}".format(prefix, self.limit, file_string), dirname)
 
 
 class RootMunger(Munger):

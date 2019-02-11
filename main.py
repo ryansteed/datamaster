@@ -51,11 +51,6 @@ if __name__ == "__main__":
     if test == "query":
         job.set_test(app.tests.query_test)
         job.parser.add_argument(
-            'query_json_file',
-            type=str,
-            help="path to a JSON file containing the query to be queried"
-        )
-        job.parser.add_argument(
             '-g',
             '--write_graph',
             action='store_true',
@@ -80,15 +75,17 @@ if __name__ == "__main__":
         job.set_test(app.tests.feature_test)
 
     # add common args
-    if test in ("root_all", "features"):
+    if test in ("root_all", "features", "query"):
         job.parser.add_argument(
             'query_json_file',
             type=str,
             help="path to a JSON file containing the query to be queried"
         )
         job.parser.add_argument(
-            'limit',
+            '-l',
+            '--limit',
             type=int,
+            default=None,
             help="the maximum number of docs to munge"
         )
     if "root" in test:

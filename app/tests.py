@@ -52,17 +52,19 @@ def root_test_multiple(query_json_file, limit, bin_size=20):
     )
 
 
-def query_test(query_json_file, write_graph=False):
+def query_test(query_json_file, limit=Config.DOC_LIMIT, write_graph=False):
     """
     The query endpoint collects patents for a query, constructs a citation network,
     and conducts metric calculations breadth-wise.
 
     :param query_json_file: path to a JSON file containing the query to be queried
     :type query_json_file: str
+    :param limit: the maximum number of docs to munge
+    :type limit: int
     :param write_graph: whether or not to write the network to a graph ml file
     :type write_graph: bool
     """
-    munger = get_query_munger(query_json_file)
+    munger = get_query_munger(query_json_file, limit=limit)
     eval_and_sum(munger, write_graph=write_graph)
 
 
@@ -92,7 +94,6 @@ def eval_and_sum(munger, write_graph=False):
     cn.summary()
     cn.file_custom_metrics(munger.make_filename())
     if write_graph:
-        test = munger.make_filename(dirname="graph")
         cn.write_graphml(munger.make_filename(dirname="graph"))
 
 
