@@ -86,7 +86,7 @@ def eval_and_sum(munger, write_graph=False):
     :param write_graph: whether or not to write the network to a graph ml file
     """
     G = munger.get_network()
-    cn = CitationNetwork(G, custom_centrality=False)
+    cn = CitationNetwork(G, custom_centrality=False, knowledge=(not write_graph))
     # cn.draw()
     cn.eval_all()
     cn.summary()
