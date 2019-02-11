@@ -33,7 +33,15 @@ View the full project proposal [here](https://rbsteed.com/docs/datamaster/propos
 | `env.yml`  | Dependencies for `conda` environment. |
 | `main.py`  | Driver script for the application containing API [endpoints](#api). |
 
-## API
+## Installation
+After installing `git` and `conda`:
+```bash
+git clone https://github.com/ryansteed/datamaster  # clone this repo
+cd datamaster
+conda env update env.yml  # create conda env
+source activate datamaster  # activate env
+python main.py -h  # view help
+```
 
 ## Making the Docs
 
