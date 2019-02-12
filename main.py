@@ -1,6 +1,5 @@
 from app.config import logger
 import app.tests
-from app.config import Config
 
 import argparse
 import sys
@@ -86,7 +85,7 @@ if __name__ == "__main__":
             '-l',
             '--limit',
             type=int,
-            default=Config.DOC_LIMIT,
+            default=None,
             help="the maximum number of docs to munge"
         )
     if "root" in test:
