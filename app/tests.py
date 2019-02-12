@@ -11,7 +11,7 @@ Official API endpoint script. All non-developer calls should run through here fo
 """
 
 
-def root_test_single(patent, depth, bin_size=20):
+def root_test_single(patent, depth, weighting_key, bin_size=20):
     """
     The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.
 
@@ -21,14 +21,16 @@ def root_test_single(patent, depth, bin_size=20):
     :type depth: int
     :param bin_size: the bin size in weeks
     :type bin_size: int
+    :param weighting_key: the weighting key to use for knowledge calculation
+    :type weighting_key: str
     """
     munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
-    cn = TreeCitationNetwork(munger.get_network(), patent)
+    cn = TreeCitationNetwork(munger.get_network(), patent, weighting_method=weighting_key)
     cn.eval_binned(bin_size, plot=True)
     cn.write_graphml("{}_{}".format(patent, depth))
 
 
-def root_test_multiple(query_json_file, limit, bin_size=20):
+def root_test_multiple(query_json_file, limit, weighting_key, bin_size=20):
     """
     The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.
 
@@ -38,12 +40,14 @@ def root_test_multiple(query_json_file, limit, bin_size=20):
     :type limit: int
     :param bin_size: bin size in weeks
     :type bin_size: int
+    :param weighting_key: the weighting key to use for knowledge calculation
+    :type weighting_key: str
     """
     # TODO: build this as a function of the full network, handling empty root networks automatically
     #  - then build a full dataframe and save to file
     munger = get_query_munger(query_json_file, limit=limit)
     G = munger.get_network(limit=limit)
-    cn = CitationNetwork(G, custom_centrality=False)
+    cn = CitationNetwork(G, custom_centrality=False, weighting_method=weighting_key)
     cn.root_analysis(
         3,
         munger.make_filename(prefix="TIME-DATA_{}".format(limit)),
@@ -52,7 +56,7 @@ def root_test_multiple(query_json_file, limit, bin_size=20):
     )
 
 
-def query_test(query_json_file, limit=Config.DOC_LIMIT, write_graph=False):
+def query_test(query_json_file, limit, weighting_key, write_graph=False):
     """
     The query endpoint collects patents for a query, constructs a citation network,
     and conducts metric calculations breadth-wise.
@@ -65,10 +69,10 @@ def query_test(query_json_file, limit=Config.DOC_LIMIT, write_graph=False):
     :type write_graph: bool
     """
     munger = get_query_munger(query_json_file, limit=limit)
-    eval_and_sum(munger, write_graph=write_graph)
+    eval_and_sum(munger, weighting_key=weighting_key, write_graph=write_graph)
 
 
-def feature_test(query_json_file, limit):
+def feature_test(query_json_file, limit, weighting_key):
     """
     The feature endpoint constructs descendant trees for a series of roots from a single query, but does not conduct
     time series analysis. It also collects additional observable features for use as controls in multiple regression.
@@ -77,18 +81,21 @@ def feature_test(query_json_file, limit):
     :type query_json_file: str
     :param limit: the maximum number of docs to munge
     :type limit: int
+    :param weighting_key: the weighting key to use for knowledge calculation
+    :type weighting_key: str
     """
-    root_test_multiple(query_json_file, limit, bin_size=None)
+    root_test_multiple(query_json_file, limit, bin_size=None, weighting_key=weighting_key)
 
 
-def eval_and_sum(munger, write_graph=False):
+def eval_and_sum(munger,  weighting_key, write_graph=False):
     """
     Evaluates all metrics and summarize using the graph output from a munger.
     :param munger: the munger to analyze
     :param write_graph: whether or not to write the network to a graph ml file
+    :param weighting_key: the weighting key to use for knowledge calculation
     """
     G = munger.get_network()
-    cn = CitationNetwork(G, custom_centrality=False, knowledge=(not write_graph))
+    cn = CitationNetwork(G, custom_centrality=False, knowledge=(not write_graph), weighting_method=weighting_key)
     # cn.draw()
     cn.eval_all()
     cn.summary()

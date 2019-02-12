@@ -4,10 +4,10 @@ import sys
 
 class Config:
 
-    ENV_NAME = "local"
+    ENV_NAME = "colonial"
 
     DATA_PATH = os.path.abspath('../../data')
-    LOG_PATH = os.path.dirname('logs/local.log')
+    LOG_PATH = os.path.dirname('logs/colonial.log')
 
     DOC_LIMIT = None
 

@@ -1,11 +1,9 @@
 import networkx as nx
 import numpy as np
 from scipy.stats import sem
-import app.munge as munge
 import csv
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-import os
 import pandas as pd
 from overrides import overrides
 
@@ -17,7 +15,7 @@ from app.munge import RootMunger
 class CitationNetwork:
     """Tracks the graph and meta-attributes for any citation network"""
     def __init__(
-            self, G, weighting_method="forward_cites",
+            self, G, weighting_method="h_index",
             quality=True, h_index=True, custom_centrality=True, knowledge=True
             ):
         """

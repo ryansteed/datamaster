@@ -1,5 +1,6 @@
 from app.config import logger
 import app.tests
+from app.config import Config
 
 import argparse
 import sys
@@ -85,7 +86,7 @@ if __name__ == "__main__":
             '-l',
             '--limit',
             type=int,
-            default=None,
+            default=Config.DOC_LIMIT,
             help="the maximum number of docs to munge"
         )
     if "root" in test:
@@ -97,4 +98,11 @@ if __name__ == "__main__":
             help="the bin size in weeks"
         )
 
+    job.parser.add_argument(
+        '-w',
+        '--weighting_key',
+        type=str,
+        default="forward_cites",
+        help="the weighting key for knowledge calculation (e.g. 'forward_cites', 'h_index')"
+    )
     job.execute()
