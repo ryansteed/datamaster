@@ -99,7 +99,7 @@ def eval_and_sum(munger,  weighting_key, write_graph=False):
     # cn.draw()
     cn.eval_all()
     cn.summary()
-    cn.file_custom_metrics(munger.make_filename())
+    cn.file_custom_metrics(munger.make_filename(prefix="METRICS_{}".format(weighting_key)))
     if write_graph:
         cn.write_graphml(munger.make_filename(dirname="graph"))
 
