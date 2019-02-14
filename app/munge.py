@@ -4,6 +4,7 @@ import networkx as nx
 import requests
 import os
 import math
+import time
 import json
 import enlighten
 from collections import defaultdict
@@ -70,17 +71,34 @@ class Munger:
         """
         raise NotImplementedError
 
-    @staticmethod
-    def query(json_query):
+    def query(self, json_query):
         """
         Makes a query to the USPTO using a JSON attributes object.
         :param json_query: the json query according to the PatentsView API.
         :return: the return query in JSON format
         """
+        error = None
+        for i in range(10):
+            try:
+                info = self.post_request(json_query)
+            except json.JSONDecodeError as e:
+                error = e
+                time.sleep(10)
+                continue
+            return info
+        raise QueryError("Tried receiving response several times, repeated JSONDecodeError:\n{}".format(error))
+
+    @staticmethod
+    def post_request(json_query):
         r = requests.post(
             'http://www.patentsview.org/api/patents/query',
             json=json_query
         )
+        if not r.ok:
+            try:
+                r.raise_for_status()
+            except Exception as e:
+                raise QueryError("Bad response", e)
         return r.json()
 
     def write_data_to_file(self, filename):
@@ -93,7 +111,7 @@ class Munger:
             self.df.to_csv(file, index=False, sep='\t')
         t.log()
 
-    def query_to_dataframe(self, info, bcites=True):
+    def query_to_dataframe(self, info, bcites=Config.COLLECT_BCITES):
         """
         Converts the JSON query results from PatentsView to an edge list dataframe.
         :param info: the query json output
@@ -148,8 +166,8 @@ class Munger:
             create_using=nx.DiGraph()
         )
 
-        logger.debug(np.unique(df_edges['patent_id']).size)
-        logger.debug(np.unique(df_edges['citation_id']).size)
+        # logger.debug(np.unique(df_edges['patent_id']).size)
+        # logger.debug(np.unique(df_edges['citation_id']).size)
         if metadata:
             self.ensure_meta()
             for entry in self.df_meta.to_dict(orient='records'):
@@ -222,15 +240,15 @@ class Munger:
             raise DataFormatError("Missing patent and citation columns in dataset")
 
     @staticmethod
-    def get_filename_from_stem(file_string):
-        return "{}.csv".format(os.path.abspath(os.path.join("./data/query", file_string)))
+    def get_filename_from_stem(file_string, dir_name):
+        return "{}.csv".format(os.path.abspath(os.path.join("./data/{}".format(dir_name), file_string)))
 
 
 class QueryMunger(Munger):
     """
     A special munger designed to make a specific query to the PatentsView API
     """
-    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=100):
+    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000):
         """
         Initializes the query munger
         :param query_json: the JSON for the query
@@ -305,11 +323,11 @@ class QueryMunger(Munger):
         return info['total_patent_count']  # , info['total_citedby_patent_count'], info['total_cited_patent_count']
 
     @overrides
-    def make_filename(self, prefix="QUERY"):
+    def make_filename(self, prefix="QUERY", dirname="query"):
         file_string = json.dumps(self.query_json)
         for c in '"{} /':
             file_string = file_string.replace(c, '')
-        return self.get_filename_from_stem("{}_{}".format(prefix, file_string))
+        return self.get_filename_from_stem("{}_{}_{}".format(prefix, self.limit, file_string), dirname)
 
 
 class RootMunger(Munger):
@@ -366,13 +384,13 @@ class RootMunger(Munger):
         super().__init__(limit, cache)
 
     @overrides
-    def make_filename(self):
-        filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth))
+    def make_filename(self, dirname="query"):
+        filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth), dirname)
         return filename
 
     @overrides
     def query_data(self):
-        logger.debug(self.patent_number)
+        # logger.debug(self.patent_number)
         t = Timer("Fetching children recursively")
         # TODO - also query patent features and include as attributes in network
         self.get_children(self.patent_number, 0)
@@ -388,7 +406,6 @@ class RootMunger(Munger):
         # logger.debug("At depth {}/{}".format(curr_depth, self.depth))
         if curr_depth == 1:
             self.completed_branches += 1
-            logger.info("Branch {}".format(self.completed_branches))
         info = self.query({
             "q": {"patent_number": curr_num},
             "f": self.query_fields
@@ -416,4 +433,7 @@ def chunks(l, n):
 
 
 class DataFormatError(Exception):
+    pass
+
+class QueryError(Exception):
     pass

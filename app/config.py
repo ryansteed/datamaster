@@ -1,17 +1,29 @@
 import os
 import logging
 import sys
+import json
+
 
 class Config:
 
-    ENV_NAME = "colonial"
+    try:
+        ENV_NAME = json.load(open("settings.json", "r")).get("ENV_NAME")
+    except FileNotFoundError as e:
+        print("You're not running from an accepted directory. Using 'unknown' env.")
+        ENV_NAME = 'unknown'
 
     DATA_PATH = os.path.abspath('../../data')
-    LOG_PATH = os.path.dirname('logs/colonial.log')
+    LOG_PATH = os.path.dirname('logs/{}.log'.format(ENV_NAME))
+
+    COLLECT_BCITES = False
 
     DOC_LIMIT = None
 
     USE_CACHED_QUERIES = True
+
+    PROGRESS_DIV = 100
+
+    K_DEPTH = 10
 
 
 log_dir = Config.LOG_PATH

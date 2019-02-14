@@ -1,31 +1,107 @@
 from app.config import logger
-from app.tests import *
+import app.tests
+
+import argparse
+import sys
+
+
+class JobHandler:
+    def __init__(self, description):
+        self.parser = argparse.ArgumentParser(description="{} endpoint".format(description))
+        self.parser.add_argument(
+            'endpoint',
+            type=str,
+            help="the name of the endpoint to be called"
+        )
+        self.test_runnable = None
+
+    def set_test(self, test_fxn):
+        self.test_runnable = test_fxn
+
+    def get_args(self):
+        args = vars(self.parser.parse_args())
+        args.pop('endpoint')
+        return args
+
+    def execute(self):
+        logger.debug(self.get_args())
+        self.test_runnable(**self.get_args())
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        raise ValueError("Missing arg.\n USAGE: python main.py [test_type]")
+        raise ValueError("Missing endpoint arg.\n USAGE: python main.py [endpoint_string]")
 
-    test = sys.argv[1]
+    parser = argparse.ArgumentParser("Datamaster job handler")
+    parser.add_argument(
+        'endpoint',
+        type=str,
+        help="the name of the endpoint to be called"
+    )
+    parser.add_argument(
+        'args',
+        nargs=argparse.REMAINDER,
+        help="endpoint-specific arguments"
+    )
+    test = vars(parser.parse_args()).get('endpoint')
+    job = JobHandler(test)
     logger.info("## Testing {} ##".format(test))
 
-    """
-    The query endpoint collects patents for a query, constructs a citation network, 
-    and conducts metric calculations.
-    """
+    # set runnables
     if test == "query":
-        query_test()
-
-    """
-    The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.
-    """
+        job.set_test(app.tests.query_test)
+        job.parser.add_argument(
+            '-g',
+            '--write_graph',
+            action='store_true',
+            help="whether or not to write the network to a graph ml file"
+        )
     if test == "root":
-        root_test_single()
+        job.set_test(app.tests.root_test_single)
+        job.parser.add_argument(
+            'patent',
+            metavar="patent_number",
+            type=str,
+            help="number for the root patent"
+        )
+        job.parser.add_argument(
+            'depth',
+            type=int,
+            help="the graph search depth"
+        )
     if test == "root_all":
-        root_test_multiple()
-
-    """
-    The feature endpoint constructs descendant trees for a series of roots from a single query, but does not conduct
-    time series analysis. It also collects additional observable features for use as controls in multiple regression.
-    """
+        job.set_test(app.tests.root_test_multiple)
     if test == "features":
-        root_test_multiple(bin_size=None)
+        job.set_test(app.tests.feature_test)
+
+    # add common args
+    if test in ("root_all", "features", "query"):
+        job.parser.add_argument(
+            'query_json_file',
+            type=str,
+            help="path to a JSON file containing the query to be queried"
+        )
+        job.parser.add_argument(
+            '-l',
+            '--limit',
+            type=int,
+            default=None,
+            help="the maximum number of docs to munge"
+        )
+    if "root" in test:
+        job.parser.add_argument(
+            '-b',
+            '--bin_size',
+            type=int,
+            default=20,
+            help="the bin size in weeks"
+        )
+
+    job.parser.add_argument(
+        '-w',
+        '--weighting_key',
+        type=str,
+        default="forward_cites",
+        help="the weighting key for knowledge calculation (e.g. 'forward_cites', 'h_index')"
+    )
+    job.execute()
