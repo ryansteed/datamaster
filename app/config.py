@@ -17,6 +17,8 @@ class Config:
 
     USE_CACHED_QUERIES = True
 
+    PROGRESS_DIV = 100
+
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):

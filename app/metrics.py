@@ -234,7 +234,7 @@ class CitationNetwork:
         node_attrs = {}
         manager = enlighten.get_manager()
         ticker = manager.counter(total=len(self.G.nodes), desc='Ticks', unit='ticks')
-        div = 20
+        div = Config.PROGRESS_DIV
         t = Timer("{}%".format(round(1/div*100)))
         for i, node in enumerate(self.G.nodes):
             node_attrs[node] = self.k(node, node, weighting_key)
