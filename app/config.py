@@ -19,6 +19,8 @@ class Config:
 
     PROGRESS_DIV = 100
 
+    K_DEPTH = 10
+
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):

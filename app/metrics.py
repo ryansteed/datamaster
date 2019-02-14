@@ -237,7 +237,7 @@ class CitationNetwork:
         div = Config.PROGRESS_DIV
         t = Timer("{}%".format(round(1/div*100)))
         for i, node in enumerate(self.G.nodes):
-            node_attrs[node] = self.k(node, node, weighting_key)
+            node_attrs[node] = self.k(node, node, weighting_key, 0)
             if i % int(len(self.G.nodes) / div) == 0:
                 t.log()
                 if i / int(len(self.G.nodes) / div) < div:
@@ -249,19 +249,23 @@ class CitationNetwork:
             'knowledge'
         )
 
-    def k(self, root, node, weighting_key, verbose=False):
+    def k(self, root, node, weighting_key, depth, max_depth=Config.K_DEPTH, verbose=False):
         """
         Recursively calculates the knowledge impact for a single node
 
         :param root: the root node
         :param node: the current node
         :param weighting_key: the quality weighting key to use for knowledge impact
+        :param depth: the current search depth
+        :param max_depth: the maximum depth to evaluate towards
         :param verbose: whether or not to print progress to stdout
         :return: the total knowledge impact
         """
+        if max_depth is not None and depth > max_depth:
+            return 0
         sum_children = 0
         for child in [x for x in self.G.successors(node) if x is not None]:
-            sum_children += self.k(root, child, weighting_key)
+            sum_children += self.k(root, child, weighting_key, depth+1)
         total_k = (self.G.nodes[node][weighting_key] + sum_children) * self.p(root, node)
         if verbose:
             logger.info('node', node)
