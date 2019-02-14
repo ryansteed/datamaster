@@ -145,17 +145,29 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../app.config.html#app.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
 
-    <span class="n">ENV_NAME</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ENV_NAME</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;settings.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ENV_NAME&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You&#39;re not running from an accepted directory. Using &#39;unknown&#39; env.&quot;</span><span class="p">)</span>
+        <span class="n">ENV_NAME</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
 
     <span class="n">DATA_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;../../data&#39;</span><span class="p">)</span>
-    <span class="n">LOG_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="s1">&#39;logs/local.log&#39;</span><span class="p">)</span>
+    <span class="n">LOG_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="s1">&#39;logs/</span><span class="si">{}</span><span class="s1">.log&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ENV_NAME</span><span class="p">))</span>
+
+    <span class="n">COLLECT_BCITES</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">DOC_LIMIT</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">USE_CACHED_QUERIES</span> <span class="o">=</span> <span class="kc">True</span></div>
+    <span class="n">USE_CACHED_QUERIES</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">PROGRESS_DIV</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="n">K_DEPTH</span> <span class="o">=</span> <span class="mi">10</span></div>
 
 
 <span class="n">log_dir</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">LOG_PATH</span>

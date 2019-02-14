@@ -165,19 +165,32 @@
   <div class="section" id="module-app.tests">
 <span id="app-tests-module"></span><h1>app.tests module<a class="headerlink" href="#module-app.tests" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="app.tests.check_args">
-<code class="descclassname">app.tests.</code><code class="descname">check_args</code><span class="sig-paren">(</span><em>num</em>, <em>usage</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#check_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.check_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Verifies the proper number of arguments have been submitted. Print usage if not.
-:param num: The proper number of arguments.
-:param usage: A string describing the usage for this endpoint.
-:return:</p>
+<dt id="app.tests.eval_and_sum">
+<code class="descclassname">app.tests.</code><code class="descname">eval_and_sum</code><span class="sig-paren">(</span><em>munger</em>, <em>weighting_key</em>, <em>write_graph=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#eval_and_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.eval_and_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates all metrics and summarize using the graph output from a munger.
+:param munger: the munger to analyze
+:param write_graph: whether or not to write the network to a graph ml file
+:param weighting_key: the weighting key to use for knowledge calculation</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="app.tests.eval_and_sum">
-<code class="descclassname">app.tests.</code><code class="descname">eval_and_sum</code><span class="sig-paren">(</span><em>munger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#eval_and_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.eval_and_sum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates all metrics and summarize using the graph output from a munger.
-:param munger: the munger to analyze</p>
+<dt id="app.tests.feature_test">
+<code class="descclassname">app.tests.</code><code class="descname">feature_test</code><span class="sig-paren">(</span><em>query_json_file</em>, <em>limit</em>, <em>weighting_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#feature_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.feature_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>The feature endpoint constructs descendant trees for a series of roots from a single query, but does not conduct
+time series analysis. It also collects additional observable features for use as controls in multiple regression.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query_json_file</strong> (<em>str</em>) – path to a JSON file containing the query to be queried</li>
+<li><strong>limit</strong> (<em>int</em>) – the maximum number of docs to munge</li>
+<li><strong>weighting_key</strong> (<em>str</em>) – the weighting key to use for knowledge calculation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -191,22 +204,62 @@
 
 <dl class="function">
 <dt id="app.tests.query_test">
-<code class="descclassname">app.tests.</code><code class="descname">query_test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#query_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.query_test" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates all metrics for a query, breadth-wise.</p>
+<code class="descclassname">app.tests.</code><code class="descname">query_test</code><span class="sig-paren">(</span><em>query_json_file</em>, <em>limit</em>, <em>weighting_key</em>, <em>write_graph=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#query_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.query_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>The query endpoint collects patents for a query, constructs a citation network,
+and conducts metric calculations breadth-wise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query_json_file</strong> (<em>str</em>) – path to a JSON file containing the query to be queried</li>
+<li><strong>limit</strong> (<em>int</em>) – the maximum number of docs to munge</li>
+<li><strong>write_graph</strong> (<em>bool</em>) – whether or not to write the network to a graph ml file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="app.tests.root_test_multiple">
-<code class="descclassname">app.tests.</code><code class="descname">root_test_multiple</code><span class="sig-paren">(</span><em>bin_size=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#root_test_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.root_test_multiple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Analyzes knowledge impact over time for a query of patents
-:param bin_size: bin size in weeks</p>
+<code class="descclassname">app.tests.</code><code class="descname">root_test_multiple</code><span class="sig-paren">(</span><em>query_json_file</em>, <em>limit</em>, <em>weighting_key</em>, <em>bin_size=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#root_test_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.root_test_multiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query_json_file</strong> (<em>str</em>) – path to a JSON file containing the query to be queried</li>
+<li><strong>limit</strong> (<em>int</em>) – the maximum number of docs to munge</li>
+<li><strong>bin_size</strong> (<em>int</em>) – bin size in weeks</li>
+<li><strong>weighting_key</strong> (<em>str</em>) – the weighting key to use for knowledge calculation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="app.tests.root_test_single">
-<code class="descclassname">app.tests.</code><code class="descname">root_test_single</code><span class="sig-paren">(</span><em>bin_size=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#root_test_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.root_test_single" title="Permalink to this definition">¶</a></dt>
-<dd><p>Analyzes knowledge impact over time for a single patent
-:param bin_size: the bin size in weeks</p>
+<code class="descclassname">app.tests.</code><code class="descname">root_test_single</code><span class="sig-paren">(</span><em>patent</em>, <em>depth</em>, <em>weighting_key</em>, <em>bin_size=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/tests.html#root_test_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.tests.root_test_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>patent</strong> (<em>str</em>) – the patent number</li>
+<li><strong>depth</strong> (<em>int</em>) – the graph search depth</li>
+<li><strong>bin_size</strong> (<em>int</em>) – the bin size in weeks</li>
+<li><strong>weighting_key</strong> (<em>str</em>) – the weighting key to use for knowledge calculation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

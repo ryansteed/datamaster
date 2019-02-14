@@ -167,7 +167,7 @@
 <span id="app-metrics-module"></span><h1>app.metrics module<a class="headerlink" href="#module-app.metrics" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="app.metrics.CitationNetwork">
-<em class="property">class </em><code class="descclassname">app.metrics.</code><code class="descname">CitationNetwork</code><span class="sig-paren">(</span><em>G</em>, <em>weighting_method='forward_cites'</em>, <em>quality=True</em>, <em>h_index=True</em>, <em>custom_centrality=True</em>, <em>knowledge=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.metrics.</code><code class="descname">CitationNetwork</code><span class="sig-paren">(</span><em>G</em>, <em>weighting_method='h_index'</em>, <em>quality=True</em>, <em>h_index=True</em>, <em>custom_centrality=True</em>, <em>knowledge=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Tracks the graph and meta-attributes for any citation network</p>
 <p>Initializes the CitationNetwork</p>
@@ -195,7 +195,7 @@
 
 <dl class="method">
 <dt id="app.metrics.CitationNetwork.eval_all">
-<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
+<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em>, <em>file_early=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.eval_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates all custom metrics</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -238,14 +238,14 @@
 
 <dl class="method">
 <dt id="app.metrics.CitationNetwork.file_custom_metrics">
-<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.file_custom_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.file_custom_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Files the calculated metrics in a CSV
-:param prefix: the filename</p>
+:param filename: the filename</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="app.metrics.CitationNetwork.k">
-<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.k" title="Permalink to this definition">¶</a></dt>
+<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>depth</em>, <em>max_depth=10</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.k" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively calculates the knowledge impact for a single node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -255,6 +255,8 @@
 <li><strong>root</strong> – the root node</li>
 <li><strong>node</strong> – the current node</li>
 <li><strong>weighting_key</strong> – the quality weighting key to use for knowledge impact</li>
+<li><strong>depth</strong> – the current search depth</li>
+<li><strong>max_depth</strong> – the maximum depth to evaluate towards</li>
 <li><strong>verbose</strong> – whether or not to print progress to stdout</li>
 </ul>
 </td>
@@ -313,8 +315,16 @@ Write time-series results to a file.</p>
 
 <dl class="method">
 <dt id="app.metrics.CitationNetwork.write_graphml">
-<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.write_graphml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/metrics.html#CitationNetwork.write_graphml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.metrics.CitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the graph to a graphml file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filepath</strong> (<em>str</em>) – the filename to store, as generated by a QueryMunger instance</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -332,7 +342,7 @@ Write time-series results to a file.</p>
 
 <dl class="method">
 <dt id="app.metrics.TreeCitationNetwork.eval_all">
-<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
+<code class="descname">eval_all</code><span class="sig-paren">(</span><em>weighting_key=None</em>, <em>verbose=True</em>, <em>file_early=None</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.eval_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates all custom metrics</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -397,9 +407,9 @@ Write time-series results to a file.</p>
 
 <dl class="method">
 <dt id="app.metrics.TreeCitationNetwork.file_custom_metrics">
-<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
+<code class="descname">file_custom_metrics</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.file_custom_metrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Files the calculated metrics in a CSV
-:param prefix: the filename</p>
+:param filename: the filename</p>
 </dd></dl>
 
 <dl class="method">
@@ -409,7 +419,7 @@ Write time-series results to a file.</p>
 
 <dl class="method">
 <dt id="app.metrics.TreeCitationNetwork.k">
-<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.k" title="Permalink to this definition">¶</a></dt>
+<code class="descname">k</code><span class="sig-paren">(</span><em>root</em>, <em>node</em>, <em>weighting_key</em>, <em>depth</em>, <em>max_depth=10</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.k" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively calculates the knowledge impact for a single node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -419,6 +429,8 @@ Write time-series results to a file.</p>
 <li><strong>root</strong> – the root node</li>
 <li><strong>node</strong> – the current node</li>
 <li><strong>weighting_key</strong> – the quality weighting key to use for knowledge impact</li>
+<li><strong>depth</strong> – the current search depth</li>
+<li><strong>max_depth</strong> – the maximum depth to evaluate towards</li>
 <li><strong>verbose</strong> – whether or not to print progress to stdout</li>
 </ul>
 </td>
@@ -477,8 +489,16 @@ Write time-series results to a file.</p>
 
 <dl class="method">
 <dt id="app.metrics.TreeCitationNetwork.write_graphml">
-<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_graphml</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="headerlink" href="#app.metrics.TreeCitationNetwork.write_graphml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the graph to a graphml file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filepath</strong> (<em>str</em>) – the filename to store, as generated by a QueryMunger instance</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

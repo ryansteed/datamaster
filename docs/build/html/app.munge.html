@@ -217,7 +217,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="staticmethod">
 <dt id="app.munge.Munger.get_filename_from_stem">
-<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.get_filename_from_stem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em>, <em>dir_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.get_filename_from_stem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -258,8 +258,13 @@ set self.__traceback__ to tb and return self.</p>
 </dd></dl>
 
 <dl class="staticmethod">
+<dt id="app.munge.Munger.post_request">
+<em class="property">static </em><code class="descname">post_request</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.post_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.post_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="app.munge.Munger.query">
-<em class="property">static </em><code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a query to the USPTO using a JSON attributes object.
 :param json_query: the json query according to the PatentsView API.
 :return: the return query in JSON format</p>
@@ -278,7 +283,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="method">
 <dt id="app.munge.Munger.query_to_dataframe">
-<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.query_to_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#Munger.query_to_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.Munger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the JSON query results from PatentsView to an edge list dataframe.
 :param info: the query json output
 :param bcites: whether or not to include backward citations
@@ -306,9 +311,27 @@ set self.__traceback__ to tb and return self.</p>
 
 </dd></dl>
 
+<dl class="exception">
+<dt id="app.munge.QueryError">
+<em class="property">exception </em><code class="descclassname">app.munge.</code><code class="descname">QueryError</code><a class="reference internal" href="_modules/app/munge.html#QueryError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.QueryError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="app.munge.QueryError.args">
+<code class="descname">args</code><a class="headerlink" href="#app.munge.QueryError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.munge.QueryError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="app.munge.QueryMunger">
-<em class="property">class </em><code class="descclassname">app.munge.</code><code class="descname">QueryMunger</code><span class="sig-paren">(</span><em>query_json</em>, <em>limit=None</em>, <em>cache=True</em>, <em>per_page=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#QueryMunger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.QueryMunger" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.munge.</code><code class="descname">QueryMunger</code><span class="sig-paren">(</span><em>query_json</em>, <em>limit=None</em>, <em>cache=True</em>, <em>per_page=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#QueryMunger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.QueryMunger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#app.munge.Munger" title="app.munge.Munger"><code class="xref py py-class docutils literal notranslate"><span class="pre">app.munge.Munger</span></code></a></p>
 <p>A special munger designed to make a specific query to the PatentsView API</p>
 <p>Initializes the query munger
@@ -342,7 +365,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="staticmethod">
 <dt id="app.munge.QueryMunger.get_filename_from_stem">
-<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em>, <em>dir_name</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -377,14 +400,19 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="method">
 <dt id="app.munge.QueryMunger.make_filename">
-<code class="descname">make_filename</code><span class="sig-paren">(</span><em>prefix='QUERY'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#QueryMunger.make_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.QueryMunger.make_filename" title="Permalink to this definition">¶</a></dt>
+<code class="descname">make_filename</code><span class="sig-paren">(</span><em>prefix='QUERY'</em>, <em>dirname='query'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#QueryMunger.make_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.QueryMunger.make_filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a filename to under which to store the munged data.
 :return: the filename</p>
 </dd></dl>
 
 <dl class="staticmethod">
+<dt id="app.munge.QueryMunger.post_request">
+<em class="property">static </em><code class="descname">post_request</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.post_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="app.munge.QueryMunger.query">
-<em class="property">static </em><code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a query to the USPTO using a JSON attributes object.
 :param json_query: the json query according to the PatentsView API.
 :return: the return query in JSON format</p>
@@ -419,7 +447,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="method">
 <dt id="app.munge.QueryMunger.query_to_dataframe">
-<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=True</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=False</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.QueryMunger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the JSON query results from PatentsView to an edge list dataframe.
 :param info: the query json output
 :param bcites: whether or not to include backward citations
@@ -491,7 +519,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="staticmethod">
 <dt id="app.munge.RootMunger.get_filename_from_stem">
-<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">get_filename_from_stem</code><span class="sig-paren">(</span><em>file_string</em>, <em>dir_name</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.get_filename_from_stem" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -526,14 +554,19 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="method">
 <dt id="app.munge.RootMunger.make_filename">
-<code class="descname">make_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#RootMunger.make_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.RootMunger.make_filename" title="Permalink to this definition">¶</a></dt>
+<code class="descname">make_filename</code><span class="sig-paren">(</span><em>dirname='query'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/munge.html#RootMunger.make_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.munge.RootMunger.make_filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a filename to under which to store the munged data.
 :return: the filename</p>
 </dd></dl>
 
 <dl class="staticmethod">
+<dt id="app.munge.RootMunger.post_request">
+<em class="property">static </em><code class="descname">post_request</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.post_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="app.munge.RootMunger.query">
-<em class="property">static </em><code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>json_query</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a query to the USPTO using a JSON attributes object.
 :param json_query: the json query according to the PatentsView API.
 :return: the return query in JSON format</p>
@@ -552,7 +585,7 @@ set self.__traceback__ to tb and return self.</p>
 
 <dl class="method">
 <dt id="app.munge.RootMunger.query_to_dataframe">
-<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=True</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_to_dataframe</code><span class="sig-paren">(</span><em>info</em>, <em>bcites=False</em><span class="sig-paren">)</span><a class="headerlink" href="#app.munge.RootMunger.query_to_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the JSON query results from PatentsView to an edge list dataframe.
 :param info: the query json output
 :param bcites: whether or not to include backward citations

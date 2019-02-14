@@ -82,7 +82,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">DataMASTER 2018-19</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#abstract">Abstract</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#index">Index</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#api">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#making-the-docs">Making the Docs</a></li>
 </ul>
 </li>
@@ -214,8 +214,16 @@
 </tr>
 </tbody>
 </table></div>
-<div class="section" id="api">
-<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>After installing <code class="docutils literal notranslate"><span class="pre">git</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/ryansteed/datamaster  <span class="c1"># clone this repo</span>
+<span class="nb">cd</span> datamaster
+conda env update env.yml  <span class="c1"># create conda env</span>
+<span class="nb">source</span> activate datamaster  <span class="c1"># activate env</span>
+python main.py -h  <span class="c1"># view help</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="making-the-docs">
 <h2>Making the Docs<a class="headerlink" href="#making-the-docs" title="Permalink to this headline">¶</a></h2>

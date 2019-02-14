@@ -144,76 +144,109 @@
   <h1>Source code for app.tests</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">app.metrics</span> <span class="k">import</span> <span class="n">CitationNetwork</span><span class="p">,</span> <span class="n">TreeCitationNetwork</span>
 <span class="kn">from</span> <span class="nn">app.munge</span> <span class="k">import</span> <span class="n">QueryMunger</span><span class="p">,</span> <span class="n">RootMunger</span>
 <span class="kn">from</span> <span class="nn">app.config</span> <span class="k">import</span> <span class="n">Config</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Official API endpoint script. All non-developer calls should run through here for convenience.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="root_test_single"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_single">[docs]</a><span class="k">def</span> <span class="nf">root_test_single</span><span class="p">(</span><span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+
+<div class="viewcode-block" id="root_test_single"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_single">[docs]</a><span class="k">def</span> <span class="nf">root_test_single</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">weighting_key</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Analyzes knowledge impact over time for a single patent</span>
+<span class="sd">    The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</span>
+
+<span class="sd">    :param patent: the patent number</span>
+<span class="sd">    :type patent: str</span>
+<span class="sd">    :param depth: the graph search depth</span>
+<span class="sd">    :type depth: int</span>
 <span class="sd">    :param bin_size: the bin size in weeks</span>
+<span class="sd">    :type bin_size: int</span>
+<span class="sd">    :param weighting_key: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_key: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">check_args</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;root [patent_number] [depth]&quot;</span><span class="p">)</span>
-    <span class="n">patent</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">depth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
     <span class="n">munger</span> <span class="o">=</span> <span class="n">RootMunger</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">)</span>
-    <span class="n">cn</span> <span class="o">=</span> <span class="n">TreeCitationNetwork</span><span class="p">(</span><span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">(),</span> <span class="n">patent</span><span class="p">)</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">TreeCitationNetwork</span><span class="p">(</span><span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">(),</span> <span class="n">patent</span><span class="p">,</span> <span class="n">weighting_method</span><span class="o">=</span><span class="n">weighting_key</span><span class="p">)</span>
     <span class="n">cn</span><span class="o">.</span><span class="n">eval_binned</span><span class="p">(</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">cn</span><span class="o">.</span><span class="n">write_graphml</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="root_test_multiple"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_multiple">[docs]</a><span class="k">def</span> <span class="nf">root_test_multiple</span><span class="p">(</span><span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<div class="viewcode-block" id="root_test_multiple"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_multiple">[docs]</a><span class="k">def</span> <span class="nf">root_test_multiple</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_key</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Analyzes knowledge impact over time for a query of patents</span>
+<span class="sd">    The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
 <span class="sd">    :param bin_size: bin size in weeks</span>
+<span class="sd">    :type bin_size: int</span>
+<span class="sd">    :param weighting_key: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_key: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: build this as a function of the full network, handling empty root networks automatically</span>
     <span class="c1">#  - then build a full dataframe and save to file</span>
-    <span class="n">check_args</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;root_all [query json file] [limit]&quot;</span><span class="p">)</span>
-    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">limit</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
-    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">weighting_method</span><span class="o">=</span><span class="n">weighting_key</span><span class="p">)</span>
     <span class="n">cn</span><span class="o">.</span><span class="n">root_analysis</span><span class="p">(</span>
         <span class="mi">3</span><span class="p">,</span>
-        <span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;TIME-DATA_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])),</span>
-        <span class="n">limit</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+        <span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;TIME-DATA_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">limit</span><span class="p">)),</span>
+        <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
         <span class="n">bin_size</span><span class="o">=</span><span class="n">bin_size</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="query_test"><a class="viewcode-back" href="../../app.tests.html#app.tests.query_test">[docs]</a><span class="k">def</span> <span class="nf">query_test</span><span class="p">():</span>
+<div class="viewcode-block" id="query_test"><a class="viewcode-back" href="../../app.tests.html#app.tests.query_test">[docs]</a><span class="k">def</span> <span class="nf">query_test</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_key</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Evaluates all metrics for a query, breadth-wise.</span>
+<span class="sd">    The query endpoint collects patents for a query, constructs a citation network,</span>
+<span class="sd">    and conducts metric calculations breadth-wise.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
+<span class="sd">    :param write_graph: whether or not to write the network to a graph ml file</span>
+<span class="sd">    :type write_graph: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">check_args</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;query [json file]&quot;</span><span class="p">)</span>
-    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-    <span class="n">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">)</span></div>
+    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">,</span> <span class="n">weighting_key</span><span class="o">=</span><span class="n">weighting_key</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="n">write_graph</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="eval_and_sum"><a class="viewcode-back" href="../../app.tests.html#app.tests.eval_and_sum">[docs]</a><span class="k">def</span> <span class="nf">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">):</span>
+<div class="viewcode-block" id="feature_test"><a class="viewcode-back" href="../../app.tests.html#app.tests.feature_test">[docs]</a><span class="k">def</span> <span class="nf">feature_test</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The feature endpoint constructs descendant trees for a series of roots from a single query, but does not conduct</span>
+<span class="sd">    time series analysis. It also collects additional observable features for use as controls in multiple regression.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
+<span class="sd">    :param weighting_key: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_key: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root_test_multiple</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weighting_key</span><span class="o">=</span><span class="n">weighting_key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="eval_and_sum"><a class="viewcode-back" href="../../app.tests.html#app.tests.eval_and_sum">[docs]</a><span class="k">def</span> <span class="nf">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">,</span>  <span class="n">weighting_key</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates all metrics and summarize using the graph output from a munger.</span>
 <span class="sd">    :param munger: the munger to analyze</span>
+<span class="sd">    :param write_graph: whether or not to write the network to a graph ml file</span>
+<span class="sd">    :param weighting_key: the weighting key to use for knowledge calculation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
-    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">knowledge</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">write_graph</span><span class="p">),</span> <span class="n">weighting_method</span><span class="o">=</span><span class="n">weighting_key</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;METRICS_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">weighting_key</span><span class="p">))</span>
     <span class="c1"># cn.draw()</span>
-    <span class="n">cn</span><span class="o">.</span><span class="n">eval_all</span><span class="p">()</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">eval_all</span><span class="p">(</span><span class="n">file_early</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">cn</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
-    <span class="n">cn</span><span class="o">.</span><span class="n">file_custom_metrics</span><span class="p">((</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">)))</span></div>
-
-
-<div class="viewcode-block" id="check_args"><a class="viewcode-back" href="../../app.tests.html#app.tests.check_args">[docs]</a><span class="k">def</span> <span class="nf">check_args</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">usage</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Verifies the proper number of arguments have been submitted. Print usage if not.</span>
-<span class="sd">    :param num: The proper number of arguments.</span>
-<span class="sd">    :param usage: A string describing the usage for this endpoint.</span>
-<span class="sd">    :return:</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No query passed.</span><span class="se">\n</span><span class="s2"> USAGE: python main.py </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">usage</span><span class="p">))</span></div>
+    <span class="n">cn</span><span class="o">.</span><span class="n">file_custom_metrics</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">write_graph</span><span class="p">:</span>
+        <span class="n">cn</span><span class="o">.</span><span class="n">write_graphml</span><span class="p">(</span><span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;graph&quot;</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="get_query_munger"><a class="viewcode-back" href="../../app.tests.html#app.tests.get_query_munger">[docs]</a><span class="k">def</span> <span class="nf">get_query_munger</span><span class="p">(</span><span class="n">query_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">):</span>
