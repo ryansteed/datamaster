@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import pandas as pd
 from overrides import overrides
+import enlighten
 
 from app.config import Config, logger
 from app.helpers import Timer
@@ -99,7 +100,7 @@ class CitationNetwork:
         t.log()
 
     # Analytics #
-    def eval_all(self, weighting_key=None, verbose=True):
+    def eval_all(self, weighting_key=None, verbose=True, file_early=None):
         """
         Calculates all custom metrics
 
@@ -127,6 +128,8 @@ class CitationNetwork:
             self.eval_centrality()
             if verbose:
                 t.log()
+        if file_early is not None:
+            self.file_custom_metrics(file_early)
         if self.knowledge:
             if verbose:
                 logger.info("Calculating knowledge")
@@ -228,9 +231,21 @@ class CitationNetwork:
         Evaluates the knowledge impact metric for every node and saves as node attribute
         :param weighting_key: the quality metric to use as a weight
         """
+        node_attrs = {}
+        manager = enlighten.get_manager()
+        ticker = manager.counter(total=len(self.G.nodes), desc='Ticks', unit='ticks')
+        div = 20
+        t = Timer("{}%".format(round(1/div*100)))
+        for i, node in enumerate(self.G.nodes):
+            node_attrs[node] = self.k(node, node, weighting_key)
+            if i % int(len(self.G.nodes) / div) == 0:
+                t.log()
+                if i / int(len(self.G.nodes) / div) < div:
+                    t.reset("{}%".format(round((i / int(len(self.G.nodes))+1/div)*100)))
+            ticker.update()
         nx.set_node_attributes(
             self.G,
-            {node: self.k(node, node, weighting_key) for node in self.G.nodes},
+            node_attrs,
             'knowledge'
         )
 

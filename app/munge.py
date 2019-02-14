@@ -111,7 +111,7 @@ class Munger:
             self.df.to_csv(file, index=False, sep='\t')
         t.log()
 
-    def query_to_dataframe(self, info, bcites=True):
+    def query_to_dataframe(self, info, bcites=Config.COLLECT_BCITES):
         """
         Converts the JSON query results from PatentsView to an edge list dataframe.
         :param info: the query json output
