@@ -6,5 +6,5 @@ app/__pycache__
 data/query
 data/graph
 logs
-app/config.py
+settings.json
 docs/build/doctrees
