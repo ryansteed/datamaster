@@ -1,13 +1,17 @@
 import os
 import logging
 import sys
+import json
+
 
 class Config:
 
-    ENV_NAME = "colonial"
+    ENV_NAME = json.load(open("settings.json", "r")).get("ENV_NAME")
 
     DATA_PATH = os.path.abspath('../../data')
-    LOG_PATH = os.path.dirname('logs/colonial.log')
+    LOG_PATH = os.path.dirname('logs/{}.log'.format(ENV_NAME))
+
+    COLLECT_BCITES = False
 
     DOC_LIMIT = None
 
