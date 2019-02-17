@@ -227,7 +227,7 @@ class CitationNetwork:
             'num_claims'
         )
 
-    def eval_k(self, weighting_keys, verbose=False):
+    def eval_k(self, weighting_keys, verbose=True):
         """
         Evaluates the knowledge impact metric for every node and saves as node attribute
         :param weighting_keys: the quality metric to use as a weight
@@ -245,6 +245,7 @@ class CitationNetwork:
                 if i / int(len(self.G.nodes) / div) < div:
                     t.reset("{}%".format(round((i / int(len(self.G.nodes))+1/div)*100)))
             ticker.update()
+        ticker.close()
         for key in weighting_keys:
             nx.set_node_attributes(
                 self.G,
@@ -269,7 +270,6 @@ class CitationNetwork:
         sum_children = defaultdict(int)
         for child in [x for x in self.G.successors(node) if x is not None]:
             next_k = self.k(root, child, weighting_keys, depth+1)
-            logger.debug(next_k)
             for key, val in next_k.items():
                 sum_children[key] += val
         total_k = defaultdict(int)

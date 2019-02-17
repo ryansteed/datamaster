@@ -26,7 +26,7 @@ class Config:
     PROGRESS_DIV = 100
 
     # How deeply to evaluate k
-    K_DEPTH = 10
+    K_DEPTH = 5
 
     # Whether or not to allow cited patents outside the query to be included in the citation network
     ALLOW_EXTERNAL = False

@@ -289,17 +289,17 @@ class QueryMunger(Munger):
             else:
                 self.df = self.df.append(page_df, ignore_index=True)
             ticker.update()
+        ticker.close()
 
         if not self.allow_external:
             # now erase any edges containing patents that aren't in the original query (the source list)
             # this will limit the network to only patents that were in the original query
-            logger.debug("patent size of original query: {}".format(len(self.queried_numbers)))
-            logger.debug("size before was {}".format(self.df.size))
+            old_size = self.df.size
             self.df = self.df[
                 (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
                 (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
             ]
-            logger.debug("new size is {}".format(self.df.size))
+            logger.debug("Stripped {} external cites".format(self.df.size-old_size))
 
         t.log()
         logger.info("Collected {} edges".format(self.df.shape[0]))
@@ -316,7 +316,7 @@ class QueryMunger(Munger):
             "f": self.query_fields,
             "o": {
                 "page": page,
-                "per_page": per_page if per_page < self.limit else self.limit
+                "per_page": per_page if self.limit is None or per_page < self.limit else self.limit
             }
         })
         self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
