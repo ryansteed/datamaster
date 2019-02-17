@@ -18,7 +18,8 @@ class CitationNetwork:
     """Tracks the graph and meta-attributes for any citation network"""
     def __init__(
             self, G, weighting_methods=["forward_cites", "h_index"],
-            quality=True, h_index=True, custom_centrality=True, knowledge=True
+            quality=True, h_index=True, custom_centrality=True, knowledge=True,
+            k_depth=Config.K_DEPTH
             ):
         """
         Initializes the CitationNetwork
@@ -29,6 +30,7 @@ class CitationNetwork:
         :param h_index: whether to use the h_index
         :param custom_centrality: whether to use custom_centrality
         :param knowledge: whether to calculate knowledge impact
+        :param k_depth: maximum depth for knowledge evaluation
         """
         self.G = G
         self.weighting_methods = weighting_methods
@@ -36,6 +38,7 @@ class CitationNetwork:
         self.h_index = h_index
         self.custom_centrality = custom_centrality
         self.knowledge = knowledge
+        self.k_depth = k_depth
         self.attributes = []
         if quality:
             self.attributes += ['forward_cites', 'backward_cites', 'family_size', 'num_claims']
@@ -254,7 +257,7 @@ class CitationNetwork:
                 "knowledge_{}".format(key)
             )
 
-    def k(self, root, node, weighting_keys, depth, max_depth=Config.K_DEPTH, verbose=False):
+    def k(self, root, node, weighting_keys, depth, verbose=False):
         """
         Recursively calculates the knowledge impact for a single node
 
@@ -262,11 +265,10 @@ class CitationNetwork:
         :param node: the current node
         :param weighting_keys: the quality weighting key to use for knowledge impact
         :param depth: the current search depth
-        :param max_depth: the maximum depth to evaluate towards
         :param verbose: whether or not to print progress to stdout
         :return: a dictionary containing the total knowledge impact score keyed by the weighting metric used
         """
-        if max_depth is not None and depth > max_depth:
+        if self.k_depth is not None and depth > self.k_depth:
             return {key: 0 for key in weighting_keys}
         sum_children = defaultdict(int)
         for child in [x for x in self.G.successors(node) if x is not None]:

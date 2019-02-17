@@ -4,6 +4,8 @@ import app.tests
 import argparse
 import sys
 
+from app.config import Config
+
 
 class JobHandler:
     def __init__(self, description):
@@ -86,6 +88,13 @@ if __name__ == "__main__":
             '--limit',
             type=int,
             default=None,
+            help="the maximum number of docs to munge"
+        )
+        job.parser.add_argument(
+            '-k',
+            '--k_depth',
+            type=int,
+            default=Config.K_DEPTH,
             help="the maximum number of docs to munge"
         )
     if "root" in test:
