@@ -265,10 +265,11 @@ class CitationNetwork:
         :return: a dictionary containing the total knowledge impact score keyed by the weighting metric used
         """
         if max_depth is not None and depth > max_depth:
-            return 0
+            return {key: 0 for key in weighting_keys}
         sum_children = defaultdict(int)
         for child in [x for x in self.G.successors(node) if x is not None]:
             next_k = self.k(root, child, weighting_keys, depth+1)
+            logger.debug(next_k)
             for key, val in next_k.items():
                 sum_children[key] += val
         total_k = defaultdict(int)
