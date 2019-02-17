@@ -227,10 +227,11 @@ class CitationNetwork:
             'num_claims'
         )
 
-    def eval_k(self, weighting_keys, verbose=True):
+    def eval_k(self, weighting_keys, verbose=False):
         """
         Evaluates the knowledge impact metric for every node and saves as node attribute
         :param weighting_keys: the quality metric to use as a weight
+        :param verbose: whether or not to print out progress, as opposed to using the ticker
         """
         node_attrs = {}
         manager = enlighten.get_manager()
