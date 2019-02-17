@@ -16,21 +16,21 @@ from app.munge import RootMunger
 class CitationNetwork:
     """Tracks the graph and meta-attributes for any citation network"""
     def __init__(
-            self, G, weighting_method="h_index",
+            self, G, weighting_methods=["forward_cites", "h_index"],
             quality=True, h_index=True, custom_centrality=True, knowledge=True
             ):
         """
         Initializes the CitationNetwork
 
         :param G: the citation graph
-        :param weighting_method: the primary importance weighting method for the knowledge impact metric
+        :param weighting_methods: the primary importance weighting methods for the knowledge impact metric
         :param quality: whether to use the quality metric
         :param h_index: whether to use the h_index
         :param custom_centrality: whether to use custom_centrality
         :param knowledge: whether to calculate knowledge impact
         """
         self.G = G
-        self.weighting_method = weighting_method
+        self.weighting_methods = weighting_methods
         self.quality = quality
         self.h_index = h_index
         self.custom_centrality = custom_centrality
@@ -43,7 +43,7 @@ class CitationNetwork:
         if custom_centrality:
             self.attributes.append("custom_centrality")
         if knowledge:
-            self.attributes.append("knowledge")
+            self.attributes += ["knowledge_{}".format(key) for key in weighting_methods]
 
     def summary(self):
         """
@@ -100,11 +100,11 @@ class CitationNetwork:
         t.log()
 
     # Analytics #
-    def eval_all(self, weighting_key=None, verbose=True, file_early=None):
+    def eval_all(self, weighting_keys=None, verbose=True, file_early=None):
         """
         Calculates all custom metrics
 
-        :param weighting_key: the preferred weighting key to use for knowledge impact
+        :param weighting_keys: the preferred weighting key to use for knowledge impact
         :param verbose: whether or not to log progress
         """
         if verbose:
@@ -133,7 +133,7 @@ class CitationNetwork:
         if self.knowledge:
             if verbose:
                 logger.info("Calculating knowledge")
-            self.eval_k(self.weighting_method if weighting_key is None else weighting_key)
+            self.eval_k(self.weighting_methods if weighting_keys is None else weighting_keys)
             if verbose:
                 t.log()
 
@@ -226,10 +226,10 @@ class CitationNetwork:
             'num_claims'
         )
 
-    def eval_k(self, weighting_key):
+    def eval_k(self, weighting_keys):
         """
         Evaluates the knowledge impact metric for every node and saves as node attribute
-        :param weighting_key: the quality metric to use as a weight
+        :param weighting_keys: the quality metric to use as a weight
         """
         node_attrs = {}
         manager = enlighten.get_manager()
@@ -237,39 +237,47 @@ class CitationNetwork:
         div = Config.PROGRESS_DIV
         t = Timer("{}%".format(round(1/div*100)))
         for i, node in enumerate(self.G.nodes):
-            node_attrs[node] = self.k(node, node, weighting_key, 0)
+            node_attrs[node] = self.k(node, node, weighting_keys, 0)
             if i % int(len(self.G.nodes) / div) == 0:
                 t.log()
                 if i / int(len(self.G.nodes) / div) < div:
                     t.reset("{}%".format(round((i / int(len(self.G.nodes))+1/div)*100)))
             ticker.update()
-        nx.set_node_attributes(
-            self.G,
-            node_attrs,
-            'knowledge'
-        )
+        for key in weighting_keys:
+            nx.set_node_attributes(
+                self.G,
+                {k: v[key] for k, v in node_attrs.items()},
+                "knowledge_{}".format(key)
+            )
 
-    def k(self, root, node, weighting_key, depth, max_depth=Config.K_DEPTH, verbose=False):
+    def k(self, root, node, weighting_keys, depth, max_depth=Config.K_DEPTH, verbose=False):
         """
         Recursively calculates the knowledge impact for a single node
 
         :param root: the root node
         :param node: the current node
-        :param weighting_key: the quality weighting key to use for knowledge impact
+        :param weighting_keys: the quality weighting key to use for knowledge impact
         :param depth: the current search depth
         :param max_depth: the maximum depth to evaluate towards
         :param verbose: whether or not to print progress to stdout
-        :return: the total knowledge impact
+        :return: a dictionary containing the total knowledge impact score keyed by the weighting metric used
         """
         if max_depth is not None and depth > max_depth:
             return 0
-        sum_children = 0
+        sum_children = {}
+        for key in weighting_keys:
+            sum_children[key] = 0
         for child in [x for x in self.G.successors(node) if x is not None]:
-            sum_children += self.k(root, child, weighting_key, depth+1)
-        total_k = (self.G.nodes[node][weighting_key] + sum_children) * self.p(root, node)
+            next_k = self.k(root, child, weighting_keys, depth+1)
+            for key in weighting_keys:
+                sum_children[key] += next_k[key]
+        total_k = {}
+        p = self.p(root, node)
+        for key in weighting_keys:
+            total_k[key] = (self.G.nodes[node][key] + sum_children[key]) * p
         if verbose:
             logger.info('node', node)
-            logger.info('> w: ', self.G.nodes[node][weighting_key])
+            logger.info('> w: ', self.G.nodes[node][weighting_keys])
             logger.info('> p: ', self.p(root, node))
             logger.info('> k: ', total_k)
         return total_k
@@ -319,12 +327,12 @@ class TreeCitationNetwork(CitationNetwork):
     A special variation on the CitationNetwork built specifically to track the descendants of a single patent.
     """
     def __init__(
-            self, G, root, weighting_method="forward_cites",
+            self, G, root, weighting_methods=["h_index", "forward_cites"],
             quality=True, h_index=True, custom_centrality=True, knowledge=True
     ):
         super().__init__(
             G,
-            weighting_method=weighting_method,
+            weighting_methods=weighting_methods,
             quality=quality,
             h_index=h_index,
             custom_centrality=custom_centrality,
@@ -335,13 +343,13 @@ class TreeCitationNetwork(CitationNetwork):
     def is_empty(self):
         return self.G.size() == 0
 
-    def eval_binned(self, bin_size_weeks, plot=False, weighting_key=None):
+    def eval_binned(self, bin_size_weeks, plot=False, weighting_keys=None):
         """
         Evaluates knowledge impact in time-based bins.
 
         :param bin_size_weeks: the bin size in weeks
         :param plot: whether or not to display a plot of knowledge over time
-        :param weighting_key: the weighting key for knowledge impact calculation
+        :param weighting_keys: the weighting key for knowledge impact calculation
         :return: a list of knowledge impact metrics, one for each bin
         """
         bin_size = timedelta(weeks=bin_size_weeks) if bin_size_weeks is not None else None
@@ -365,7 +373,7 @@ class TreeCitationNetwork(CitationNetwork):
                     remove.append(edge)
             self.G.remove_edges_from(remove)
             # TODO: only evaluate root node, rather than all nodes
-            self.eval_all(weighting_key=weighting_key, verbose=False)
+            self.eval_all(weighting_keys=weighting_keys, verbose=False)
             k.append(self.G.nodes[self.root]["knowledge"])
             if bins>1:
                 logger.debug("Bin {}/{}".format(i+1, bins))
@@ -378,12 +386,14 @@ class TreeCitationNetwork(CitationNetwork):
         return k
 
     @overrides
-    def eval_k(self, weighting_key):
-        nx.set_node_attributes(
-            self.G,
-            {self.root: self.k(self.root, self.root, weighting_key)},
-            'knowledge'
-        )
+    def eval_k(self, weighting_keys):
+        root_k = self.k(self.root, self.root, weighting_keys)
+        for key in weighting_keys:
+            nx.set_node_attributes(
+                self.G,
+                {self.root: root_k[key]},
+                "knowledge_{}".format(key)
+            )
 
     @overrides
     def summary(self):

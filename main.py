@@ -99,9 +99,8 @@ if __name__ == "__main__":
 
     job.parser.add_argument(
         '-w',
-        '--weighting_key',
-        type=str,
-        default="forward_cites",
-        help="the weighting key for knowledge calculation (e.g. 'forward_cites', 'h_index')"
+        '--weighting_keys',
+        nargs='+',
+        help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
     )
     job.execute()
