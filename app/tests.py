@@ -99,7 +99,7 @@ def eval_and_sum(munger,  weighting_keys, write_graph=False):
     """
     G = munger.get_network()
     cn = CitationNetwork(G, custom_centrality=False, knowledge=(not write_graph), weighting_methods=weighting_keys)
-    filename = munger.make_filename(prefix="METRICS_{}".format(weighting_keys).strip(" "))
+    filename = munger.make_filename(prefix="METRICS_{}".format(str(weighting_keys).strip(" ")))
     # cn.draw()
     cn.eval_all(file_early=filename)
     cn.summary()

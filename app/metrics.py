@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 from overrides import overrides
 import enlighten
+from collections import defaultdict
 
 from app.config import Config, logger
 from app.helpers import Timer
@@ -226,7 +227,7 @@ class CitationNetwork:
             'num_claims'
         )
 
-    def eval_k(self, weighting_keys):
+    def eval_k(self, weighting_keys, verbose=False):
         """
         Evaluates the knowledge impact metric for every node and saves as node attribute
         :param weighting_keys: the quality metric to use as a weight
@@ -235,10 +236,11 @@ class CitationNetwork:
         manager = enlighten.get_manager()
         ticker = manager.counter(total=len(self.G.nodes), desc='Ticks', unit='ticks')
         div = Config.PROGRESS_DIV
-        t = Timer("{}%".format(round(1/div*100)))
+        if verbose:
+            t = Timer("{}%".format(round(1/div*100)))
         for i, node in enumerate(self.G.nodes):
             node_attrs[node] = self.k(node, node, weighting_keys, 0)
-            if i % int(len(self.G.nodes) / div) == 0:
+            if verbose and i % int(len(self.G.nodes) / div) == 0:
                 t.log()
                 if i / int(len(self.G.nodes) / div) < div:
                     t.reset("{}%".format(round((i / int(len(self.G.nodes))+1/div)*100)))
@@ -264,14 +266,12 @@ class CitationNetwork:
         """
         if max_depth is not None and depth > max_depth:
             return 0
-        sum_children = {}
-        for key in weighting_keys:
-            sum_children[key] = 0
+        sum_children = defaultdict(int)
         for child in [x for x in self.G.successors(node) if x is not None]:
             next_k = self.k(root, child, weighting_keys, depth+1)
-            for key in weighting_keys:
-                sum_children[key] += next_k[key]
-        total_k = {}
+            for key, val in next_k.items():
+                sum_children[key] += val
+        total_k = defaultdict(int)
         p = self.p(root, node)
         for key in weighting_keys:
             total_k[key] = (self.G.nodes[node][key] + sum_children[key]) * p

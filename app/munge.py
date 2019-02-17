@@ -248,7 +248,10 @@ class QueryMunger(Munger):
     """
     A special munger designed to make a specific query to the PatentsView API
     """
-    def __init__(self, query_json, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000):
+    def __init__(
+            self, query_json,
+            limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000, allow_external=Config.ALLOW_EXTERNAL
+            ):
         """
         Initializes the query munger
         :param query_json: the JSON for the query
@@ -258,6 +261,8 @@ class QueryMunger(Munger):
         """
         self.query_json = query_json
         self.per_page = per_page
+        self.allow_external = allow_external
+        self.queried_numbers = []
         super().__init__(limit, cache)
 
     @overrides
@@ -284,8 +289,19 @@ class QueryMunger(Munger):
             else:
                 self.df = self.df.append(page_df, ignore_index=True)
             ticker.update()
-        t.log()
 
+        if not self.allow_external:
+            # now erase any edges containing patents that aren't in the original query (the source list)
+            # this will limit the network to only patents that were in the original query
+            logger.debug("patent size of original query: {}".format(len(self.queried_numbers)))
+            logger.debug("size before was {}".format(self.df.size))
+            self.df = self.df[
+                (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
+                (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
+            ]
+            logger.debug("new size is {}".format(self.df.size))
+
+        t.log()
         logger.info("Collected {} edges".format(self.df.shape[0]))
 
     def query_paginated(self, page, per_page):
@@ -300,9 +316,10 @@ class QueryMunger(Munger):
             "f": self.query_fields,
             "o": {
                 "page": page,
-                "per_page": str(per_page)
+                "per_page": per_page if per_page < self.limit else self.limit
             }
         })
+        self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
         return self.query_to_dataframe(info)
 
     def query_sounding(self):

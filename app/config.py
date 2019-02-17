@@ -19,11 +19,17 @@ class Config:
 
     DOC_LIMIT = None
 
+    # whether to use file caches first or make a new query
     USE_CACHED_QUERIES = True
 
+    # how many divisions to use for progress bars
     PROGRESS_DIV = 100
 
+    # How deeply to evaluate k
     K_DEPTH = 10
+
+    # Whether or not to allow cited patents outside the query to be included in the citation network
+    ALLOW_EXTERNAL = False
 
 
 log_dir = Config.LOG_PATH
