@@ -36,7 +36,7 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(os.path.join(log_dir,'{}.log'.format(Config.ENV_NAME)))
 handler.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('[%(asctime)s] %(levelname)s> %(message)s')
+formatter = logging.Formatter('%(asctime)s [%(filename)s:%(lineno)d] %(levelname)s> %(message)s')
 formatter.datefmt = '%d%b%Y:%H:%M:%S'
 
 handler.setFormatter(formatter)
