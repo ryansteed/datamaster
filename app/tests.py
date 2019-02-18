@@ -30,7 +30,7 @@ def root_test_single(patent, depth, weighting_keys, bin_size=20):
     cn.write_graphml("{}_{}".format(patent, depth))
 
 
-def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, bin_size=20):
+def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, bin_size=20, prefix="TIME-DATA"):
     """
     The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.
 
@@ -44,6 +44,8 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, bin_size
     :type bin_size: int
     :param weighting_keys: the weighting key to use for knowledge calculation
     :type weighting_keys: str
+    :param prefix: prefix for final storage file name
+    :type prefix: str
     """
     # TODO: build this as a function of the full network, handling empty root networks automatically
     #  - then build a full dataframe and save to file
@@ -52,7 +54,7 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, bin_size
     cn = CitationNetwork(G, custom_centrality=False, weighting_methods=weighting_keys, k_depth=k_depth)
     cn.root_analysis(
         3,
-        munger.make_filename(prefix="TIME-DATA_{}".format(limit)),
+        munger.make_filename(prefix="{}_{}".format(prefix, limit)),
         limit=limit,
         bin_size=bin_size
     )
@@ -93,7 +95,7 @@ def feature_test(query_json_file, limit, weighting_keys, k_depth):
     :param weighting_keys: the weighting key to use for knowledge calculation
     :type weighting_keys: list
     """
-    root_test_multiple(query_json_file, limit, k_depth, bin_size=None, weighting_keys=weighting_keys)
+    root_test_multiple(query_json_file, limit, k_depth, bin_size=None, weighting_keys=weighting_keys, prefix="FEATURE")
 
 
 def eval_and_sum(munger,  weighting_keys, k_depth, write_graph=False):
