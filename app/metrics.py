@@ -211,12 +211,12 @@ class CitationNetwork:
         """
         nx.set_node_attributes(
             self.G,
-            {node: int(out_degree * (len(self.G) - 1)) for node, out_degree in self.G.out_degree()},
+            {node: out_degree for node, out_degree in self.G.out_degree()},
             'forward_cites'
         )
         nx.set_node_attributes(
             self.G,
-            {node: int(in_degree * (len(self.G) - 1)) for node, in_degree in self.G.in_degree()},
+            {node: in_degree for node, in_degree in self.G.in_degree()},
             'backward_cites'
         )
         nx.set_node_attributes(
