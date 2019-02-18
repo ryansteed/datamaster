@@ -7,4 +7,4 @@ data/query
 data/graph
 logs
 settings.json
-docs/build/doctrees
+docs/build/*
