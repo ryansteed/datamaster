@@ -429,6 +429,8 @@ class RootMunger(Munger):
         })
         if curr_depth == 0:
             logger.debug("Exploring {} branches".format(len(info['patents'][0]['citedby_patents'])))
+        if curr_depth > self.depth:
+            return
         if info.get('patents') is not None:
             # TODO: include bcites, and recurse once more to get bcites for the leaves but not fcites
             df = self.query_to_dataframe(info, bcites=False)

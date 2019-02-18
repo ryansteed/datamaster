@@ -47,7 +47,7 @@ class CitationNetwork:
         if custom_centrality:
             self.attributes.append("custom_centrality")
         if knowledge:
-            self.attributes += ["knowledge_{}".format(key) for key in weighting_methods]
+            self.attributes += [self.make_knowledge_name(key) for key in weighting_methods]
 
     def summary(self):
         """
@@ -66,6 +66,10 @@ class CitationNetwork:
         """
         nx.draw_networkx(self.G, pos=nx.kamada_kawai_layout(self.G))
         plt.show()
+
+    @staticmethod
+    def make_knowledge_name(weighting_key):
+        return "knowledge_{}".format(weighting_key)
 
     def write_graphml(self, filepath):
         """
@@ -254,7 +258,7 @@ class CitationNetwork:
             nx.set_node_attributes(
                 self.G,
                 {k: v[key] for k, v in node_attrs.items()},
-                "knowledge_{}".format(key)
+                self.make_knowledge_name(key)
             )
 
     def k(self, root, node, weighting_keys, depth, verbose=False):
@@ -305,16 +309,23 @@ class CitationNetwork:
         patents = [i for i in self.G.nodes]
         if limit is not None:
             patents = patents[:limit+1]
+
+        manager = enlighten.get_manager()
+        ticker = manager.counter(total=len(patents), desc='Patent Trees Analyzed', unit='patents')
         for i, patent in enumerate(patents):
             munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
             # eval_and_sum(munger)
-            cn = TreeCitationNetwork(munger.get_network(), patent)
+            cn = TreeCitationNetwork(munger.get_network(), patent, weighting_methods=self.weighting_methods, k_depth=self.k_depth)
             if not cn.is_empty():
-                data = cn.eval_binned(bin_size, plot=False)
+                data = cn.eval_binned(bin_size, weighting_keys=self.weighting_methods, plot=False)
                 if df is None:
                     df = pd.DataFrame(
-                        data=[[x, i]+list(munger.features.values()) for i, x in enumerate(data)],
-                        columns=["t", "k"]+list(munger.features.keys())
+                        data=[
+                            [x[key] for key in self.weighting_methods] +
+                            [i] +
+                            list(munger.features.values()) for i, x in enumerate(data)
+                        ],
+                        columns=["t"]+["k_{}".format(key) for key in self.weighting_methods]+list(munger.features.keys())
                     )
                 else:
                     df_new = pd.DataFrame(
@@ -326,6 +337,8 @@ class CitationNetwork:
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, sep='\t', header=True)
                 t.log()
+            ticker.update()
+        ticker.close()
 
 
 class TreeCitationNetwork(CitationNetwork):
@@ -333,7 +346,7 @@ class TreeCitationNetwork(CitationNetwork):
     A special variation on the CitationNetwork built specifically to track the descendants of a single patent.
     """
     def __init__(
-            self, G, root, weighting_methods=["h_index", "forward_cites"],
+            self, G, root, weighting_methods=["h_index", "forward_cites"], k_depth=Config.K_DEPTH,
             quality=True, h_index=True, custom_centrality=True, knowledge=True
     ):
         super().__init__(
@@ -342,14 +355,15 @@ class TreeCitationNetwork(CitationNetwork):
             quality=quality,
             h_index=h_index,
             custom_centrality=custom_centrality,
-            knowledge=knowledge
+            knowledge=knowledge,
+            k_depth=k_depth
         )
         self.root = root
 
     def is_empty(self):
         return self.G.size() == 0
 
-    def eval_binned(self, bin_size_weeks, plot=False, weighting_keys=None):
+    def eval_binned(self, bin_size_weeks, plot=False, weighting_keys=["h_index", "forward_cites"]):
         """
         Evaluates knowledge impact in time-based bins.
 
@@ -364,7 +378,7 @@ class TreeCitationNetwork(CitationNetwork):
         dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
         # logger.debug("Range: {}".format(max(dates) - min(dates)))
 
-        k = []
+        k = defaultdict(list)
         bins = int((max(dates) - min(dates)) / bin_size) if bin_size is not None else 1
         # TODO: this is inefficient; create a hashtable and store edges that way,
         #  then generate the network from the hash tables
@@ -380,8 +394,9 @@ class TreeCitationNetwork(CitationNetwork):
             self.G.remove_edges_from(remove)
             # TODO: only evaluate root node, rather than all nodes
             self.eval_all(weighting_keys=weighting_keys, verbose=False)
-            k.append(self.G.nodes[self.root]["knowledge"])
-            if bins>1:
+            for key in self.weighting_methods:
+                k[key].append(self.G.nodes[self.root][key])
+            if bins > 1:
                 logger.debug("Bin {}/{}".format(i+1, bins))
             self.G = full_G.copy()
 
@@ -392,13 +407,13 @@ class TreeCitationNetwork(CitationNetwork):
         return k
 
     @overrides
-    def eval_k(self, weighting_keys):
-        root_k = self.k(self.root, self.root, weighting_keys)
+    def eval_k(self, weighting_keys, verbose=False):
+        root_k = self.k(self.root, self.root, weighting_keys, 0)
         for key in weighting_keys:
             nx.set_node_attributes(
                 self.G,
                 {self.root: root_k[key]},
-                "knowledge_{}".format(key)
+                self.make_knowledge_name(key)
             )
 
     @overrides
