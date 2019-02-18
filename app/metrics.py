@@ -302,7 +302,9 @@ class CitationNetwork:
         :param bin_size: the size of the time bins in weeks
         """
         df = None
-        patents = [i for i in self.G.nodes][:limit+1]
+        patents = [i for i in self.G.nodes]
+        if limit is not None:
+            patents = patents[:limit+1]
         for i, patent in enumerate(patents):
             munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
             # eval_and_sum(munger)
