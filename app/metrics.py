@@ -19,7 +19,7 @@ class CitationNetwork:
     def __init__(
             self, G, weighting_methods=["forward_cites", "h_index"],
             quality=True, h_index=True, custom_centrality=True, knowledge=True,
-            k_depth=Config.K_DEPTH
+            k_depth=Config.K_DEPTH, discount=Config.DISCOUNT
             ):
         """
         Initializes the CitationNetwork
@@ -270,6 +270,7 @@ class CitationNetwork:
         :param weighting_keys: the quality weighting key to use for knowledge impact
         :param depth: the current search depth
         :param verbose: whether or not to print progress to stdout
+        :param discount: the discount rate
         :return: a dictionary containing the total knowledge impact score keyed by the weighting metric used
         """
         if self.k_depth is not None and depth > self.k_depth:
@@ -282,7 +283,7 @@ class CitationNetwork:
         total_k = defaultdict(int)
         p = self.p(root, node)
         for key in weighting_keys:
-            total_k[key] = (self.G.nodes[node][key] + sum_children[key]) * p
+            total_k[key] = (self.G.nodes[node][key] + self.discount * sum_children[key]) * p
         if verbose:
             logger.info('node', node)
             logger.info('> w: ', self.G.nodes[node][weighting_keys])

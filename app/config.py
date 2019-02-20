@@ -28,6 +28,9 @@ class Config:
     # How deeply to evaluate k
     K_DEPTH = 10
 
+    # the discount rate
+    DISCOUNT = 0.5
+
     # Whether or not to allow cited patents outside the query to be included in the citation network
     ALLOW_EXTERNAL = False
 
