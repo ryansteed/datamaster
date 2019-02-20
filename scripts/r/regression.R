@@ -4,9 +4,9 @@ head(dat)
 colnames(dat) = c(
   "k",
   "t",
-  "t_0", 
+  "t_0",
   "patent_num_claims", 
-  "patent_num_citedby_us", 
+  "patent_num_citedby_us",
   "patent_processing_time",
   "inventor_id", 
   "inventor_total_num_patents", 
