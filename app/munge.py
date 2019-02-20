@@ -26,7 +26,7 @@ class Munger:
         "citedby_patent_date"
     ]
 
-    def __init__(self, limit, cache):
+    def __init__(self, limit, cache, allow_external=Config.ALLOW_EXTERNAL):
         """
         Initializes a munger.
         :param limit: the maximum number of patents to process and query
@@ -36,6 +36,8 @@ class Munger:
         self.cache = cache
         self.df = None
         self.df_meta = None
+        self.allow_external = allow_external
+        self.queried_numbers = []
         self.load_data()
 
     def load_data(self):
@@ -243,6 +245,17 @@ class Munger:
     def get_filename_from_stem(file_string, dir_name):
         return "{}.csv".format(os.path.abspath(os.path.join("./data/{}".format(dir_name), file_string)))
 
+    def handle_external(self):
+        if not self.allow_external:
+            # now erase any edges containing patents that aren't in the original query (the source list)
+            # this will limit the network to only patents that were in the original query
+            old_size = self.df.size
+            self.df = self.df[
+                (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
+                (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
+            ]
+            logger.debug("Stripped {} external cites".format(self.df.size-old_size))
+
 
 class QueryMunger(Munger):
     """
@@ -250,7 +263,7 @@ class QueryMunger(Munger):
     """
     def __init__(
             self, query_json,
-            limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000, allow_external=Config.ALLOW_EXTERNAL
+            limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000
             ):
         """
         Initializes the query munger
@@ -261,8 +274,6 @@ class QueryMunger(Munger):
         """
         self.query_json = query_json
         self.per_page = per_page
-        self.allow_external = allow_external
-        self.queried_numbers = []
         super().__init__(limit, cache)
 
     @overrides
@@ -291,15 +302,7 @@ class QueryMunger(Munger):
             ticker.update()
         ticker.close()
 
-        if not self.allow_external:
-            # now erase any edges containing patents that aren't in the original query (the source list)
-            # this will limit the network to only patents that were in the original query
-            old_size = self.df.size
-            self.df = self.df[
-                (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
-                (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
-            ]
-            logger.debug("Stripped {} external cites".format(self.df.size-old_size))
+        self.handle_external()
 
         t.log()
         logger.info("Collected {} edges".format(self.df.shape[0]))
@@ -412,6 +415,7 @@ class RootMunger(Munger):
         # TODO - also query patent features and include as attributes in network
         self.get_children(self.patent_number, 0)
         logger.debug("Examined {} branches".format(self.completed_branches))
+        self.handle_external()
         t.log()
 
     def get_children(self, curr_num, curr_depth):
@@ -432,6 +436,7 @@ class RootMunger(Munger):
         if curr_depth > self.depth:
             return
         if info.get('patents') is not None:
+            self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
             # TODO: include bcites, and recurse once more to get bcites for the leaves but not fcites
             df = self.query_to_dataframe(info, bcites=False)
             if self.df is None:

@@ -2,7 +2,7 @@ setwd("/Users/Ryan/datamaster/data")
 library(stargazer)
 library(ggplot2)
 library(cowplot)
-dat = read.csv("colonial/METRICS_both_None_coherent-light_17Feb19.csv", sep=",", header=TRUE)
+dat = read.csv("colonial/METRICS_both_None_coherent-light_19Feb19.csv", sep=",", header=TRUE)
 print = dat[,!(names(dat) == "node")]
 colnames(print) = c(
   "Forward Cites",
