@@ -39,6 +39,7 @@ class CitationNetwork:
         self.custom_centrality = custom_centrality
         self.knowledge = knowledge
         self.k_depth = k_depth
+        self.discount = discount
         self.attributes = []
         if quality:
             self.attributes += ['forward_cites', 'backward_cites', 'family_size', 'num_claims']

@@ -97,6 +97,13 @@ if __name__ == "__main__":
             default=Config.K_DEPTH,
             help="the maximum number of docs to munge"
         )
+        job.parser.add_argument(
+            '-d',
+            '--discount',
+            type=float,
+            default=Config.DISCOUNT,
+            help="the generational discount rate"
+        )
     if "root" in test:
         job.parser.add_argument(
             '-b',
