@@ -118,7 +118,7 @@ if __name__ == "__main__":
         '-w',
         '--weighting_keys',
         nargs='+',
-        default=("forward_cites", "k_depth"),
+        default=("forward_cites", "h_index"),
         help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
     )
     job.execute()

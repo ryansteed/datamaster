@@ -26,7 +26,7 @@ class Munger:
         "citedby_patent_date"
     ]
 
-    def __init__(self, limit, cache, allow_external=Config.ALLOW_EXTERNAL):
+    def __init__(self, limit, cache):
         """
         Initializes a munger.
         :param limit: the maximum number of patents to process and query
@@ -36,8 +36,6 @@ class Munger:
         self.cache = cache
         self.df = None
         self.df_meta = None
-        self.allow_external = allow_external
-        self.queried_numbers = []
         self.load_data()
 
     def load_data(self):
@@ -73,7 +71,8 @@ class Munger:
         """
         raise NotImplementedError
 
-    def query(self, json_query):
+    @staticmethod
+    def query(json_query):
         """
         Makes a query to the USPTO using a JSON attributes object.
         :param json_query: the json query according to the PatentsView API.
@@ -82,7 +81,7 @@ class Munger:
         error = None
         for i in range(10):
             try:
-                info = self.post_request(json_query)
+                info = Munger.post_request(json_query)
             except json.JSONDecodeError as e:
                 error = e
                 time.sleep(10)
@@ -245,17 +244,6 @@ class Munger:
     def get_filename_from_stem(file_string, dir_name):
         return "{}.csv".format(os.path.abspath(os.path.join("./data/{}".format(dir_name), file_string)))
 
-    def handle_external(self):
-        if not self.allow_external:
-            # now erase any edges containing patents that aren't in the original query (the source list)
-            # this will limit the network to only patents that were in the original query
-            old_size = self.df.size
-            self.df = self.df[
-                (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
-                (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
-            ]
-            logger.debug("Stripped {} external cites".format(self.df.size-old_size))
-
 
 class QueryMunger(Munger):
     """
@@ -263,7 +251,8 @@ class QueryMunger(Munger):
     """
     def __init__(
             self, query_json,
-            limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000
+            limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000,
+            allow_external=Config.ALLOW_EXTERNAL
             ):
         """
         Initializes the query munger
@@ -274,6 +263,8 @@ class QueryMunger(Munger):
         """
         self.query_json = query_json
         self.per_page = per_page
+        self.allow_external = allow_external
+        self.queried_numbers = []
         super().__init__(limit, cache)
 
     @overrides
@@ -342,6 +333,18 @@ class QueryMunger(Munger):
         t.log()
         return info['total_patent_count']  # , info['total_citedby_patent_count'], info['total_cited_patent_count']
 
+    def handle_external(self):
+        if not self.allow_external:
+            # now erase any edges containing patents that aren't in the original query (the source list)
+            # this will limit the network to only patents that were in the original query
+            old_size = self.df.size
+            logger.debug("Size before {}".format(old_size))
+            self.df = self.df[
+                (self.df[self.get_citation_keys()[0]].isin(self.queried_numbers)) &
+                (self.df[self.get_citation_keys()[1]].isin(self.queried_numbers))
+            ]
+            logger.debug("Stripped {} external cites".format(old_size-self.df.size))
+
     @overrides
     def make_filename(self, prefix="QUERY", dirname="query"):
         file_string = json.dumps(self.query_json)
@@ -354,6 +357,28 @@ class RootMunger(Munger):
     """
     A special munger to fetch the descendants of a given patent number
     """
+    features = [
+        "cpc_category",
+        "cpc_group_id",
+        "assignee_type",
+        "assignee_total_num_patents",
+        "assignee_id",
+        "inventor_id",
+        "inventor_total_num_patents",
+        "ipc_class",
+        "ipc_main_group",
+        "nber_category_id",
+        "nber_subcategory_id",
+        # TODO handle the abstract
+        # "patent_abstract",
+        "patent_date",
+        "patent_num_claims",
+        "patent_num_cited_by_us_patents",
+        "patent_processing_time",
+        "uspc_mainclass_id",
+        "uspc_subclass_id",
+        "wipo_field_id"
+    ]
     def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES):
         """
         Initializes the root munger
@@ -368,40 +393,28 @@ class RootMunger(Munger):
         t = Timer("Fetching root features")
         features = self.query({
             "q": {"patent_number": self.patent_number},
-            "f": [
-                "cpc_category",
-                "cpc_group_id",
-                "assignee_type",
-                "assignee_total_num_patents",
-                "assignee_id",
-                "inventor_id",
-                "inventor_total_num_patents",
-                "ipc_class",
-                "ipc_main_group",
-                "nber_category_id",
-                "nber_subcategory_id",
-                # TODO handle the abstract
-                # "patent_abstract",
-                "patent_date",
-                "patent_num_claims",
-                "patent_num_cited_by_us_patents",
-                "patent_processing_time",
-                "uspc_mainclass_id",
-                "uspc_subclass_id",
-                "wipo_field_id"
-            ]
+            "f": self.features
         }).get('patents')[0]
         # TODO - unnest the return to self.features - should be flat dict
-        features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
-        self.features = {key: val for key, val in features.items() if key not in features_categorical}
-        for category in features_categorical:
-            unpacked = defaultdict(list)
-            for item in features[category]:
-                for key, val in item.items():
-                    unpacked[key].append(val)
-            self.features.update(unpacked)
+        self.features = self.query_features(features)
         t.log()
         super().__init__(limit, cache)
+
+    @staticmethod
+    def query_features(patent):
+        info = Munger.query({
+            "q": {"patent_number": patent},
+            "f": RootMunger.features
+        }).get('patents')[0]
+        features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
+        features = {key: val for key, val in info.items() if key not in features_categorical}
+        for category in features_categorical:
+            unpacked = defaultdict(list)
+            for item in info[category]:
+                for key, val in item.items():
+                    unpacked[key].append(val)
+            features.update(unpacked)
+        return features
 
     @overrides
     def make_filename(self, dirname="query"):
@@ -415,7 +428,6 @@ class RootMunger(Munger):
         # TODO - also query patent features and include as attributes in network
         self.get_children(self.patent_number, 0)
         logger.debug("Examined {} branches".format(self.completed_branches))
-        self.handle_external()
         t.log()
 
     def get_children(self, curr_num, curr_depth):
@@ -436,7 +448,6 @@ class RootMunger(Munger):
         if curr_depth > self.depth:
             return
         if info.get('patents') is not None:
-            self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
             # TODO: include bcites, and recurse once more to get bcites for the leaves but not fcites
             df = self.query_to_dataframe(info, bcites=False)
             if self.df is None:

@@ -295,7 +295,7 @@ class CitationNetwork:
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
-    def root_analysis(self, depth, filename, limit=Config.DOC_LIMIT, bin_size=20):
+    def root_analysis(self, depth, filename, allow_external=Config.ALLOW_EXTERNAL, limit=Config.DOC_LIMIT, bin_size=20):
         """
         Instead of evaluating knowledge impact within the network (breadth-first), conducts a depth-first calculation
         for every node in the network up to some limit.
@@ -306,6 +306,7 @@ class CitationNetwork:
         :param filename: the filename to save results
         :param limit: the maximum number of nodes to evaluate
         :param bin_size: the size of the time bins in weeks
+        :param allow_external: whether or not to allow external patents in the analysis
         """
         df = None
         patents = [i for i in self.G.nodes]
@@ -315,9 +316,22 @@ class CitationNetwork:
         manager = enlighten.get_manager()
         ticker = manager.counter(total=len(patents), desc='Patent Trees Analyzed', unit='patents')
         for i, patent in enumerate(patents):
-            munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
-            # eval_and_sum(munger)
-            cn = TreeCitationNetwork(munger.get_network(), patent, weighting_methods=self.weighting_methods, k_depth=self.k_depth)
+            if allow_external:
+                munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
+                network = munger.get_network()
+                features = list(munger.features.values())
+            else:
+                # logger.debug(list(self.G.successors(patent)))
+                network = nx.DiGraph(self.G.subgraph([patent] + self.get_successors_recursively(patent, 0, depth)))
+                # logger.debug(self.G.nodes[patent])
+                features = RootMunger.query_features(patent)
+            # logger.debug(network.nodes)
+            cn = TreeCitationNetwork(
+                network,
+                patent,
+                weighting_methods=self.weighting_methods,
+                k_depth=self.k_depth,
+            )
             if not cn.is_empty():
                 data = cn.eval_binned(bin_size, weighting_keys=self.weighting_methods, plot=False)
                 if df is None:
@@ -325,22 +339,35 @@ class CitationNetwork:
                         data=[
                             [x[key] for key in self.weighting_methods] +
                             [i] +
-                            list(munger.features.values()) for i, x in enumerate(data)
+                            list(features.values()) for i, x in enumerate(data)
                         ],
-                        columns=["t"]+["k_{}".format(key) for key in self.weighting_methods]+list(munger.features.keys())
+                        columns=["t"]+["k_{}".format(key) for key in self.weighting_methods]+list(features.keys())
                     )
                 else:
                     df_new = pd.DataFrame(
-                        data=[[x, i] + list(munger.features.values()) for i, x in enumerate(data)],
-                        columns=["t", "k"] + list(munger.features.keys())
+                        data=[[x, i] + list(features.values()) for i, x in enumerate(data)],
+                        columns=["t", "k"] + list(features.keys())
                     )
                     df = df.append(df_new, ignore_index=True)
-                t = Timer("Patent {}/{} - writing data to file {}".format(i, len(patents), filename))
+                t = Timer(
+                    "Patent {}/{} with {} successors - updating data in file {}".format(
+                        i, len(patents), network.size()-1, filename
+                    )
+                )
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, sep='\t', header=True)
                 t.log()
             ticker.update()
         ticker.close()
+
+    def get_successors_recursively(self, patent, depth, max_depth):
+        successors = []
+        children = list(self.G.successors(patent))
+        for child in children:
+            successors.append(child)
+            if depth < max_depth:
+                successors += self.get_successors_recursively(child, depth+1, max_depth)
+        return successors
 
 
 class TreeCitationNetwork(CitationNetwork):
@@ -348,8 +375,8 @@ class TreeCitationNetwork(CitationNetwork):
     A special variation on the CitationNetwork built specifically to track the descendants of a single patent.
     """
     def __init__(
-            self, G, root, weighting_methods=["h_index", "forward_cites"], k_depth=Config.K_DEPTH,
-            quality=True, h_index=True, custom_centrality=True, knowledge=True
+            self, G, root, weighting_methods=("h_index", "forward_cites"),
+            k_depth=Config.K_DEPTH, quality=True, h_index=True, custom_centrality=True, knowledge=True
     ):
         super().__init__(
             G,
@@ -380,7 +407,7 @@ class TreeCitationNetwork(CitationNetwork):
         dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
         # logger.debug("Range: {}".format(max(dates) - min(dates)))
 
-        k = defaultdict(list)
+        k = []
         bins = int((max(dates) - min(dates)) / bin_size) if bin_size is not None else 1
         # TODO: this is inefficient; create a hashtable and store edges that way,
         #  then generate the network from the hash tables
@@ -396,8 +423,10 @@ class TreeCitationNetwork(CitationNetwork):
             self.G.remove_edges_from(remove)
             # TODO: only evaluate root node, rather than all nodes
             self.eval_all(weighting_keys=weighting_keys, verbose=False)
+            x = {}
             for key in self.weighting_methods:
-                k[key].append(self.G.nodes[self.root][key])
+                x[key] = self.G.nodes[self.root][key]
+            k.append(x)
             if bins > 1:
                 logger.debug("Bin {}/{}".format(i+1, bins))
             self.G = full_G.copy()

@@ -41,9 +41,9 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount
     :param discount: the discount rate
     :type discount: float
     :param bin_size: bin size in weeks
-    :type bin_size: int
+    :type bin_size: Integer
     :param weighting_keys: the weighting key to use for knowledge calculation
-    :type weighting_keys: str
+    :type weighting_keys: list
     :param prefix: prefix for final storage file name
     :type prefix: str
     """
