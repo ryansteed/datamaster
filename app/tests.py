@@ -1,6 +1,4 @@
 import json
-import sys
-import os
 
 from app.metrics import CitationNetwork, TreeCitationNetwork
 from app.munge import QueryMunger, RootMunger
@@ -53,7 +51,9 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount
     #  - then build a full dataframe and save to file
     munger = get_query_munger(query_json_file, limit=limit)
     G = munger.get_network(limit=limit)
-    cn = CitationNetwork(G, custom_centrality=False, weighting_methods=weighting_keys, k_depth=k_depth)
+    cn = CitationNetwork(
+        G, custom_centrality=False, weighting_methods=weighting_keys, k_depth=k_depth, discount=discount
+    )
     cn.root_analysis(
         3,
         munger.make_filename(prefix="{}_{}".format(prefix, limit)),
@@ -101,7 +101,7 @@ def feature_test(query_json_file, limit, weighting_keys, discount, k_depth):
     :param weighting_keys: the weighting key to use for knowledge calculation
     :type weighting_keys: list
     """
-    root_test_multiple(query_json_file, limit, k_depth, discount, bin_size=None, weighting_keys=weighting_keys, prefix="FEATURE")
+    root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount, bin_size=None, prefix="FEATURE")
 
 
 def eval_and_sum(munger,  weighting_keys, k_depth, discount, write_graph=False):

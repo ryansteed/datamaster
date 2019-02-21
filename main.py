@@ -27,6 +27,7 @@ class JobHandler:
 
     def execute(self):
         logger.debug(self.get_args())
+        logger.info("==== NEW SESSION ====")
         self.test_runnable(**self.get_args())
 
 
@@ -117,6 +118,7 @@ if __name__ == "__main__":
         '-w',
         '--weighting_keys',
         nargs='+',
+        default=("forward_cites", "k_depth"),
         help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
     )
     job.execute()

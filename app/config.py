@@ -55,5 +55,3 @@ handler_stdout = logging.StreamHandler(sys.stdout)
 handler_stdout.setLevel(logging.DEBUG)
 handler_stdout.setFormatter(formatter)
 logger.addHandler(handler_stdout)
-
-logger.info("==== NEW SESSION ====")
