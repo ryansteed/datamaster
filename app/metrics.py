@@ -18,7 +18,7 @@ class CitationNetwork:
     """Tracks the graph and meta-attributes for any citation network"""
     def __init__(
             self, G, weighting_methods=["forward_cites", "h_index"],
-            quality=True, h_index=True, custom_centrality=True, knowledge=True,
+            quality=True, h_index=True, custom_centrality=False, knowledge=True,
             k_depth=Config.K_DEPTH, discount=Config.DISCOUNT
             ):
         """
@@ -346,14 +346,14 @@ class CitationNetwork:
                 else:
                     df = df.append(self.make_df(features, data), ignore_index=True)
                     # logger.debug(df)
-                t = Timer(
-                    "Patent {}/{} with {} successors - updating data in file {}".format(
-                        i, len(patents), network.size()-1, filename
-                    )
-                )
+                # t = Timer(
+                #     "Patent {}/{} with {} successors - updating data in file {}".format(
+                #         i, len(patents), network.size()-1, filename
+                #     )
+                # )
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, sep='\t', header=True)
-                t.log()
+                # t.log()
             ticker.update()
         ticker.close()
 
@@ -384,7 +384,7 @@ class TreeCitationNetwork(CitationNetwork):
     """
     def __init__(
             self, G, root, weighting_methods=("h_index", "forward_cites"),
-            k_depth=Config.K_DEPTH, quality=True, h_index=True, custom_centrality=True, knowledge=True
+            k_depth=Config.K_DEPTH, quality=True, h_index=True, custom_centrality=False, knowledge=True
     ):
         super().__init__(
             G,
