@@ -41,6 +41,8 @@ class CitationNetwork:
         self.k_depth = k_depth
         self.discount = discount
         self.attributes = []
+        self.visited = []
+        self.k_visited = []
         if quality:
             self.attributes += ['forward_cites', 'backward_cites', 'family_size', 'num_claims']
         if h_index:
@@ -248,6 +250,7 @@ class CitationNetwork:
         if verbose:
             t = Timer("{}%".format(round(1/div*100)))
         for i, node in enumerate(self.G.nodes):
+            self.k_visited = [node]
             node_attrs[node] = self.k(node, node, weighting_keys, 0)
             if verbose and i % int(len(self.G.nodes) / div) == 0:
                 t.log()
@@ -277,7 +280,9 @@ class CitationNetwork:
         if self.k_depth is not None and depth > self.k_depth:
             return {key: 0 for key in weighting_keys}
         sum_children = defaultdict(int)
-        for child in [x for x in self.G.successors(node) if x is not None]:
+        children = [x for x in self.G.successors(node) if x is not None and x not in self.k_visited]
+        self.k_visited += children
+        for child in children:
             next_k = self.k(root, child, weighting_keys, depth+1)
             for key, val in next_k.items():
                 sum_children[key] += val
@@ -322,7 +327,8 @@ class CitationNetwork:
                 features = list(munger.features.values())
             else:
                 # logger.debug(list(self.G.successors(patent)))
-                network = nx.DiGraph(self.G.subgraph([patent] + self.get_successors_recursively(patent, 0, depth)))
+                self.visited = [patent]
+                network = nx.DiGraph(self.G.subgraph([patent] + self.get_successors_recursively(patent, depth, 0)))
                 # logger.debug(self.G.nodes[patent])
                 features = RootMunger.query_features(patent)
             # logger.debug(network.nodes)
@@ -334,21 +340,12 @@ class CitationNetwork:
             )
             if not cn.is_empty():
                 data = cn.eval_binned(bin_size, weighting_keys=self.weighting_methods, plot=False)
+                # logger.debug(data)
                 if df is None:
-                    df = pd.DataFrame(
-                        data=[
-                            [x[key] for key in self.weighting_methods] +
-                            [i] +
-                            list(features.values()) for i, x in enumerate(data)
-                        ],
-                        columns=["t"]+["k_{}".format(key) for key in self.weighting_methods]+list(features.keys())
-                    )
+                    df = self.make_df(features, data)
                 else:
-                    df_new = pd.DataFrame(
-                        data=[[x, i] + list(features.values()) for i, x in enumerate(data)],
-                        columns=["t", "k"] + list(features.keys())
-                    )
-                    df = df.append(df_new, ignore_index=True)
+                    df = df.append(self.make_df(features, data), ignore_index=True)
+                    # logger.debug(df)
                 t = Timer(
                     "Patent {}/{} with {} successors - updating data in file {}".format(
                         i, len(patents), network.size()-1, filename
@@ -360,9 +357,20 @@ class CitationNetwork:
             ticker.update()
         ticker.close()
 
-    def get_successors_recursively(self, patent, depth, max_depth):
+    def make_df(self, features, data):
+        return pd.DataFrame(
+            data=[
+                [x[self.make_knowledge_name(key)] for key in self.weighting_methods] +
+                [i] +
+                list(features.values()) for i, x in enumerate(data)
+            ],
+            columns=[self.make_knowledge_name(key) for key in self.weighting_methods] + ["t"] + list(features.keys())
+        )
+
+    def get_successors_recursively(self, patent, max_depth, depth):
         successors = []
-        children = list(self.G.successors(patent))
+        children = [patent for patent in self.G.successors(patent) if patent not in self.visited]
+        self.visited += children
         for child in children:
             successors.append(child)
             if depth < max_depth:
@@ -425,7 +433,7 @@ class TreeCitationNetwork(CitationNetwork):
             self.eval_all(weighting_keys=weighting_keys, verbose=False)
             x = {}
             for key in self.weighting_methods:
-                x[key] = self.G.nodes[self.root][key]
+                x[self.make_knowledge_name(key)] = self.G.nodes[self.root][self.make_knowledge_name(key)]
             k.append(x)
             if bins > 1:
                 logger.debug("Bin {}/{}".format(i+1, bins))

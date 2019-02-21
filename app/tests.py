@@ -55,7 +55,7 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount
         G, custom_centrality=False, weighting_methods=weighting_keys, k_depth=k_depth, discount=discount
     )
     cn.root_analysis(
-        3,
+        k_depth,
         munger.make_filename(prefix="{}_{}".format(prefix, limit)),
         limit=limit,
         bin_size=bin_size
