@@ -46,6 +46,7 @@ hp = ggplot(to_plot, aes(yy, xx)) +
   ggtitle("TKC Distribution By Weighting Method") +
   theme_classic() +
   theme(legend.title=element_blank()) +
+  theme(text=element_text(size=12, family="Times New Roman")) +
   ylab("K") +
   xlab("Weighting Method")
 hp
