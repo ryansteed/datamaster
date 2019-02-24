@@ -29,6 +29,7 @@ class Munger:
     def __init__(self, limit, cache):
         """
         Initializes a munger.
+
         :param limit: the maximum number of patents to process and query
         :param cache: whether or not to use data cached in a csv file or make a fresh query
         """
@@ -41,6 +42,7 @@ class Munger:
     def load_data(self):
         """
         Loads data from query or file to a dataframe.
+
         :return: the instance
         """
         if self.cache:
@@ -67,6 +69,7 @@ class Munger:
     def make_filename(self, prefix="QUERY", dirname="query"):
         """
         Creates a filename to under which to store the munged data.
+
         :return: the filename
         """
         raise NotImplementedError
@@ -75,6 +78,7 @@ class Munger:
     def query(json_query):
         """
         Makes a query to the USPTO using a JSON attributes object.
+
         :param json_query: the json query according to the PatentsView API.
         :return: the return query in JSON format
         """
@@ -106,6 +110,7 @@ class Munger:
     def write_data_to_file(self, filename):
         """
         Write the data collected to a file
+
         :param filename: the name of the file, typically the query name
         """
         t = Timer("Writing data to file {}".format(filename))
@@ -120,6 +125,7 @@ class Munger:
     def query_to_dataframe(self, info, bcites=Config.COLLECT_BCITES):
         """
         Converts the JSON query results from PatentsView to an edge list dataframe.
+
         :param info: the query json output
         :param bcites: whether or not to include backward citations
         :return: the dataframe containing an edge list wtih the query results
@@ -197,6 +203,7 @@ class Munger:
     def get_edges(self):
         """
         Return the edges from this query, if it has been made; else, load data
+
         :return: the edge list in a dataframe, including date
         """
         self.ensure_data()
@@ -269,6 +276,7 @@ class QueryMunger(Munger):
             ):
         """
         Initializes the query munger
+
         :param query_json: the JSON for the query
         :param limit: the maximum number of documents to munge
         :param cache: whether or not to use cached query data
@@ -316,6 +324,7 @@ class QueryMunger(Munger):
     def query_paginated(self, page, per_page):
         """
         Iteratively queries the PatentsView API (so as not to receive a timeout, and to gather data to file over time)
+
         :param page: the current page number to query
         :param per_page: the number of patents per query
         :return: a dataframe containing the query page results
@@ -335,13 +344,16 @@ class QueryMunger(Munger):
         self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
 
         if self.feature_keys is not None:
-            self.features.update({patent['patent_number']: RootMunger.parse_features(patent) for patent in info['patents']})
+            self.features.update(
+                {patent['patent_number']: RootMunger.parse_features(patent) for patent in info['patents']}
+            )
 
         return self.query_to_dataframe(info)
 
     def query_sounding(self):
         """
         Sends a sounding query to establish the number of documents to scrape
+
         :return: the number of patents to scrape
         """
         t = Timer("Sounding")
@@ -354,7 +366,7 @@ class QueryMunger(Munger):
             }
         })
         t.log()
-        return info['total_patent_count']  # , info['total_citedby_patent_count'], info['total_cited_patent_count']
+        return info['total_patent_count']
 
     def handle_external(self):
         if not self.allow_external:
@@ -393,6 +405,7 @@ class RootMunger(Munger):
     def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES):
         """
         Initializes the root munger
+
         :param patent_number: the root patent number
         :param depth: the depth of the search (the number of generations of children)
         :param limit: a document limit
@@ -421,7 +434,7 @@ class RootMunger(Munger):
     @staticmethod
     def query_features(patents=None, query=None):
         if query is None and patents is None:
-            raise ValueError("Need either query or list of patents.")
+            raise DataFormatError("Need either query or list of patents.")
 
         t = Timer("Querying features")
 
@@ -445,7 +458,10 @@ class RootMunger(Munger):
     def parse_features(patent_info):
         # logger.debug("started feature parsing")
         features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
-        features = {key: val for key, val in patent_info.items() if key not in features_categorical and key in RootMunger.features}
+        features = {
+            key: val for key, val in patent_info.items()
+            if key not in features_categorical and key in RootMunger.features
+        }
         for category in features_categorical:
             unpacked = defaultdict(list)
             for item in patent_info[category]:
@@ -471,6 +487,7 @@ class RootMunger(Munger):
     def get_children(self, curr_num, curr_depth):
         """
         Recursively fetches the children of the current patent up to the maximum depth and add to the edge list
+
         :param curr_num: the current patent being munged
         :param curr_depth: the current depth away from the root patent number
         """
@@ -507,6 +524,7 @@ def chunks(l, n):
 
 class DataFormatError(Exception):
     pass
+
 
 class QueryError(Exception):
     pass
