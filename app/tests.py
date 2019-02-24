@@ -58,7 +58,8 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount
         k_depth,
         munger.make_filename(prefix="{}_{}".format(prefix, limit)),
         limit=limit,
-        bin_size=bin_size
+        bin_size=bin_size,
+        query=munger.query_json
     )
 
 
@@ -126,7 +127,7 @@ def eval_and_sum(munger,  weighting_keys, k_depth, discount, write_graph=False):
         cn.write_graphml(munger.make_filename(dirname="graph"))
 
 
-def get_query_munger(query_file, limit=Config.DOC_LIMIT):
+def get_query_munger(query_file, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES):
     """
     Construct a query munger for a given query, stored in a JSON file.
     :param query_file: the path to the query file
@@ -135,4 +136,4 @@ def get_query_munger(query_file, limit=Config.DOC_LIMIT):
     """
     with open(query_file, 'r') as f:
         query = json.load(f)
-    return QueryMunger(query, limit=limit)
+    return QueryMunger(query, limit=limit, cache=cache)

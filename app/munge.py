@@ -64,7 +64,7 @@ class Munger:
         """
         raise NotImplementedError
 
-    def make_filename(self):
+    def make_filename(self, prefix="QUERY", dirname="query"):
         """
         Creates a filename to under which to store the munged data.
         :return: the filename
@@ -85,6 +85,7 @@ class Munger:
             except json.JSONDecodeError as e:
                 error = e
                 time.sleep(10)
+                logger.warn("Failed query #{}, trying again".format(i+1))
                 continue
             return info
         raise QueryError("Tried receiving response several times, repeated JSONDecodeError:\n{}".format(error))
@@ -111,6 +112,10 @@ class Munger:
         with open(filename, "w+") as file:
             self.df.to_csv(file, index=False, sep='\t')
         t.log()
+
+    @staticmethod
+    def write_graph_to_file(G, filename):
+        nx.write_gpickle(G, filename)
 
     def query_to_dataframe(self, info, bcites=Config.COLLECT_BCITES):
         """
@@ -152,6 +157,13 @@ class Munger:
         :param limit: a limit to the number of documents to return
         :return: the NetworkX graph
         """
+
+        if self.cache:
+            try:
+                return nx.read_gpickle(self.make_filename(prefix="GRAPH"))
+            except FileNotFoundError:
+                logger.warn("No file on record, creating new graph")
+
         logger.info("Generating network from data (metadata={}, limit={})".format(metadata, limit))
         df_edges = self.get_edges()
         if limit is not None:
@@ -179,6 +191,9 @@ class Munger:
                     logger.error("Couldn't find network entry for {}".format(entry['patent_number']))
 
         logger.info("Generated network with {} nodes and {} edges".format(len(G.nodes), len(G.edges)))
+
+        self.write_graph_to_file(G, self.make_filename(prefix="GRAPH"))
+
         return G
 
     def get_edges(self):
@@ -252,7 +267,7 @@ class QueryMunger(Munger):
     def __init__(
             self, query_json,
             limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES, per_page=1000,
-            allow_external=Config.ALLOW_EXTERNAL
+            allow_external=Config.ALLOW_EXTERNAL, feature_keys=Config.FEATURES
             ):
         """
         Initializes the query munger
@@ -265,6 +280,8 @@ class QueryMunger(Munger):
         self.per_page = per_page
         self.allow_external = allow_external
         self.queried_numbers = []
+        self.feature_keys = feature_keys
+        self.features = {}
         super().__init__(limit, cache)
 
     @overrides
@@ -305,6 +322,10 @@ class QueryMunger(Munger):
         :param per_page: the number of patents per query
         :return: a dataframe containing the query page results
         """
+        f = self.query_fields
+        if self.feature_keys is not None:
+            f += self.feature_keys
+
         info = self.query({
             "q": self.query_json,
             "f": self.query_fields,
@@ -314,6 +335,10 @@ class QueryMunger(Munger):
             }
         })
         self.queried_numbers += [patent['patent_number'] for patent in info['patents']]
+
+        if self.feature_keys is not None:
+            self.features.update({patent['patent_number']: RootMunger.parse_features(patent) for patent in info['patents']})
+
         return self.query_to_dataframe(info)
 
     def query_sounding(self):
@@ -346,6 +371,15 @@ class QueryMunger(Munger):
             logger.debug("Stripped {} external cites".format(old_size-self.df.size))
 
     @overrides
+    def get_network(self, metadata=False, limit=None):
+        G = super().get_network(metadata=metadata, limit=limit)
+        if len(self.features) > 0:
+            logger.debug("num features: {}".format(len(self.features)))
+            nx.set_node_attributes(G, self.features, "features")
+            self.write_graph_to_file(G, self.make_filename(prefix="GRAPH"))
+        return G
+
+    @overrides
     def make_filename(self, prefix="QUERY", dirname="query"):
         file_string = json.dumps(self.query_json)
         for c in '"{} /':
@@ -357,28 +391,8 @@ class RootMunger(Munger):
     """
     A special munger to fetch the descendants of a given patent number
     """
-    features = [
-        "cpc_category",
-        "cpc_group_id",
-        "assignee_type",
-        "assignee_total_num_patents",
-        "assignee_id",
-        "inventor_id",
-        "inventor_total_num_patents",
-        "ipc_class",
-        "ipc_main_group",
-        "nber_category_id",
-        "nber_subcategory_id",
-        # TODO handle the abstract
-        # "patent_abstract",
-        "patent_date",
-        "patent_num_claims",
-        "patent_num_cited_by_us_patents",
-        "patent_processing_time",
-        "uspc_mainclass_id",
-        "uspc_subclass_id",
-        "wipo_field_id"
-    ]
+    features = Config.FEATURES
+
     def __init__(self, patent_number, depth, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED_QUERIES):
         """
         Initializes the root munger
@@ -395,29 +409,56 @@ class RootMunger(Munger):
             "q": {"patent_number": self.patent_number},
             "f": self.features
         }).get('patents')[0]
-        # TODO - unnest the return to self.features - should be flat dict
-        self.features = self.query_features(features)
+        self.features = self.query_features_single(features)
         t.log()
         super().__init__(limit, cache)
 
     @staticmethod
-    def query_features(patent):
+    def query_features_single(patent):
         info = Munger.query({
             "q": {"patent_number": patent},
             "f": RootMunger.features
         }).get('patents')[0]
+        return RootMunger.parse_features(info)
+
+    @staticmethod
+    def query_features(patents=None, query=None):
+        if query is None and patents is None:
+            raise ValueError("Need either query or list of patents.")
+
+        t = Timer("Querying features")
+
+        q = query if query is not None else {"patent_number": patents}
+        # logger.debug(q)
+        info = Munger.query({
+            "q": q,
+            "f": ['patent_number'] + RootMunger.features,
+            # TODO handle sizes over 100,000 with paginated query
+            "o": {"per_page": "50000"}
+        })
+        features = {}
+        for patent in info['patents']:
+            # logger.debug(patent)
+            features[patent['patent_number']] = RootMunger.parse_features(patent)
+
+        t.log()
+        return features
+
+    @staticmethod
+    def parse_features(patent_info):
+        # logger.debug("started feature parsing")
         features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
-        features = {key: val for key, val in info.items() if key not in features_categorical}
+        features = {key: val for key, val in patent_info.items() if key not in features_categorical}
         for category in features_categorical:
             unpacked = defaultdict(list)
-            for item in info[category]:
+            for item in patent_info[category]:
                 for key, val in item.items():
                     unpacked[key].append(val)
             features.update(unpacked)
         return features
 
     @overrides
-    def make_filename(self, dirname="query"):
+    def make_filename(self, prefix="QUERY", dirname="query"):
         filename = self.get_filename_from_stem("PATENT_{}_{}".format(self.patent_number, self.depth), dirname)
         return filename
 

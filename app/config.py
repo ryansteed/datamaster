@@ -34,6 +34,29 @@ class Config:
     # Whether or not to allow cited patents outside the query to be included in the citation network
     ALLOW_EXTERNAL = False
 
+    FEATURES = [
+        "cpc_category",
+        "cpc_group_id",
+        "assignee_type",
+        "assignee_total_num_patents",
+        "assignee_id",
+        "inventor_id",
+        "inventor_total_num_patents",
+        "ipc_class",
+        "ipc_main_group",
+        "nber_category_id",
+        "nber_subcategory_id",
+        # TODO handle the abstract
+        # "patent_abstract",
+        "patent_date",
+        "patent_num_claims",
+        "patent_num_cited_by_us_patents",
+        "patent_processing_time",
+        "uspc_mainclass_id",
+        "uspc_subclass_id",
+        "wipo_field_id"
+    ]
+
 
 log_dir = Config.LOG_PATH
 if not os.path.exists(log_dir):

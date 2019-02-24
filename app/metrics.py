@@ -300,7 +300,8 @@ class CitationNetwork:
     def p(self, root, node):
         return 1 if node == root else 1 / int(self.G.in_degree(node))
 
-    def root_analysis(self, depth, filename, allow_external=Config.ALLOW_EXTERNAL, limit=Config.DOC_LIMIT, bin_size=20):
+    def root_analysis(self, depth, filename, allow_external=Config.ALLOW_EXTERNAL, limit=Config.DOC_LIMIT, bin_size=20,
+                      query=None):
         """
         Instead of evaluating knowledge impact within the network (breadth-first), conducts a depth-first calculation
         for every node in the network up to some limit.
@@ -312,6 +313,7 @@ class CitationNetwork:
         :param limit: the maximum number of nodes to evaluate
         :param bin_size: the size of the time bins in weeks
         :param allow_external: whether or not to allow external patents in the analysis
+        :param query: a query to help speed up feature querying, if no external patents allowed
         """
         df = None
         patents = [i for i in self.G.nodes]
@@ -320,18 +322,22 @@ class CitationNetwork:
 
         manager = enlighten.get_manager()
         ticker = manager.counter(total=len(patents), desc='Patent Trees Analyzed', unit='patents')
+
         for i, patent in enumerate(patents):
             if allow_external:
                 munger = RootMunger(patent, depth=depth, limit=Config.DOC_LIMIT)
                 network = munger.get_network()
-                features = list(munger.features.values())
+                network.nodes[patent]["features"] = munger.features
             else:
-                # logger.debug(list(self.G.successors(patent)))
                 self.visited = [patent]
                 network = nx.DiGraph(self.G.subgraph([patent] + self.get_successors_recursively(patent, depth, 0)))
-                # logger.debug(self.G.nodes[patent])
-                features = RootMunger.query_features(patent)
-            # logger.debug(network.nodes)
+                try:
+                    features = network.nodes[patent]['features']
+                except KeyError:
+                    logger.warn("Bad query input file. For root analysis, need to first collect features. "
+                                "Try again with cache=False.")
+                    features = RootMunger.query_features_single(patent)
+
             cn = TreeCitationNetwork(
                 network,
                 patent,
@@ -340,21 +346,15 @@ class CitationNetwork:
             )
             if not cn.is_empty():
                 data = cn.eval_binned(bin_size, weighting_keys=self.weighting_methods, plot=False)
-                # logger.debug(data)
                 if df is None:
                     df = self.make_df(features, data)
                 else:
                     df = df.append(self.make_df(features, data), ignore_index=True)
-                    # logger.debug(df)
-                # t = Timer(
-                #     "Patent {}/{} with {} successors - updating data in file {}".format(
-                #         i, len(patents), network.size()-1, filename
-                #     )
-                # )
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, sep='\t', header=True)
                 # t.log()
             ticker.update()
+
         ticker.close()
 
     def make_df(self, features, data):
