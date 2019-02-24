@@ -58,8 +58,7 @@ def root_test_multiple(query_json_file, limit, weighting_keys, k_depth, discount
         k_depth,
         munger.make_filename(prefix="{}_{}".format(prefix, limit)),
         limit=limit,
-        bin_size=bin_size,
-        query=munger.query_json
+        bin_size=bin_size
     )
 
 
@@ -81,7 +80,6 @@ def query_test(query_json_file, limit, weighting_keys, k_depth, discount, write_
     :param weighting_keys: the weighting key to use for knowledge calculation
     :type weighting_keys: list
     """
-    logger.debug(weighting_keys)
     munger = get_query_munger(query_json_file, limit=limit)
     eval_and_sum(munger, discount=discount, k_depth=k_depth, weighting_keys=weighting_keys, write_graph=write_graph)
 

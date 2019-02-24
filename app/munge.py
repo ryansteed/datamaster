@@ -179,8 +179,6 @@ class Munger:
             create_using=nx.DiGraph()
         )
 
-        # logger.debug(np.unique(df_edges['patent_id']).size)
-        # logger.debug(np.unique(df_edges['citation_id']).size)
         if metadata:
             self.ensure_meta()
             for entry in self.df_meta.to_dict(orient='records'):
@@ -374,7 +372,6 @@ class QueryMunger(Munger):
     def get_network(self, metadata=False, limit=None):
         G = super().get_network(metadata=metadata, limit=limit)
         if len(self.features) > 0:
-            logger.debug("num features: {}".format(len(self.features)))
             nx.set_node_attributes(G, self.features, "features")
             self.write_graph_to_file(G, self.make_filename(prefix="GRAPH"))
         return G
@@ -448,7 +445,7 @@ class RootMunger(Munger):
     def parse_features(patent_info):
         # logger.debug("started feature parsing")
         features_categorical = ["inventors", "assignees", "cpcs", "nbers", "uspcs", "IPCs", "wipos"]
-        features = {key: val for key, val in patent_info.items() if key not in features_categorical}
+        features = {key: val for key, val in patent_info.items() if key not in features_categorical and key in RootMunger.features}
         for category in features_categorical:
             unpacked = defaultdict(list)
             for item in patent_info[category]:
