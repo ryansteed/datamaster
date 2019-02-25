@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>app.tests &mdash; datamaster 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> datamaster
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DataMASTER 2018-19</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">app</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">datamaster</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>app.tests</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for app.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">app.metrics</span> <span class="k">import</span> <span class="n">CitationNetwork</span><span class="p">,</span> <span class="n">TreeCitationNetwork</span>
+<span class="kn">from</span> <span class="nn">app.munge</span> <span class="k">import</span> <span class="n">QueryMunger</span><span class="p">,</span> <span class="n">RootMunger</span>
+<span class="kn">from</span> <span class="nn">app.config</span> <span class="k">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">logger</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Official API endpoint script. All non-developer calls should run through here for convenience.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="root_test_single"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_single">[docs]</a><span class="k">def</span> <span class="nf">root_test_single</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</span>
+
+<span class="sd">    :param patent: the patent number</span>
+<span class="sd">    :type patent: str</span>
+<span class="sd">    :param depth: the graph search depth</span>
+<span class="sd">    :type depth: int</span>
+<span class="sd">    :param bin_size: the bin size in weeks</span>
+<span class="sd">    :type bin_size: int</span>
+<span class="sd">    :param weighting_keys: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_keys: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">munger</span> <span class="o">=</span> <span class="n">RootMunger</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">)</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">TreeCitationNetwork</span><span class="p">(</span><span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">(),</span> <span class="n">patent</span><span class="p">,</span> <span class="n">weighting_methods</span><span class="o">=</span><span class="n">weighting_keys</span><span class="p">)</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">eval_binned</span><span class="p">(</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">write_graphml</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patent</span><span class="p">,</span> <span class="n">depth</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="root_test_multiple"><a class="viewcode-back" href="../../app.tests.html#app.tests.root_test_multiple">[docs]</a><span class="k">def</span> <span class="nf">root_test_multiple</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;TIME-DATA&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The root endpoint constructs a descendant citation tree for one or more patents and calculates metrics for the root.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
+<span class="sd">    :param k_depth: the maximum depth to evaluate k</span>
+<span class="sd">    :type k_depth: int</span>
+<span class="sd">    :param discount: the discount rate</span>
+<span class="sd">    :type discount: float</span>
+<span class="sd">    :param bin_size: bin size in weeks</span>
+<span class="sd">    :type bin_size: Integer</span>
+<span class="sd">    :param weighting_keys: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_keys: list</span>
+<span class="sd">    :param prefix: prefix for final storage file name</span>
+<span class="sd">    :type prefix: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: build this as a function of the full network, handling empty root networks automatically</span>
+    <span class="c1">#  - then build a full dataframe and save to file</span>
+    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span>
+        <span class="n">G</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">weighting_methods</span><span class="o">=</span><span class="n">weighting_keys</span><span class="p">,</span> <span class="n">k_depth</span><span class="o">=</span><span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="o">=</span><span class="n">discount</span>
+    <span class="p">)</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">root_analysis</span><span class="p">(</span>
+        <span class="n">k_depth</span><span class="p">,</span>
+        <span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">limit</span><span class="p">)),</span>
+        <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+        <span class="n">bin_size</span><span class="o">=</span><span class="n">bin_size</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="query_test"><a class="viewcode-back" href="../../app.tests.html#app.tests.query_test">[docs]</a><span class="k">def</span> <span class="nf">query_test</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The query endpoint collects patents for a query, constructs a citation network,</span>
+<span class="sd">    and conducts metric calculations breadth-wise.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
+<span class="sd">    :param k_depth: the maximum depth to evaluate k</span>
+<span class="sd">    :type k_depth: int</span>
+<span class="sd">    :param discount: the discount rate</span>
+<span class="sd">    :type discount: float</span>
+<span class="sd">    :param write_graph: whether or not to write the network to a graph ml file</span>
+<span class="sd">    :type write_graph: bool</span>
+<span class="sd">    :param weighting_keys: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_keys: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">munger</span> <span class="o">=</span> <span class="n">get_query_munger</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">,</span> <span class="n">discount</span><span class="o">=</span><span class="n">discount</span><span class="p">,</span> <span class="n">k_depth</span><span class="o">=</span><span class="n">k_depth</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="o">=</span><span class="n">weighting_keys</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="n">write_graph</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="feature_test"><a class="viewcode-back" href="../../app.tests.html#app.tests.feature_test">[docs]</a><span class="k">def</span> <span class="nf">feature_test</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">k_depth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The feature endpoint constructs descendant trees for a series of roots from a single query, but does not conduct</span>
+<span class="sd">    time series analysis. It also collects additional observable features for use as controls in multiple regression.</span>
+
+<span class="sd">    :param query_json_file: path to a JSON file containing the query to be queried</span>
+<span class="sd">    :type query_json_file: str</span>
+<span class="sd">    :param limit: the maximum number of docs to munge</span>
+<span class="sd">    :type limit: int</span>
+<span class="sd">    :param k_depth: the maximum depth to evaluate k</span>
+<span class="sd">    :type k_depth: int</span>
+<span class="sd">    :param discount: the discount rate</span>
+<span class="sd">    :type discount: float</span>
+<span class="sd">    :param weighting_keys: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :type weighting_keys: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root_test_multiple</span><span class="p">(</span><span class="n">query_json_file</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">bin_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;FEATURE&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="eval_and_sum"><a class="viewcode-back" href="../../app.tests.html#app.tests.eval_and_sum">[docs]</a><span class="k">def</span> <span class="nf">eval_and_sum</span><span class="p">(</span><span class="n">munger</span><span class="p">,</span>  <span class="n">weighting_keys</span><span class="p">,</span> <span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">write_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates all metrics and summarize using the graph output from a munger.</span>
+<span class="sd">    :param munger: the munger to analyze</span>
+<span class="sd">    :param write_graph: whether or not to write the network to a graph ml file</span>
+<span class="sd">    :param weighting_keys: the weighting key to use for knowledge calculation</span>
+<span class="sd">    :param k_depth: the maximum depth to evaluate k</span>
+<span class="sd">    :type k_depth: int</span>
+<span class="sd">    :param discount: the discount rate</span>
+<span class="sd">    :type discount: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">CitationNetwork</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">k_depth</span><span class="o">=</span><span class="n">k_depth</span><span class="p">,</span> <span class="n">discount</span><span class="o">=</span><span class="n">discount</span><span class="p">,</span> <span class="n">custom_centrality</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">knowledge</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">write_graph</span><span class="p">),</span> <span class="n">weighting_methods</span><span class="o">=</span><span class="n">weighting_keys</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;METRICS_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">weighting_keys</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+    <span class="c1"># cn.draw()</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">eval_all</span><span class="p">(</span><span class="n">file_early</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+    <span class="n">cn</span><span class="o">.</span><span class="n">file_custom_metrics</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">write_graph</span><span class="p">:</span>
+        <span class="n">cn</span><span class="o">.</span><span class="n">write_graphml</span><span class="p">(</span><span class="n">munger</span><span class="o">.</span><span class="n">make_filename</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;graph&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_query_munger"><a class="viewcode-back" href="../../app.tests.html#app.tests.get_query_munger">[docs]</a><span class="k">def</span> <span class="nf">get_query_munger</span><span class="p">(</span><span class="n">query_file</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DOC_LIMIT</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_CACHED_QUERIES</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a query munger for a given query, stored in a JSON file.</span>
+<span class="sd">    :param query_file: the path to the query file</span>
+<span class="sd">    :param limit: the maximum number of docs to query</span>
+<span class="sd">    :return: a QueryMunger with this configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">query_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">QueryMunger</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright Ryan Steed
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
