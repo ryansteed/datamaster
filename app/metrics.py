@@ -208,7 +208,8 @@ class CitationNetwork:
     def k(self, root, node, weighting_keys, depth, verbose=False):
         """
         Recursively calculates the knowledge impact for a single node
-        `$$K_i = W_i + \sum_{j=1}^{n_i} \lambda P_jK_{j}$$`
+
+        :math:`K_i = W_i + \sum_{j=1}^{n_i} \lambda P_jK_{j}`
 
         :param root: the root node
         :param node: the current node
