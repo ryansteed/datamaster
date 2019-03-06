@@ -2,7 +2,8 @@ import json
 
 from app.metrics import CitationNetwork, TreeCitationNetwork
 from app.munge import QueryMunger, RootMunger
-from app.config import Config, logger
+from app.config import Config
+from app.regression import main
 
 """
 Official API endpoint script. All non-developer calls should run through here for convenience.
@@ -135,3 +136,7 @@ def get_query_munger(query_file, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED
     with open(query_file, 'r') as f:
         query = json.load(f)
     return QueryMunger(query, limit=limit, cache=cache)
+
+
+def regression():
+    main()

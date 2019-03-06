@@ -36,8 +36,8 @@ colnames(print) = c(
 )
 summary(print)
 
-log_h = log(dat$knowledge_h_index)
-log_f = log(dat$knowledge_forward_cites)
+log_h = log1p(dat$knowledge_h_index)
+log_f = log1p(dat$knowledge_forward_cites)
 #sqrt_h = sqrt(dat$knowledge_h_index)
 #sqrt_h = sqrt(dat$knowledge_forward_cites)
 

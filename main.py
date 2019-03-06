@@ -76,6 +76,8 @@ if __name__ == "__main__":
         job.set_test(app.tests.root_test_multiple)
     if test == "features":
         job.set_test(app.tests.feature_test)
+    if test == "regression":
+        job.set_test(app.tests.regression)
 
     # add common args
     if test in ("root_all", "features", "query"):
@@ -114,11 +116,13 @@ if __name__ == "__main__":
             help="the bin size in weeks"
         )
 
-    job.parser.add_argument(
-        '-w',
-        '--weighting_keys',
-        nargs='+',
-        default=("forward_cites", "h_index"),
-        help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
-    )
+    if test in ["query", "root", "features", "root_all"]:
+        job.parser.add_argument(
+            '-w',
+            '--weighting_keys',
+            nargs='+',
+            default=("forward_cites", "h_index"),
+            help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
+        )
+
     job.execute()

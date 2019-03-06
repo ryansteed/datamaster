@@ -2,7 +2,7 @@ setwd("/Users/Ryan/datamaster/data")
 library(stargazer)
 library(ggplot2)
 library(gdata)
-library(geoR)
+library(xtable)
 
 # Input
 engines = read.csv(sprintf("colonial/METRICS_both_None_engines_20Feb19.csv"), sep=",", header=TRUE)
@@ -49,5 +49,9 @@ gg = hp + facet_grid(yy ~ src)
 gg
 ggsave(sprintf("r/tkc_boxplots.png"), gg)
 
-pairwise.t.test(dat$knowledge_forward_cites, dat$source)
+ptt = pairwise.t.test(dat$knowledge_forward_cites, dat$source)
+ptt
 
+sink(sprintf("r/pairwise_t.tex"), append=FALSE, split=FALSE)
+xtable(ptt$p.value, caption=ptt$method, digits=-3)
+sink()

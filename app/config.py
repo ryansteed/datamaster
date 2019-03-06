@@ -13,6 +13,7 @@ class Config:
         ENV_NAME = 'unknown'
 
     DATA_PATH = os.path.abspath('../../data')
+    EXT_DATA_PATH = os.path.abspath('../../../data')
     LOG_PATH = os.path.dirname('logs/{}.log'.format(ENV_NAME))
 
     COLLECT_BCITES = False
