@@ -1,8 +1,9 @@
 setwd("/Users/Ryan/datamaster/data")
 library(gdata)
+library(stargazer)
 
 # Input
-engines = read.csv(sprintf("colonial/FEATURE_both_None_engines_05Mar19.csv"), sep=",", header=TRUE)
+engines = read.csv(sprintf("colonial/FEATURE_both_None_engines_12Mar19.csv"), sep=",", header=TRUE)
 radio = read.csv(sprintf("colonial/FEATURE_both_None_radio_05Mar19.csv"), sep=",", header=TRUE)
 robots = read.csv(sprintf("colonial/FEATURE_both_None_robots_05Mar19.csv"), sep=",", header=TRUE)
 transportation = read.csv(sprintf("colonial/FEATURE_both_None_transportation_05Mar19.csv"), sep=",", header=TRUE)
@@ -22,6 +23,10 @@ dat = combine(
 )
 dat = na.omit(dat[,!(names(dat) == "node")])
 summary(dat)
+
+sink(sprintf("r/features_all.tex"), append=FALSE, split=FALSE)
+stargazer(dat[,!(names(dat) == "source")], summary.stat=c("mean", "sd", "min", "max"), title="")
+sink()
 
 # process dates
 dat[,"patent_date"] = as.Date(dat[,"patent_date"])

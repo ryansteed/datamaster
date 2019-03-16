@@ -5,6 +5,7 @@ app/lib/__pycache__
 app/__pycache__
 data/query
 data/graph
+data/regression
 logs
 settings.json
 docs/build/*

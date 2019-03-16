@@ -6,6 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
 from statsmodels.api import OLS
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import seaborn as sns
 
 from app.config import logger, Config
 
@@ -13,41 +14,65 @@ from app.config import logger, Config
 def main():
     logger.debug("Running")
     keys = [
-        #"engines",
-        "radio",
-        "robots",
-        "transportation",
-        "xray",
-        "coherent-light"
+        "engines_12Mar19",
+        "radio_05Mar19",
+        "robots_05Mar19",
+        "transportation_05Mar19",
+        "xray_05Mar19",
+        "coherent-light_05Mar19"
     ]
     df = pd.concat([
         FeatureExtractor(
-            os.path.join(Config.EXT_DATA_PATH, "colonial/FEATURE_both_None_{}_05Mar19.csv".format(key))
+            os.path.join(Config.EXT_DATA_PATH, "colonial/FEATURE_both_None_{}.csv".format(key))
         ).extract()
         for key in keys
     ], keys=keys)
+    write(df_pretty_columns(df).describe().to_latex(), "description")
     df = FeatureTransformer(df).fit_transform()
+
     print(df.head())
 
-    regress(df)
+    for metric in ["h_index", "forward_cites"]:
+        write(regress(df, metric=metric), "all")
+        for key in keys:
+            print("\n\n## {} ##".format(key))
+            write(regress(df.loc[key], metric=metric), "{}_{}".format(key, metric))
 
-    for key in keys:
-        print("\n\n## {} ##".format(key))
-        regress(df.loc[key])
+
+def write(content, name):
+    with open("data/regression/{}.tex".format(name), 'w') as f:
+        f.write(content)
+        f.close()
 
 
-def regress(df):
+def regress(df, metric="forward_cites"):
     features = ["max_{}".format(key) for key in FeatureExtractor.max_list]
     features += [key for key in df if key.startswith("one-hot")]
     features += ["patent_date_center", 'patent_num_claims', 'patent_processing_time']
-    reg = Regressor(df, features=features)
-    # reg.score()
-    # reg.fit()
-    reg.summary()
+    reg = Regressor(df, features=features, target="log(knowledge_{})".format(metric))
+    return reg.summary()
+
+
+def df_pretty_columns(df):
+    copy = df.copy().drop("t", 1)
+    keys = {
+        "knowledge_forward_cites": "Knowledge Forward Cites",
+        "knowledge_h_index": "Knowledge H Index",
+        "patent_num_claims": "Number of Claims",
+        "patent_processing_time": "Processing Time",
+        "log(knowledge_h_index)": "Log(Knowledge H Index)",
+        "log(knowledge_forward_cites)": "Log(Knowledge Forward Cites)",
+        "max_inventor_total_num_patents": "Maximum Inventor Other Patents",
+        "max_assignee_total_num_patents": "Maximum Assignee Other Patents",
+    }
+    keys.update({key: "NBER Category {}".format(key[-1]) for key in copy.columns if "nber_category_id" in key})
+    cols = [keys[col] if col in keys else col for col in copy.columns]
+    copy.columns = cols
+    return copy
 
 
 class Regressor:
-    def __init__(self, data, features, target="knowledge_h_index"):
+    def __init__(self, data, features, target="log(knowledge_forward_cites)"):
         self.data = data
         self.target = target
         self.features = features
@@ -66,8 +91,13 @@ class Regressor:
 
     def summary(self):
         x, y = self.make_x_y()
+        # trim highly correlated vars to avoid multicollinearity
         x = Regressor.calculate_vif_(pd.DataFrame(x), thresh=5.0)
-        print(OLS(y, x).fit().summary())
+        # check correlation matrix
+        Regressor.print_corr(x.corr())
+        fit = OLS(y, x).fit()
+        print(fit.summary())
+        return fit.summary().as_latex()
 
     def make_x_y(self):
         # x = np.apply_along_axis(Regressor.flatten, 1, np.array(self.data[self.features].values))
@@ -75,6 +105,15 @@ class Regressor:
         x = self.data[self.features].fillna(self.data[self.features].mean())
         y = self.data[self.target]
         return x, y
+
+    @staticmethod
+    def print_corr(corr):
+        corr = corr.abs()
+        # s = corr.unstack()
+        # so = s.sort_values(ascending=False)
+        sol = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool)).stack().sort_values(ascending=False)
+        print("# Correlation Pairs #")
+        print(sol[:10])
 
     @staticmethod
     def calculate_vif_(X, thresh=5.0):
@@ -87,7 +126,7 @@ class Regressor:
 
             maxloc = vif.index(max(vif))
             if max(vif) > thresh:
-                print("dropping a variable {}".format(maxloc))
+                print("dropping a variable {}".format(X.columns[variables[maxloc]]))
                 del variables[maxloc]
                 dropped = True
 
@@ -105,6 +144,9 @@ class FeatureTransformer:
         self.df = df
 
     def fit_transform(self):
+        # create logarithm of knowledge columns
+        for key in ["knowledge_h_index", "knowledge_forward_cites"]:
+            self.make_logarithm(key)
         # transform date column
         self.df['patent_date'] = pd.to_datetime(self.df['patent_date'])
         # create centered date column (as numeric)
@@ -119,6 +161,9 @@ class FeatureTransformer:
             self.make_list(key)
             self.one_hot_encode(key)
         return self.df
+
+    def make_logarithm(self, key):
+        self.df["log({})".format(key)] = np.log1p(self.df[key])
 
     def make_list(self, key):
         self.df[key] = self.df[key].apply(
@@ -142,8 +187,11 @@ class FeatureTransformer:
 
 class FeatureExtractor:
     max_list = ['inventor_total_num_patents', 'assignee_total_num_patents']
-    one_hot = ["assignee_type", "cpc_category",
-               "nber_category_id"]
+    one_hot = [
+        # "assignee_type",
+        # "cpc_category",
+        "nber_category_id"
+    ]
     _types = {
         'knowledge_forward_cites': np.float64,
         'knowledge_h_index': np.float64,
