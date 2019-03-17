@@ -6,7 +6,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
 from statsmodels.api import OLS
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-import seaborn as sns
 
 from app.config import logger, Config
 
@@ -27,13 +26,13 @@ def main():
         ).extract()
         for key in keys
     ], keys=keys)
-    write(df_pretty_columns(df).describe().to_latex(), "description")
+    write(df_pretty_columns(df.drop("t", 1)).describe().to_latex(), "description")
     df = FeatureTransformer(df).fit_transform()
 
     print(df.head())
 
     for metric in ["h_index", "forward_cites"]:
-        write(regress(df, metric=metric), "all")
+        write(regress(df, metric=metric), "all_{}".format(metric))
         for key in keys:
             print("\n\n## {} ##".format(key))
             write(regress(df.loc[key], metric=metric), "{}_{}".format(key, metric))
@@ -46,36 +45,44 @@ def write(content, name):
 
 
 def regress(df, metric="forward_cites"):
-    features = ["max_{}".format(key) for key in FeatureExtractor.max_list]
-    features += [key for key in df if key.startswith("one-hot")]
-    features += ["patent_date_center", 'patent_num_claims', 'patent_processing_time']
-    reg = Regressor(df, features=features, target="log(knowledge_{})".format(metric))
+    features = [
+        "patent_date_center",
+        'log(patent_num_claims)',
+        'log(patent_processing_time)',
+        "log(avg_inventor_total_num_patents)",
+        # "interaction"
+    ]
+    protected = features.copy()
+    features += [key for key in df.columns if key.startswith("one-hot")]
+    print(features)
+    reg = Regressor(df, features=features, protected=protected, target="log(knowledge_{})".format(metric))
     return reg.summary()
 
 
 def df_pretty_columns(df):
-    copy = df.copy().drop("t", 1)
+    copy = df.copy()
     keys = {
         "knowledge_forward_cites": "Knowledge Forward Cites",
         "knowledge_h_index": "Knowledge H Index",
-        "patent_num_claims": "Number of Claims",
-        "patent_processing_time": "Processing Time",
+        "log(patent_num_claims)": "Log(Number of Claims)",
+        "log(patent_processing_time)": "Log(Processing Time)",
         "log(knowledge_h_index)": "Log(Knowledge H Index)",
         "log(knowledge_forward_cites)": "Log(Knowledge Forward Cites)",
-        "max_inventor_total_num_patents": "Maximum Inventor Other Patents",
-        "max_assignee_total_num_patents": "Maximum Assignee Other Patents",
+        "log(avg_inventor_total_num_patents)": "Log(Average Inventor Other Patents)",
+        "log(avg_assignee_total_num_patents)": "Log(Average Assignee Other Patents)",
+        "patent_date_center": "Centered Patent Date"
     }
-    keys.update({key: "NBER Category {}".format(key[-1]) for key in copy.columns if "nber_category_id" in key})
     cols = [keys[col] if col in keys else col for col in copy.columns]
     copy.columns = cols
     return copy
 
 
 class Regressor:
-    def __init__(self, data, features, target="log(knowledge_forward_cites)"):
+    def __init__(self, data, features, protected=None, target="log(knowledge_forward_cites)"):
         self.data = data
         self.target = target
         self.features = features
+        self.protected = protected
 
     def score(self):
         lm = LinearRegression()
@@ -92,10 +99,10 @@ class Regressor:
     def summary(self):
         x, y = self.make_x_y()
         # trim highly correlated vars to avoid multicollinearity
-        x = Regressor.calculate_vif_(pd.DataFrame(x), thresh=5.0)
+        x = self.calculate_vif_(pd.DataFrame(x), thresh=5.0)
         # check correlation matrix
         Regressor.print_corr(x.corr())
-        fit = OLS(y, x).fit()
+        fit = OLS(y, df_pretty_columns(x)).fit()
         print(fit.summary())
         return fit.summary().as_latex()
 
@@ -115,19 +122,20 @@ class Regressor:
         print("# Correlation Pairs #")
         print(sol[:10])
 
-    @staticmethod
-    def calculate_vif_(X, thresh=5.0):
+    def calculate_vif_(self, X, thresh=5.0):
         variables = list(range(X.shape[1]))
         dropped = True
         while dropped:
             dropped = False
             vif = [variance_inflation_factor(X.iloc[:, variables].values, ix)
                    for ix in range(X.iloc[:, variables].shape[1])]
-
-            maxloc = vif.index(max(vif))
+            avgloc = vif.index(max(vif))
             if max(vif) > thresh:
-                print("dropping a variable {}".format(X.columns[variables[maxloc]]))
-                del variables[maxloc]
+                if X.columns[variables[avgloc]] in self.protected:
+                    print("Warning: {} has high VIF but is protected".format(X.columns[variables[avgloc]]))
+                    break
+                print("dropping a variable {}".format(X.columns[variables[avgloc]]))
+                del variables[avgloc]
                 dropped = True
 
         print('Remaining variables:')
@@ -150,16 +158,29 @@ class FeatureTransformer:
         # transform date column
         self.df['patent_date'] = pd.to_datetime(self.df['patent_date'])
         # create centered date column (as numeric)
+        print("Calculating durations with {}".format(min(self.df['patent_date'])))
         self.df['patent_date_center'] = \
             (self.df['patent_date'] - min(self.df['patent_date'])).dt.total_seconds() / (24 * 60 * 60)
-        # transform max columns
-        for key in FeatureExtractor.max_list:
+        print(self.df['patent_date_center'].describe())
+        # transform avg columns
+        for key in FeatureExtractor.avg_list:
             self.make_list(key)
-            self.df["max_{}".format(key)] = self.df[key].apply(lambda x: max(int(xx) for xx in x) if len(x) > 0 else 0)
+            self.df["avg_{}".format(key)] = self.df[key].apply(lambda x: np.mean([int(xx) for xx in x]) if len(x) > 0 else 0)
         # one-hot encode list columns
         for key in FeatureExtractor.one_hot:
             self.make_list(key)
             self.one_hot_encode(key)
+        # logarithm the continuous dependents
+        continuous_dependents = [
+            "patent_num_claims",
+            "avg_inventor_total_num_patents",
+            "avg_assignee_total_num_patents",
+            "patent_processing_time"
+        ]
+        self.df["interaction"] = np.ones(self.df.shape[0])
+        for key in continuous_dependents:
+            self.make_logarithm(key)
+            self.df["interaction"] *= self.df[key]
         return self.df
 
     def make_logarithm(self, key):
@@ -176,19 +197,21 @@ class FeatureTransformer:
         vals = self.df[key].values
         mlb = MultiLabelBinarizer()
         enc = mlb.fit_transform(vals)
-        codes = {c: [] for c in mlb.classes_}
-        for code in list(enc):
-            for i in range(len(code)):
-                codes[mlb.classes_[i]].append(code[i])
+        codes = {c: [] for c in mlb.classes_[:-1]}
+        print("REFERENCE CATEGORY: {}_{}".format(key, mlb.classes_[-1]))
+        for row in list(enc):
+            # using range - 1 to only include n-1 dummies - nth dummy represented by the intercept
+            for i in range(len(row)-1):
+                codes[mlb.classes_[i]].append(row[i])
         for k, c in codes.items():
             self.df["one-hot_{}_{}".format(key, k)] = c
         return self
 
 
 class FeatureExtractor:
-    max_list = ['inventor_total_num_patents', 'assignee_total_num_patents']
+    avg_list = ['inventor_total_num_patents', 'assignee_total_num_patents']
     one_hot = [
-        # "assignee_type",
+        "assignee_type",
         # "cpc_category",
         "nber_category_id"
     ]
@@ -206,7 +229,7 @@ class FeatureExtractor:
 
     @staticmethod
     def get_types():
-        FeatureExtractor._types.update({key: str for key in FeatureExtractor.max_list + FeatureExtractor.one_hot})
+        FeatureExtractor._types.update({key: str for key in FeatureExtractor.avg_list + FeatureExtractor.one_hot})
         return FeatureExtractor._types
 
     def extract(self):
