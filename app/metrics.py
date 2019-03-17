@@ -467,8 +467,6 @@ class TreeCitationNetwork(CitationNetwork):
             for key in self.weighting_methods:
                 x[self.make_knowledge_name(key)] = self.G.nodes[self.root][self.make_knowledge_name(key)]
             k.append(x)
-            if bins > 1:
-                logger.debug("Bin {}/{}".format(i+1, bins))
             self.G = full_G.copy()
 
         if plot:

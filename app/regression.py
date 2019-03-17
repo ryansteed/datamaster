@@ -35,7 +35,7 @@ def main():
         write(regress(df, metric=metric), "all_{}".format(metric))
         for key in keys:
             print("\n\n## {} ##".format(key))
-            write(regress(df.loc[key], metric=metric), "{}_{}".format(key, metric))
+            write(regress(df.loc[key], metric=metric, exclude_nber=True), "{}_{}".format(key, metric))
 
 
 def write(content, name):
@@ -44,16 +44,18 @@ def write(content, name):
         f.close()
 
 
-def regress(df, metric="forward_cites"):
+def regress(df, metric="forward_cites", exclude_nber=False):
     features = [
         "patent_date_center",
         'log(patent_num_claims)',
-        'log(patent_processing_time)',
+        # 'log(patent_processing_time)',
         "log(avg_inventor_total_num_patents)",
         # "interaction"
     ]
     protected = features.copy()
     features += [key for key in df.columns if key.startswith("one-hot")]
+    if exclude_nber:
+        features = [feature for feature in features if "nber_category" not in feature]
     print(features)
     reg = Regressor(df, features=features, protected=protected, target="log(knowledge_{})".format(metric))
     return reg.summary()
@@ -124,18 +126,21 @@ class Regressor:
 
     def calculate_vif_(self, X, thresh=5.0):
         variables = list(range(X.shape[1]))
+        copy = variables.copy()
         dropped = True
         while dropped:
             dropped = False
-            vif = [variance_inflation_factor(X.iloc[:, variables].values, ix)
-                   for ix in range(X.iloc[:, variables].shape[1])]
+            vif = [variance_inflation_factor(X.iloc[:, copy].values, ix)
+                   for ix in range(X.iloc[:, copy].shape[1])]
             avgloc = vif.index(max(vif))
             if max(vif) > thresh:
-                if X.columns[variables[avgloc]] in self.protected:
+                if X.columns[copy[avgloc]] in self.protected:
                     print("Warning: {} has high VIF but is protected".format(X.columns[variables[avgloc]]))
-                    break
-                print("dropping a variable {}".format(X.columns[variables[avgloc]]))
-                del variables[avgloc]
+                    del copy[avgloc]
+                else:
+                    print("dropping a variable {}".format(X.columns[variables[avgloc]]))
+                    del copy[avgloc]
+                    del variables[avgloc]
                 dropped = True
 
         print('Remaining variables:')
@@ -152,24 +157,35 @@ class FeatureTransformer:
         self.df = df
 
     def fit_transform(self):
+
         # create logarithm of knowledge columns
         for key in ["knowledge_h_index", "knowledge_forward_cites"]:
             self.make_logarithm(key)
+
         # transform date column
         self.df['patent_date'] = pd.to_datetime(self.df['patent_date'])
+
         # create centered date column (as numeric)
-        print("Calculating durations with {}".format(min(self.df['patent_date'])))
+        # print("Calculating durations with {}".format(min(self.df['patent_date'])))
         self.df['patent_date_center'] = \
             (self.df['patent_date'] - min(self.df['patent_date'])).dt.total_seconds() / (24 * 60 * 60)
-        print(self.df['patent_date_center'].describe())
+        # print(self.df['patent_date_center'].describe())
+
         # transform avg columns
         for key in FeatureExtractor.avg_list:
             self.make_list(key)
             self.df["avg_{}".format(key)] = self.df[key].apply(lambda x: np.mean([int(xx) for xx in x]) if len(x) > 0 else 0)
+
         # one-hot encode list columns
         for key in FeatureExtractor.one_hot:
             self.make_list(key)
+
+            # remove "1" from assignee id
+            if key == "assignee_type":
+                self.df[key] = self.df[key].apply(lambda x: [xx[-1] for xx in x])
+
             self.one_hot_encode(key)
+
         # logarithm the continuous dependents
         continuous_dependents = [
             "patent_num_claims",
@@ -181,6 +197,7 @@ class FeatureTransformer:
         for key in continuous_dependents:
             self.make_logarithm(key)
             self.df["interaction"] *= self.df[key]
+
         return self.df
 
     def make_logarithm(self, key):
