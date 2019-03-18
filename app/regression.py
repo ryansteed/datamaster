@@ -29,9 +29,7 @@ def main():
     write(df_pretty_columns(df.drop("t", 1)).describe().to_latex(), "description")
     df = FeatureTransformer(df).fit_transform()
 
-    print(df.head())
-
-    for metric in ["h_index", "forward_cites"]:
+    for metric in ["forward_cites", "h_index"]:
         write(regress(df, metric=metric), "all_{}".format(metric))
         for key in keys:
             print("\n\n## {} ##".format(key))
@@ -211,15 +209,22 @@ class FeatureTransformer:
         )
 
     def one_hot_encode(self, key):
+        references = {
+            "nber_category_id": "6",
+            "assignee_type": "2"
+        }
+        if key == "nber_category_id":
+            self.df[key] = self.df[key].apply(lambda x: ["6" if xx == "7" else xx for xx in x])
         vals = self.df[key].values
         mlb = MultiLabelBinarizer()
         enc = mlb.fit_transform(vals)
-        codes = {c: [] for c in mlb.classes_[:-1]}
-        print("REFERENCE CATEGORY: {}_{}".format(key, mlb.classes_[-1]))
+        codes = {c: [] for c in mlb.classes_ if c != references[key]}
+        print("REFERENCE CATEGORY: {}_{}".format(key, references[key]))
         for row in list(enc):
             # using range - 1 to only include n-1 dummies - nth dummy represented by the intercept
-            for i in range(len(row)-1):
-                codes[mlb.classes_[i]].append(row[i])
+            for i in range(len(row)):
+                if i != list(mlb.classes_).index(references[key]):
+                    codes[mlb.classes_[i]].append(row[i])
         for k, c in codes.items():
             self.df["one-hot_{}_{}".format(key, k)] = c
         return self
