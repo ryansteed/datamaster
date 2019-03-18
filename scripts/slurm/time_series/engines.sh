@@ -8,4 +8,4 @@
 #SBATCH --mail-user=ryansteed@gwu.edu
 
 ./scripts/slurm/prep.sh
-python main.py root_all scripts/json/engines.json -w h_index forward_cites -k 7 -b 20
+python main.py root_all scripts/json/engines.json -d 0.5 -k 5 -b 20
