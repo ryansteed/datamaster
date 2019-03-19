@@ -3,6 +3,7 @@
 #SBATCH -o slurm/analysis-transportation.out
 #SBATCH -e slurm/analysis-transportation.err
 #SBATCH -p defq
+#SBATCH -n 16
 #SBATCH -t 2-00:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryansteed@gwu.edu
