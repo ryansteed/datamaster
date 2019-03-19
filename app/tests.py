@@ -2,7 +2,7 @@ import json
 
 from app.metrics import CitationNetwork, TreeCitationNetwork
 from app.munge import QueryMunger, RootMunger
-from app.config import Config
+from app.config import Config, logger
 from app.regression import main
 
 """

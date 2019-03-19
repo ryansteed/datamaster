@@ -102,7 +102,7 @@ class Regressor:
         x = self.calculate_vif_(pd.DataFrame(x), thresh=5.0)
         # check correlation matrix
         Regressor.print_corr(x.corr())
-        fit = OLS(y, df_pretty_columns(x)).fit()
+        fit = OLS(y, df_pretty_columns(x)).fit(cov_type="HC0")
         print(fit.summary())
         return fit.summary().as_latex()
 

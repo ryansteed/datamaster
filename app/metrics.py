@@ -55,7 +55,7 @@ class CitationNetwork:
             self.attributes += [self.make_knowledge_name(key) for key in weighting_methods]
 
     # Metric Calculation #
-    def eval_all(self, weighting_keys=None, verbose=True, file_early=None):
+    def eval_all(self, weighting_keys=None, verbose=True, file_early=None, knowledge=True):
         """
         Calculates all custom metrics, if requested during instantiation
 
@@ -79,7 +79,7 @@ class CitationNetwork:
             if verbose: t.log()
         if file_early is not None:
             self.file_custom_metrics(file_early)
-        if self.knowledge:
+        if self.knowledge and knowledge:
             if verbose: logger.info("Calculating knowledge")
             self.eval_k(self.weighting_methods if weighting_keys is None else weighting_keys)
             if verbose: t.log()
@@ -306,7 +306,6 @@ class CitationNetwork:
                     df = df.append(self.make_df(features, data), ignore_index=True)
                 with open(filename, "w+") as file:
                     df.to_csv(file, index=False, header=True)
-                # t.log()
             ticker.update()
 
         ticker.close()
@@ -314,7 +313,7 @@ class CitationNetwork:
     def make_df(self, features, data):
         return pd.DataFrame(
             data=[
-                [x[self.make_knowledge_name(key)] for key in self.weighting_methods] +
+                [x[key] for key in self.weighting_methods] +
                 [str(i)] +
                 [str(val).replace(",", " ") for val in features.values()] for i, x in enumerate(data)
             ],
@@ -445,8 +444,7 @@ class TreeCitationNetwork(CitationNetwork):
         :return: a list of knowledge impact metrics, one for each bin
         """
         bin_size = timedelta(weeks=bin_size_weeks) if bin_size_weeks is not None else None
-        full_G = self.G.copy()
-        dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(full_G, "date")]
+        dates = [self.str_to_datetime(self.G.edges[edge]['date']) for edge in nx.get_edge_attributes(self.G, "date")]
 
         k = []
         bins = int((max(dates) - min(dates)) / bin_size) if bin_size is not None else 1
@@ -460,30 +458,26 @@ class TreeCitationNetwork(CitationNetwork):
                 date = self.str_to_datetime(self.G.edges[edge]['date'])
                 if date < date_min or date > date_max:
                     remove.append(edge)
-            self.G.remove_edges_from(remove)
-            # TODO: only evaluate root node, rather than all nodes
-            self.eval_all(weighting_keys=weighting_keys, verbose=False)
-            x = {}
-            for key in self.weighting_methods:
-                x[self.make_knowledge_name(key)] = self.G.nodes[self.root][self.make_knowledge_name(key)]
-            k.append(x)
-            self.G = full_G.copy()
+            G_copy = self.G.copy()
+            G_copy.remove_edges_from(remove)
+            tn = TreeCitationNetwork(
+                G_copy,
+                self.root,
+                weighting_methods=self.weighting_methods,
+                k_depth=self.k_depth,
+                quality=self.quality,
+                h_index=self.h_index,
+                custom_centrality=self.custom_centrality,
+                knowledge=self.knowledge
+            )
+            tn.eval_all(weighting_keys=weighting_keys, verbose=False, knowledge=False)
+            k.append(tn.k(self.root, self.root, weighting_keys, 0))
 
         if plot:
             plt.plot(k)
             plt.show()
 
         return k
-
-    @overrides
-    def eval_k(self, weighting_keys, verbose=False):
-        root_k = self.k(self.root, self.root, weighting_keys, 0)
-        for key in weighting_keys:
-            nx.set_node_attributes(
-                self.G,
-                {self.root: root_k[key]},
-                self.make_knowledge_name(key)
-            )
 
     @overrides
     def summary(self):
