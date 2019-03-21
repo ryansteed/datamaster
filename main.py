@@ -26,8 +26,6 @@ class JobHandler:
         return args
 
     def execute(self):
-        logger.debug(self.get_args())
-        logger.info("==== NEW SESSION ====")
         self.test_runnable(**self.get_args())
 
 
@@ -48,7 +46,7 @@ if __name__ == "__main__":
     )
     test = vars(parser.parse_args()).get('endpoint')
     job = JobHandler(test)
-    logger.info("## Testing {} ##".format(test))
+    logger.info("==== NEW TEST: {} ====".format(test))
 
     # set runnables
     if test == "query":
@@ -78,6 +76,8 @@ if __name__ == "__main__":
         job.set_test(app.tests.feature_test)
     if test == "regression":
         job.set_test(app.tests.regression)
+    if test == "forecasting":
+        job.set_test(app.tests.forecasting)
 
     # add common args
     if test in ("root_all", "features", "query"):

@@ -5,13 +5,15 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
 from statsmodels.api import OLS
+from statsmodels.tsa.statespace.varmax import VARMAX
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import pickle
+import enlighten
 
 from app.config import logger, Config
 
 
-def main():
-    logger.debug("Running")
+def test_regression():
     keys = [
         "engines_12Mar19",
         "radio_05Mar19",
@@ -20,20 +22,160 @@ def main():
         "xray_05Mar19",
         "coherent-light_05Mar19"
     ]
-    df = pd.concat([
-        FeatureExtractor(
-            os.path.join(Config.EXT_DATA_PATH, "colonial/FEATURE_both_None_{}.csv".format(key))
-        ).extract()
-        for key in keys
-    ], keys=keys)
+    df = get_stacked_df(keys)
     write(df_pretty_columns(df.drop("t", 1)).describe().to_latex(), "description")
     df = FeatureTransformer(df).fit_transform()
 
     for metric in ["forward_cites", "h_index"]:
-        write(regress(df, metric=metric), "all_{}".format(metric))
+        write(regress(df, metric=metric, exclude_nber=False), "all_{}".format(metric))
         for key in keys:
             print("\n\n## {} ##".format(key))
             write(regress(df.loc[key], metric=metric, exclude_nber=True), "{}_{}".format(key, metric))
+
+
+def test_forecasting(bin_size=20, n=50):
+    cache_name = os.path.abspath("data/regression/forecasting_cache.pkl")
+
+    keys = [
+        "coherent-light_19Mar19"
+    ]
+    bin_size_weeks = np.timedelta64(bin_size, 'W')
+
+    try:
+        df = pickle.load(open(cache_name, 'rb'))
+    except FileNotFoundError:
+        df = FeatureTransformer(get_stacked_df(keys, endpoint="TIME-DATA")).fit_transform()
+        pickle.dump(df, open(cache_name, 'wb'))
+
+    df_endog = df[["log(knowledge_forward_cites)", "t", "patent_date"]]
+    features, protected = get_features(True, df)
+    df_exog = df[features]
+    logger.debug(df_endog.describe())
+    logger.debug(df_endog.values.shape)
+
+    regress_varmax(df_endog, bin_size_weeks, n)
+
+
+def regress_arima():
+    pass
+
+
+def regress_varmax(df_endog, bin_size_weeks, n):
+    """
+    Trains a varmax model on time series for each patent up to n steps,
+    working forwards from the publication date or working backwards from the current date. Also includes exogenous
+    patent features.
+
+    :param df_endog: the multiple endogenous time series, not yet transformed
+    :param bin_size_weeks: the bin size in weeks
+    :type bin_size_weeks: pd.Timedelta
+    :param n: the number of steps required in each patent series - must make a square matrix!
+    :return: None
+    """
+    df_endog = transform_endog(df_endog, bin_size_weeks, n, ascending=True)
+
+    # remove columns with low variance
+    order = 4
+    df_endog = df_endog.loc[:, df_endog.apply(pd.Series.nunique, axis=0) > order]
+    logger.debug(df_endog)
+    logger.debug(df_endog.describe())
+
+    logger.debug("Training VARMAX...")
+    model = VARMAX(df_endog.values, order=(order, 0))
+    res = model.fit(maxiter=1000, disp=True)
+    logger.debug(res.summary())
+
+
+def transform_endog(df_endog, bin_size_weeks, n, ascending=True):
+    """
+
+    :param df_endog:
+    :param bin_size_weeks:
+    :param n:
+    :param past: whether or not the data is structured from inception up to n steps, or from current back n steps
+    :return:
+    """
+    cache_name = os.path.abspath("data/regression/forecasting_cache2.pkl")
+
+    try:
+        df, bin_size_stored, n_stored, ascending_stored = pickle.load(open(cache_name, 'rb'))
+        if bin_size_weeks != bin_size_stored or n != n_stored or ascending_stored != ascending:
+            raise FileNotFoundError
+
+    except (FileNotFoundError, ValueError):
+
+        # adding a multindex that separates each patent - TODO collect patent number and group by that
+        c = Counter()
+        df_endog["i"] = df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
+        df_endog["t"] = df_endog.patent_date + df_endog.t * bin_size_weeks
+        df_endog = df_endog.set_index(
+            [df_endog.index.get_level_values(0), "i", "t"]
+        ).drop(columns="patent_date")
+
+        # iterate through patents ("i" index) with groupby
+        # for each patent
+        # 1. extend the maximum date to the maximum end-of-data date
+        # 2. join the dataframes on the date index up to n weeks ago
+        date_max = df_endog.index.get_level_values("t").max()
+        i = 0
+
+        manager = enlighten.get_manager()
+        ticker = manager.counter(total=df_endog.index.get_level_values("i").nunique(), desc='Patent Samples Transformed',
+                                 unit='patents')
+        subs = []
+        for date, subdf in df_endog.groupby(level="i"):
+            local_max = subdf.index.get_level_values("t").max()
+            num_new_vals = int((date_max - local_max) / bin_size_weeks) + 1
+
+            subdf = subdf.reset_index().drop(["i", "level_0"], 1)
+            vals = np.full((num_new_vals, subdf.shape[1]), subdf[-1:].values)
+            index = np.array(
+                [pd.Timestamp(np.datetime64(local_max + (i + 1) * bin_size_weeks)) for i in range(num_new_vals - 1)] + [
+                    date_max]
+            )
+            vals[:, 0] = index
+            df_append = pd.DataFrame(
+                data=vals,
+                columns=["t", "log(knowledge_forward_cites)"]
+            )
+            subdf = subdf.append(df_append).set_index("t").sort_index(level="t", ascending=ascending).reset_index(drop=True)
+            if subdf.shape[0] >= n:
+                subs.append(subdf.head(n))
+
+            ticker.update()
+        ticker.close()
+
+        df_endog = pd.concat(subs, axis=1)
+        df_endog.columns = range(df_endog.shape[1])
+        logger.debug(df_endog.describe())
+
+        pickle.dump((df_endog, bin_size_weeks, n), open(cache_name, 'wb'))
+
+        df = df_endog
+
+    logger.debug("Loaded transformed endogenous set")
+    return df
+
+
+class Counter:
+    def __init__(self):
+        self.i = 0
+
+    def inc(self):
+        self.i += 1
+        return self.i
+
+    def get(self):
+        return self.i
+
+
+def get_stacked_df(keys, endpoint="FEATURE"):
+    return pd.concat([
+        FeatureExtractor(
+            os.path.join(Config.EXT_DATA_PATH, "colonial/{}_both_None_{}.csv".format(endpoint, key))
+        ).extract()
+        for key in keys
+    ], keys=keys)
 
 
 def write(content, name):
@@ -43,6 +185,12 @@ def write(content, name):
 
 
 def regress(df, metric="forward_cites", exclude_nber=False):
+    features, protected = get_features(exclude_nber, df.columns)
+    reg = Regressor(df, features=features, protected=protected, target="log(knowledge_{})".format(metric))
+    return reg.summary()
+
+
+def get_features(exclude_nber, columns):
     features = [
         "patent_date_center",
         'log(patent_num_claims)',
@@ -50,13 +198,23 @@ def regress(df, metric="forward_cites", exclude_nber=False):
         "log(avg_inventor_total_num_patents)",
         # "interaction"
     ]
+
     protected = features.copy()
-    features += [key for key in df.columns if key.startswith("one-hot")]
+
+    features += [key for key in columns if key.startswith("one-hot")]
+
+    exclude = [
+        # "one-hot_assignee_type_5",
+        # "one-hot_assignee_type_9"
+    ]
+    for e in exclude:
+        df = df[df[e] == 0]
+    features = [feature for feature in features if feature not in exclude]
+
     if exclude_nber:
         features = [feature for feature in features if "nber_category" not in feature]
-    print(features)
-    reg = Regressor(df, features=features, protected=protected, target="log(knowledge_{})".format(metric))
-    return reg.summary()
+
+    return features, protected
 
 
 def df_pretty_columns(df):
@@ -133,7 +291,7 @@ class Regressor:
             avgloc = vif.index(max(vif))
             if max(vif) > thresh:
                 if X.columns[copy[avgloc]] in self.protected:
-                    print("Warning: {} has high VIF but is protected".format(X.columns[variables[avgloc]]))
+                    print("Warning: {} has high VIF {} but is protected".format(X.columns[variables[avgloc]], max(vif)))
                     del copy[avgloc]
                 else:
                     print("dropping a variable {}".format(X.columns[variables[avgloc]]))
@@ -214,7 +372,7 @@ class FeatureTransformer:
             "assignee_type": "2"
         }
         if key == "nber_category_id":
-            self.df[key] = self.df[key].apply(lambda x: ["6" if xx == "7" else xx for xx in x])
+            self.df[key] = self.df[key].apply(lambda x: [xx if xx != "7" else xx for xx in x])
         vals = self.df[key].values
         mlb = MultiLabelBinarizer()
         enc = mlb.fit_transform(vals)
@@ -263,7 +421,3 @@ class FeatureExtractor:
             usecols=list(FeatureExtractor.get_types().keys()),
             dtype=FeatureExtractor.get_types()
         )
-
-
-if __name__ == "__main__":
-    main()
