@@ -1,4 +1,6 @@
 import pandas as pd
+from pandas.plotting import autocorrelation_plot
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -6,6 +8,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
 from statsmodels.api import OLS
 from statsmodels.tsa.statespace.varmax import VARMAX
+from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 import pickle
 import enlighten
@@ -53,11 +57,71 @@ def test_forecasting(bin_size=20, n=50):
     logger.debug(df_endog.describe())
     logger.debug(df_endog.values.shape)
 
-    regress_varmax(df_endog, bin_size_weeks, n)
+    # regress_varmax(df_endog, bin_size_weeks, n)
+
+    regress_arima(df_endog, bin_size_weeks)
 
 
-def regress_arima():
-    pass
+def regress_arima(df_endog, bin_size_weeks):
+    cache_name = 'data/regression/arima.pkl'
+
+    # average columns along "i" index
+    start_date = df_endog["patent_date"].min()
+    df_endog["t"] = (df_endog["t"] + ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int))
+
+    # try:
+    #     df_endog, bin_size_stored = pickle.load(open(cache_name, 'rb'))
+    #     if bin_size_weeks != bin_size_stored:
+    #         raise FileNotFoundError
+    # except FileNotFoundError:
+    data = []
+    ind = []
+    mask = (df_endog["t"].shift(-1) == 0)
+    for row in df_endog[mask][["log(knowledge_forward_cites)", "t", "patent_date"]].itertuples():
+        index, k, t, date = row
+        logger.debug(int(df_endog["t"].max()) - int(t))
+        for i in range(int(df_endog["t"].max()) - int(t)):
+            data.append((k, t + 1 + i, date))
+            ind.append(index)
+    to_add = pd.DataFrame(data, index=ind, columns=["log(knowledge_forward_cites)", "t", "patent_date"])
+    df_endog = df_endog.append(to_add)
+    # pickle.dump((df_endog, bin_size_weeks), open(cache_name, 'wb'))
+    logger.debug(to_add)
+    logger.debug(df_endog)
+
+    # now convert back to date
+    df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
+    logger.debug(df_endog)
+    df_endog = df_endog.groupby("t").mean()
+    logger.debug(df_endog)
+
+    # fig1 = df_endog.plot()
+    # fig2 = autocorrelation_plot(df_endog)
+    # result = seasonal_decompose(df_endog, model="linear")
+    # fig = result.plot()
+    # plt.show()
+
+    aia_date = np.datetime64("2013-03-16")
+    train = df_endog.loc[df_endog.index < aia_date]
+    test = df_endog.loc[df_endog.index >= aia_date]
+
+    model = ARIMA(train["log(knowledge_forward_cites)"], order=(2, 1, 0))
+    fit = model.fit(maxiter=1000000, disp=True, transparams=True, trend='c')
+    logger.debug(fit.summary())
+
+    # residuals = pd.DataFrame(fit.resid)
+    # autocorrelation_plot(residuals)
+    # plt.show()
+    # residuals.plot(kind='kde')
+    # plt.show()
+    # print(residuals.describe())
+
+    # adapted from
+    # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
+    test["actual"] = test["log(knowledge_forward_cites)"]
+    ax = test["actual"].plot()
+    fit.plot_predict(start=train.index[-10], end=test.index[-1], ax=ax)
+    plt.show()
 
 
 def regress_varmax(df_endog, bin_size_weeks, n):
@@ -117,7 +181,6 @@ def transform_endog(df_endog, bin_size_weeks, n, ascending=True):
         # 1. extend the maximum date to the maximum end-of-data date
         # 2. join the dataframes on the date index up to n weeks ago
         date_max = df_endog.index.get_level_values("t").max()
-        i = 0
 
         manager = enlighten.get_manager()
         ticker = manager.counter(total=df_endog.index.get_level_values("i").nunique(), desc='Patent Samples Transformed',
@@ -167,6 +230,9 @@ class Counter:
 
     def get(self):
         return self.i
+
+    def reset(self):
+        self.i = 0
 
 
 def get_stacked_df(keys, endpoint="FEATURE"):
