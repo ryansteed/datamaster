@@ -146,10 +146,11 @@
 
 <span class="kn">from</span> <span class="nn">app.metrics</span> <span class="k">import</span> <span class="n">CitationNetwork</span><span class="p">,</span> <span class="n">TreeCitationNetwork</span>
 <span class="kn">from</span> <span class="nn">app.munge</span> <span class="k">import</span> <span class="n">QueryMunger</span><span class="p">,</span> <span class="n">RootMunger</span>
-<span class="kn">from</span> <span class="nn">app.config</span> <span class="k">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">app.config</span> <span class="k">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">app.regression</span> <span class="k">import</span> <span class="n">test_regression</span><span class="p">,</span> <span class="n">test_forecasting</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Official API endpoint script. All non-developer calls should run through here for convenience.</span>
+<span class="sd">Official API endpoint script. All non-test invocations should run through here for convenience.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
@@ -279,6 +280,14 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">query_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">query</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">QueryMunger</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="regression"><a class="viewcode-back" href="../../app.tests.html#app.tests.regression">[docs]</a><span class="k">def</span> <span class="nf">regression</span><span class="p">():</span>
+    <span class="n">test_regression</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="forecasting"><a class="viewcode-back" href="../../app.tests.html#app.tests.forecasting">[docs]</a><span class="k">def</span> <span class="nf">forecasting</span><span class="p">(</span><span class="n">relative_series</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">test_forecasting</span><span class="p">(</span><span class="n">relative_series</span><span class="o">=</span><span class="n">relative_series</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

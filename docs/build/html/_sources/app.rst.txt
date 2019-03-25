@@ -10,6 +10,7 @@ Submodules
    app.helpers
    app.metrics
    app.munge
+   app.regression
    app.tests
 
 Module contents
