@@ -41,7 +41,12 @@ def test_forecasting(bin_size=20, n=50):
     cache_name = os.path.abspath("data/regression/forecasting_cache.pkl")
 
     keys = [
-        "coherent-light_19Mar19"
+        "engines_25Mar19",
+        "radio_25Mar19",
+        "robots_25Mar19",
+        "transportation_25Mar19",
+        "xray_25Mar19",
+        "coherent-light_25Mar19"
     ]
     bin_size_weeks = np.timedelta64(bin_size, 'W')
 
@@ -54,8 +59,6 @@ def test_forecasting(bin_size=20, n=50):
     df_endog = df[["log(knowledge_forward_cites)", "t", "patent_date"]]
     features, protected = get_features(True, df)
     df_exog = df[features]
-    logger.debug(df_endog.describe())
-    logger.debug(df_endog.values.shape)
 
     # regress_varmax(df_endog, bin_size_weeks, n)
 
@@ -63,58 +66,31 @@ def test_forecasting(bin_size=20, n=50):
 
 
 def regress_arima(df_endog, bin_size_weeks):
-    cache_name = 'data/regression/arima.pkl'
+    
+    df_endog = ARIMATransformer('arima', load_from_cache=False).transform(df_endog, bin_size_weeks)
 
-    # average columns along "i" index
-    start_date = df_endog["patent_date"].min()
-    df_endog["t"] = (df_endog["t"] + ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int))
-
-    # try:
-    #     df_endog, bin_size_stored = pickle.load(open(cache_name, 'rb'))
-    #     if bin_size_weeks != bin_size_stored:
-    #         raise FileNotFoundError
-    # except FileNotFoundError:
-    data = []
-    ind = []
-    mask = (df_endog["t"].shift(-1) == 0)
-    for row in df_endog[mask][["log(knowledge_forward_cites)", "t", "patent_date"]].itertuples():
-        index, k, t, date = row
-        logger.debug(int(df_endog["t"].max()) - int(t))
-        for i in range(int(df_endog["t"].max()) - int(t)):
-            data.append((k, t + 1 + i, date))
-            ind.append(index)
-    to_add = pd.DataFrame(data, index=ind, columns=["log(knowledge_forward_cites)", "t", "patent_date"])
-    df_endog = df_endog.append(to_add)
-    # pickle.dump((df_endog, bin_size_weeks), open(cache_name, 'wb'))
-    logger.debug(to_add)
-    logger.debug(df_endog)
-
-    # now convert back to date
-    df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
-    logger.debug(df_endog)
-    df_endog = df_endog.groupby("t").mean()
-    logger.debug(df_endog)
-
-    # fig1 = df_endog.plot()
-    # fig2 = autocorrelation_plot(df_endog)
-    # result = seasonal_decompose(df_endog, model="linear")
-    # fig = result.plot()
-    # plt.show()
+    fig1 = df_endog.plot()
+    plt.show()
+    fig2 = autocorrelation_plot(df_endog)
+    plt.show()
+    result = seasonal_decompose(df_endog, model="linear")
+    fig = result.plot()
+    plt.show()
 
     aia_date = np.datetime64("2013-03-16")
     train = df_endog.loc[df_endog.index < aia_date]
     test = df_endog.loc[df_endog.index >= aia_date]
 
     model = ARIMA(train["log(knowledge_forward_cites)"], order=(2, 1, 0))
-    fit = model.fit(maxiter=1000000, disp=True, transparams=True, trend='c')
+    fit = model.fit(maxiter=1000000, disp=False, transparams=True, trend='c')
     logger.debug(fit.summary())
 
-    # residuals = pd.DataFrame(fit.resid)
-    # autocorrelation_plot(residuals)
-    # plt.show()
-    # residuals.plot(kind='kde')
-    # plt.show()
-    # print(residuals.describe())
+    residuals = pd.DataFrame(fit.resid)
+    autocorrelation_plot(residuals)
+    plt.show()
+    residuals.plot(kind='kde')
+    plt.show()
+    print(residuals.describe())
 
     # adapted from
     # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
@@ -136,7 +112,7 @@ def regress_varmax(df_endog, bin_size_weeks, n):
     :param n: the number of steps required in each patent series - must make a square matrix!
     :return: None
     """
-    df_endog = transform_endog(df_endog, bin_size_weeks, n, ascending=True)
+    df_endog = VARMAXTransformer("varmax").transform(df_endog, bin_size_weeks, n, ascending=True)
 
     # remove columns with low variance
     order = 4
@@ -150,25 +126,84 @@ def regress_varmax(df_endog, bin_size_weeks, n):
     logger.debug(res.summary())
 
 
-def transform_endog(df_endog, bin_size_weeks, n, ascending=True):
-    """
+class ForecastingTransformer:
+    def __init__(self, cache_name, load_from_cache=True):
+        self.cache = "data/regression/{}.pkl".format(cache_name)
+        self.load_from_cache = load_from_cache
 
-    :param df_endog:
-    :param bin_size_weeks:
-    :param n:
-    :param past: whether or not the data is structured from inception up to n steps, or from current back n steps
-    :return:
-    """
-    cache_name = os.path.abspath("data/regression/forecasting_cache2.pkl")
+    def transform(self, df_endog, *kwargs):
+        try:
+            if not self.load_from_cache:
+                raise ValueError
+            return self.load(*kwargs)
+        except (FileNotFoundError, ValueError):
+            return self.dump(df_endog, *kwargs)
 
-    try:
-        df, bin_size_stored, n_stored, ascending_stored = pickle.load(open(cache_name, 'rb'))
-        if bin_size_weeks != bin_size_stored or n != n_stored or ascending_stored != ascending:
-            raise FileNotFoundError
+    def load(self, *args):
+        logger.debug("Attempting to load from cache {}".format(self.cache))
+        stored = pickle.load(open(self.cache, 'rb'))
+        if stored[1:] != args:
+            logger.warn("Load failed due to param mismatch, refitting")
+            raise ValueError
+        return stored[0]
 
-    except (FileNotFoundError, ValueError):
+    def dump(self, df_endog, *args):
+        logger.debug("Fitting data")
+        df_endog = self.fit(df_endog, *args)
+        logger.debug("Dumping to cache {}".format(self.cache))
+        pickle.dump(tuple(df_endog) + args, open(self.cache, 'wb'))
+        return df_endog
 
-        # adding a multindex that separates each patent - TODO collect patent number and group by that
+    def fit(self, *args):
+        raise NotImplementedError
+
+
+class ARIMATransformer(ForecastingTransformer):
+    def fit(self, df_endog, bin_size_weeks):
+        cutoff_date = np.datetime64("2018-11-27")
+        df_endog = df_endog[(df_endog["patent_date"] + df_endog["t"]*bin_size_weeks) < cutoff_date]
+        # average columns along "i" index
+        start_date = df_endog["patent_date"].min()
+        # logger.debug(df_endog["t"].describe())
+        # logger.debug(start_date)
+        time_from_t = ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int)
+        # logger.debug(time_from_t.describe())
+        df_endog["t"] = df_endog["t"] + time_from_t
+        # logger.debug(df_endog["t"].max())
+
+        # iterate through rows where next t is zero - so iterating through last entry in each series
+        data = []
+        ind = []
+        # a mask where true if row after is less than row before
+        mask = (df_endog["t"].shift(-1) < df_endog["t"])
+
+        manager = enlighten.get_manager()
+        ticker = manager.counter(
+            total=df_endog[mask].shape[0],
+            desc='Patent Samples Transformed',
+            unit='patents'
+        )
+        for row in df_endog[mask][["log(knowledge_forward_cites)", "t", "patent_date"]].itertuples():
+            index, k, t, date = row
+            # append the last k entry as many times as necessary to reach the present
+            for i in range(int(df_endog["t"].max()) - int(t)):
+                data.append((k, t + 1 + i, date))
+                ind.append(index)
+            # logger.debug(data[-1][1])
+            ticker.update()
+        ticker.close()
+
+        to_add = pd.DataFrame(data, index=ind, columns=["log(knowledge_forward_cites)", "t", "patent_date"])
+        df_endog = df_endog.append(to_add)
+
+        df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
+        df_endog = df_endog.groupby("t").mean()
+
+        return df_endog
+
+
+class VARMAXTransformer(ForecastingTransformer):
+    def fit(self, df_endog, bin_size_weeks, n, ascending=True):
         c = Counter()
         df_endog["i"] = df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
         df_endog["t"] = df_endog.patent_date + df_endog.t * bin_size_weeks
@@ -212,12 +247,10 @@ def transform_endog(df_endog, bin_size_weeks, n, ascending=True):
         df_endog.columns = range(df_endog.shape[1])
         logger.debug(df_endog.describe())
 
-        pickle.dump((df_endog, bin_size_weeks, n), open(cache_name, 'wb'))
-
         df = df_endog
 
-    logger.debug("Loaded transformed endogenous set")
-    return df
+        logger.debug("Loaded transformed endogenous set")
+        return df
 
 
 class Counter:
