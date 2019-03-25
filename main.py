@@ -26,8 +26,6 @@ class JobHandler:
         return args
 
     def execute(self):
-        logger.debug(self.get_args())
-        logger.info("==== NEW SESSION ====")
         self.test_runnable(**self.get_args())
 
 
@@ -48,7 +46,7 @@ if __name__ == "__main__":
     )
     test = vars(parser.parse_args()).get('endpoint')
     job = JobHandler(test)
-    logger.info("## Testing {} ##".format(test))
+    logger.info("==== NEW TEST: {} ====".format(test))
 
     # set runnables
     if test == "query":
@@ -76,6 +74,16 @@ if __name__ == "__main__":
         job.set_test(app.tests.root_test_multiple)
     if test == "features":
         job.set_test(app.tests.feature_test)
+    if test == "regression":
+        job.set_test(app.tests.regression)
+    if test == "forecasting":
+        job.set_test(app.tests.forecasting)
+        job.parser.add_argument(
+            '-r',
+            '--relative_series',
+            action='store_true',
+            help="whether or not to use a time-relative series"
+        )
 
     # add common args
     if test in ("root_all", "features", "query"):
@@ -114,11 +122,13 @@ if __name__ == "__main__":
             help="the bin size in weeks"
         )
 
-    job.parser.add_argument(
-        '-w',
-        '--weighting_keys',
-        nargs='+',
-        default=("forward_cites", "h_index"),
-        help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
-    )
+    if test in ["query", "root", "features", "root_all"]:
+        job.parser.add_argument(
+            '-w',
+            '--weighting_keys',
+            nargs='+',
+            default=("forward_cites", "h_index"),
+            help="the weighting keys for knowledge calculation (e.g. 'forward_cites', 'h_index')"
+        )
+
     job.execute()

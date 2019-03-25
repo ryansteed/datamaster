@@ -2,10 +2,11 @@ import json
 
 from app.metrics import CitationNetwork, TreeCitationNetwork
 from app.munge import QueryMunger, RootMunger
-from app.config import Config, logger
+from app.config import Config
+from app.regression import test_regression, test_forecasting
 
 """
-Official API endpoint script. All non-developer calls should run through here for convenience.
+Official API endpoint script. All non-test invocations should run through here for convenience.
 """
 
 
@@ -135,3 +136,11 @@ def get_query_munger(query_file, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED
     with open(query_file, 'r') as f:
         query = json.load(f)
     return QueryMunger(query, limit=limit, cache=cache)
+
+
+def regression():
+    test_regression()
+
+
+def forecasting(relative_series=False):
+    test_forecasting(relative_series=relative_series)
