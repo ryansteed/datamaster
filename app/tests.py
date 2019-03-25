@@ -141,5 +141,6 @@ def get_query_munger(query_file, limit=Config.DOC_LIMIT, cache=Config.USE_CACHED
 def regression():
     test_regression()
 
-def forecasting():
-    test_forecasting()
+
+def forecasting(relative_series=False):
+    test_forecasting(relative_series=relative_series)

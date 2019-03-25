@@ -37,7 +37,7 @@ def test_regression():
             write(regress(df.loc[key], metric=metric, exclude_nber=True), "{}_{}".format(key, metric))
 
 
-def test_forecasting(bin_size=20, n=50):
+def test_forecasting(bin_size=20, relative_series=False):
     cache_name = os.path.abspath("data/regression/forecasting_cache.pkl")
 
     keys = [
@@ -48,6 +48,7 @@ def test_forecasting(bin_size=20, n=50):
         "xray_25Mar19",
         "coherent-light_25Mar19"
     ]
+
     bin_size_weeks = np.timedelta64(bin_size, 'W')
 
     try:
@@ -62,19 +63,23 @@ def test_forecasting(bin_size=20, n=50):
 
     # regress_varmax(df_endog, bin_size_weeks, n)
 
-    regress_arima(df_endog, bin_size_weeks)
+    regress_arima(df_endog, bin_size_weeks, relative_series)
 
 
-def regress_arima(df_endog, bin_size_weeks):
-    
-    df_endog = ARIMATransformer('arima', load_from_cache=False).transform(df_endog, bin_size_weeks)
+def regress_arima(df_endog, bin_size_weeks, relative_series):
 
-    fig1 = df_endog.plot()
+    df_endog = ARIMATransformer('arima', load_from_cache=True).transform(df_endog, bin_size_weeks)
+    if relative_series:
+        time_from_t = (df_endog["patent_date"] - df_endog["patent_date"].min()) / bin_size_weeks
+        df_endog["t"] = df_endog["t"] - time_from_t
+    df_endog = df_endog.groupby("t").mean()
+
+    df_endog.plot()
     plt.show()
-    fig2 = autocorrelation_plot(df_endog)
+    autocorrelation_plot(df_endog)
     plt.show()
     result = seasonal_decompose(df_endog, model="linear")
-    fig = result.plot()
+    result.plot()
     plt.show()
 
     aia_date = np.datetime64("2013-03-16")
@@ -112,7 +117,7 @@ def regress_varmax(df_endog, bin_size_weeks, n):
     :param n: the number of steps required in each patent series - must make a square matrix!
     :return: None
     """
-    df_endog = VARMAXTransformer("varmax").transform(df_endog, bin_size_weeks, n, ascending=True)
+    df_endog = VARMAXTransformer("varmax").transform(df_endog, bin_size_weeks, n)
 
     # remove columns with low variance
     order = 4
@@ -139,19 +144,22 @@ class ForecastingTransformer:
         except (FileNotFoundError, ValueError):
             return self.dump(df_endog, *kwargs)
 
-    def load(self, *args):
+    def load(self, *kwargs):
         logger.debug("Attempting to load from cache {}".format(self.cache))
-        stored = pickle.load(open(self.cache, 'rb'))
-        if stored[1:] != args:
+        df_endog, stored = pickle.load(open(self.cache, 'rb'))
+        logger.debug(kwargs)
+        logger.debug(stored)
+        if stored != kwargs:
             logger.warn("Load failed due to param mismatch, refitting")
             raise ValueError
-        return stored[0]
+        return df_endog
 
-    def dump(self, df_endog, *args):
+    def dump(self, df_endog, *kwargs):
         logger.debug("Fitting data")
-        df_endog = self.fit(df_endog, *args)
+        df_endog = self.fit(df_endog, *kwargs)
         logger.debug("Dumping to cache {}".format(self.cache))
-        pickle.dump(tuple(df_endog) + args, open(self.cache, 'wb'))
+        logger.debug(kwargs)
+        pickle.dump((df_endog, kwargs), open(self.cache, 'wb'))
         return df_endog
 
     def fit(self, *args):
@@ -197,7 +205,6 @@ class ARIMATransformer(ForecastingTransformer):
         df_endog = df_endog.append(to_add)
 
         df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
-        df_endog = df_endog.groupby("t").mean()
 
         return df_endog
 

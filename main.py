@@ -78,6 +78,12 @@ if __name__ == "__main__":
         job.set_test(app.tests.regression)
     if test == "forecasting":
         job.set_test(app.tests.forecasting)
+        job.parser.add_argument(
+            '-r',
+            '--relative_series',
+            action='store_true',
+            help="whether or not to use a time-relative series"
+        )
 
     # add common args
     if test in ("root_all", "features", "query"):
