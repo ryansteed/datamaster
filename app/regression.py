@@ -69,20 +69,40 @@ def test_forecasting(bin_size=20, relative_series=False):
 def regress_arima(df_endog, bin_size_weeks, relative_series):
 
     df_endog = ARIMATransformer('arima', load_from_cache=True).transform(df_endog, bin_size_weeks)
-    if relative_series:
-        time_from_t = (df_endog["patent_date"] - df_endog["patent_date"].min()) / bin_size_weeks
-        df_endog["t"] = df_endog["t"] - time_from_t
-    df_endog = df_endog.groupby("t").mean()
-
-    df_endog.plot()
-    plt.show()
-    autocorrelation_plot(df_endog)
-    plt.show()
-    result = seasonal_decompose(df_endog, model="linear")
-    result.plot()
-    plt.show()
 
     aia_date = np.datetime64("2013-03-16")
+    if relative_series:
+        arima_relative(df_endog, bin_size_weeks, aia_date)
+    else:
+        arima_absolute(df_endog, aia_date)
+
+
+def arima_relative(df_endog, bin_size_weeks, aia_date):
+    duration_since_pub = ((df_endog["t"] - df_endog["patent_date"]) / bin_size_weeks).astype(int) * bin_size_weeks
+    df_endog["t"] = duration_since_pub + df_endog["patent_date"].min()
+    logger.warn(
+        "Reminder that dummy date indexes were used to comply with statsmodels API. These dates are not real."
+    )
+
+    data = {
+        "before": {},
+        "after": {}
+    }
+    data["before"]["df"] = df_endog[df_endog["patent_date"] < aia_date].groupby("t").mean()
+    data["after"]["df"] = df_endog[df_endog["patent_date"] >= aia_date].groupby("t").mean()
+    for key, d in data.items():
+        logger.debug("Fit for {}".format(key))
+        explore_series(d["df"])
+        data[key]["model"] = ARIMA(d["df"]["log(knowledge_forward_cites)"], order=(2, 1, 0))
+        data[key]["fit"] = data[key]["model"].fit(maxiter=1000000, disp=False, transparams=True, trend='c')
+        logger.debug(data[key]["fit"].summary())
+        # d["fit"].plot_predict(start=d["df"].index[-5], end="2020")
+    plt.show()
+
+
+def arima_absolute(df_endog, aia_date):
+    df_endog = df_endog.groupby("t").mean()
+
     train = df_endog.loc[df_endog.index < aia_date]
     test = df_endog.loc[df_endog.index >= aia_date]
 
@@ -90,6 +110,19 @@ def regress_arima(df_endog, bin_size_weeks, relative_series):
     fit = model.fit(maxiter=1000000, disp=False, transparams=True, trend='c')
     logger.debug(fit.summary())
 
+    # adapted from
+    # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
+    test["actual"] = test["log(knowledge_forward_cites)"]
+    ax = test["actual"].plot()
+    fit.plot_predict(start=train.index[-10], end=test.index[-1], ax=ax)
+    plt.show()
+
+    analyze_res(fit)
+
+    return fit
+
+
+def analyze_res(fit):
     residuals = pd.DataFrame(fit.resid)
     autocorrelation_plot(residuals)
     plt.show()
@@ -97,11 +130,14 @@ def regress_arima(df_endog, bin_size_weeks, relative_series):
     plt.show()
     print(residuals.describe())
 
-    # adapted from
-    # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
-    test["actual"] = test["log(knowledge_forward_cites)"]
-    ax = test["actual"].plot()
-    fit.plot_predict(start=train.index[-10], end=test.index[-1], ax=ax)
+
+def explore_series(df_endog):
+    df_endog.plot()
+    plt.show()
+    autocorrelation_plot(df_endog)
+    plt.show()
+    result = seasonal_decompose(df_endog, model="linear")
+    result.plot()
     plt.show()
 
 
