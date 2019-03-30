@@ -37,7 +37,7 @@ def test_regression():
             write(regress(df.loc[key], metric=metric, exclude_nber=True), "{}_{}".format(key, metric))
 
 
-def test_forecasting(bin_size=20, relative_series=False):
+def test_forecasting(endpoint, bin_size=20, relative_series=False):
     cache_name = os.path.abspath("data/regression/forecasting_cache.pkl")
 
     keys = [
@@ -59,17 +59,35 @@ def test_forecasting(bin_size=20, relative_series=False):
 
     df_endog = df[["log(knowledge_forward_cites)", "t", "patent_date"]]
     features, protected = get_features(True, df)
-    df_exog = df[features]
+    df_exog = df[features+["t"]]
 
-    # regress_varmax(df_endog, bin_size_weeks, n)
+    if endpoint == "arima":
+        regress_arima(df_endog, bin_size_weeks, relative_series)
 
-    regress_arima(df_endog, bin_size_weeks, relative_series)
+    if endpoint == "pooled":
+        regress_pooled(df_endog, df_exog, bin_size_weeks)
+
+
+def regress_pooled(df_endog, df_exog, bin_size_weeks):
+
+    df_endog = PooledTransformer('pooled', load_from_cache=True).transform(df_endog, bin_size_weeks)
+    df_endog["i"] = ForecastingTransformer.entity_id(df_endog)
+    df_exog["i"] = ForecastingTransformer.entity_id(df_exog)
+
+    # NEEDED
+    # dependent var - time x entity
+    # exog - variable x time x entity
+    # clusters - ??
+
+    logger.debug(df_endog.columns)
+    logger.debug(df_endog.head())
+    logger.debug(df_exog.columns)
+    logger.debug(df_exog.head())
 
 
 def regress_arima(df_endog, bin_size_weeks, relative_series):
 
     df_endog = ARIMATransformer('arima', load_from_cache=True).transform(df_endog, bin_size_weeks)
-
     aia_date = np.datetime64("2013-03-16")
     if relative_series:
         arima_relative(df_endog, bin_size_weeks, aia_date)
@@ -92,19 +110,29 @@ def arima_relative(df_endog, bin_size_weeks, aia_date):
     data["after"]["df"] = df_endog[df_endog["patent_date"] >= aia_date].groupby("t").mean()
     for key, d in data.items():
         logger.debug("Fit for {}".format(key))
-        explore_series(d["df"])
+        # explore_series(d["df"])
         data[key]["model"] = ARIMA(d["df"]["log(knowledge_forward_cites)"], order=(2, 1, 0))
         data[key]["fit"] = data[key]["model"].fit(maxiter=1000000, disp=False, transparams=True, trend='c')
         logger.debug(data[key]["fit"].summary())
-        # d["fit"].plot_predict(start=d["df"].index[-5], end="2020")
+
+    data["before"]["fit"].plot_predict(
+        start=data["after"]["df"].index[1],
+        end=data["after"]["df"].index[-1]+5*bin_size_weeks
+    )
+    ax = data["before"]["df"].plot()
+    data["after"]["fit"].plot_predict(
+        start=data["after"]["df"].index[1],
+        end=data["after"]["df"].index[-1]+5*bin_size_weeks,
+        ax=ax
+    )
     plt.show()
 
 
-def arima_absolute(df_endog, aia_date):
-    df_endog = df_endog.groupby("t").mean()
+def arima_absolute(df_endog, aia_date, stratify=True):
+    df_grouped = df_endog.groupby("t").mean()
 
-    train = df_endog.loc[df_endog.index < aia_date]
-    test = df_endog.loc[df_endog.index >= aia_date]
+    train = df_grouped.loc[df_grouped.index < aia_date]
+    test = df_grouped.loc[df_grouped.index >= aia_date]
 
     model = ARIMA(train["log(knowledge_forward_cites)"], order=(2, 1, 0))
     fit = model.fit(maxiter=1000000, disp=False, transparams=True, trend='c')
@@ -115,9 +143,20 @@ def arima_absolute(df_endog, aia_date):
     test["actual"] = test["log(knowledge_forward_cites)"]
     ax = test["actual"].plot()
     fit.plot_predict(start=train.index[-10], end=test.index[-1], ax=ax)
-    plt.show()
+    # plt.show()
 
-    analyze_res(fit)
+    # analyze_res(fit)
+
+    if stratify:
+        logger.debug(np.unique(df_endog.index.get_level_values(0)))
+        ax = None
+        for source in np.unique(df_endog.index.get_level_values(0)):
+            df_grouped = df_endog.xs(source, level=0).groupby("t").mean()
+            if ax is None:
+                ax = df_grouped.plot()
+            else:
+                df_grouped.plot(ax=ax)
+        plt.show()
 
     return fit
 
@@ -201,26 +240,40 @@ class ForecastingTransformer:
     def fit(self, *args):
         raise NotImplementedError
 
+    @staticmethod
+    def entity_id(df_endog):
+        c = Counter()
+        return df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
+
 
 class ARIMATransformer(ForecastingTransformer):
     def fit(self, df_endog, bin_size_weeks):
-        cutoff_date = np.datetime64("2018-11-27")
-        df_endog = df_endog[(df_endog["patent_date"] + df_endog["t"]*bin_size_weeks) < cutoff_date]
-        # average columns along "i" index
-        start_date = df_endog["patent_date"].min()
-        # logger.debug(df_endog["t"].describe())
-        # logger.debug(start_date)
-        time_from_t = ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int)
-        # logger.debug(time_from_t.describe())
-        df_endog["t"] = df_endog["t"] + time_from_t
-        # logger.debug(df_endog["t"].max())
+        df_endog = self.apply_cutoff(df_endog, bin_size_weeks)
 
+        start_date = df_endog["patent_date"].min()
+
+        time_from_t = ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int)
+
+        df_endog["t"] = df_endog["t"] + time_from_t
+
+        df_endog["i"] = self.add_duplicates(df_endog)
+
+        df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
+
+        return df_endog
+
+    @staticmethod
+    def apply_cutoff(df_endog, bin_size_weeks):
+        cutoff_date = np.datetime64("2018-11-27")
+        return df_endog[(df_endog["patent_date"] + df_endog["t"] * bin_size_weeks) < cutoff_date]
+
+    @staticmethod
+    def add_duplicates(df_endog):
         # iterate through rows where next t is zero - so iterating through last entry in each series
         data = []
         ind = []
         # a mask where true if row after is less than row before
         mask = (df_endog["t"].shift(-1) < df_endog["t"])
-
         manager = enlighten.get_manager()
         ticker = manager.counter(
             total=df_endog[mask].shape[0],
@@ -240,15 +293,17 @@ class ARIMATransformer(ForecastingTransformer):
         to_add = pd.DataFrame(data, index=ind, columns=["log(knowledge_forward_cites)", "t", "patent_date"])
         df_endog = df_endog.append(to_add)
 
-        df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
-
         return df_endog
+
+
+class PooledTransformer(ForecastingTransformer):
+    def fit(self, df_endog, bin_size_weeks):
+        return ARIMATransformer.add_duplicates(ARIMATransformer.apply_cutoff(df_endog, bin_size_weeks))
 
 
 class VARMAXTransformer(ForecastingTransformer):
     def fit(self, df_endog, bin_size_weeks, n, ascending=True):
-        c = Counter()
-        df_endog["i"] = df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
+        df_endog["i"] = ForecastingTransformer.entity_id(df_endog)
         df_endog["t"] = df_endog.patent_date + df_endog.t * bin_size_weeks
         df_endog = df_endog.set_index(
             [df_endog.index.get_level_values(0), "i", "t"]

@@ -142,5 +142,5 @@ def regression():
     test_regression()
 
 
-def forecasting(relative_series=False):
-    test_forecasting(relative_series=relative_series)
+def forecasting(forecast_type, relative_series=False):
+    test_forecasting(forecast_type, relative_series=relative_series)
