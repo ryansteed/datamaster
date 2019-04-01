@@ -89,9 +89,6 @@ def model_pooled(df):
     df["agesq"] = np.square(df.age)
     df["t"] = pd.Categorical(df.t)
 
-    logger.debug(df.columns)
-    logger.debug(df.head())
-
     df = df.rename(index=str, columns={
         "log(knowledge_forward_cites)": "lknowledge_forward_cites"
     })
@@ -104,6 +101,7 @@ def model_pooled(df):
         "t",
         "source",
         'log(avg_inventor_total_num_patents)',
+        'log(patent_processing_time)',
         'one-hot_assignee_type_3',
         'one-hot_assignee_type_4',
         'one-hot_assignee_type_5',
@@ -115,16 +113,15 @@ def model_pooled(df):
     ]
     exog = add_constant(df[exog_vars])
 
-    logger.debug(exog.dtypes)
-
     mod = PooledOLS(df.lknowledge_forward_cites, exog)
-    entity_res = fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
     robust_res = fit_write(mod, "robust", cov_type='robust')
+    entity_res = fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
     both_res = fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
     logger.debug(compare({"Robust": robust_res, "Entity": entity_res, "Entity-Time": both_res}))
 
 
 def fit_write(mod, filename, **kwargs):
+    logger.info("Fitting model {}".format(filename))
     pooled_res = mod.fit(**kwargs)
     logger.debug(pooled_res)
     with open("data/regression/{}_res.txt".format(filename), 'w') as f:
@@ -132,8 +129,8 @@ def fit_write(mod, filename, **kwargs):
         f.close()
     return pooled_res
 
-def regress_arima(df_endog, bin_size_weeks, relative_series):
 
+def regress_arima(df_endog, bin_size_weeks, relative_series):
     df_endog = ARIMATransformer('arima', load_from_cache=True).transform(df_endog, bin_size_weeks)
     aia_date = np.datetime64("2013-03-16")
     if relative_series:
@@ -461,7 +458,7 @@ def get_features(exclude_nber, columns):
     features = [
         "patent_date_center",
         'log(patent_num_claims)',
-        # 'log(patent_processing_time)',
+        'log(patent_processing_time)',
         "log(avg_inventor_total_num_patents)",
         # "interaction"
     ]
