@@ -121,13 +121,16 @@ def model_pooled(df):
 
 
 def fit_write(mod, filename, **kwargs):
-    file = open("data/regression/{}_res.txt".format(filename), 'rwb')
+    file = "data/regression/{}_res.pkl".format(filename)
     try:
-        pooled_res = pickle.load(file)
-    except FileNotFoundError:
+        pooled_res = pickle.load(open(file, 'rb'))
+    except (FileNotFoundError, EOFError):
         logger.info("Fitting model {}".format(filename))
         pooled_res = mod.fit(**kwargs)
-        pickle.dump(pooled_res, file)
+        # pickle.dump(pooled_res, open(file, 'wb'), protocol=4)
+        with open(file.strip(".pkl")+".txt", 'w') as f:
+            f.write(str(pooled_res))
+            f.close()
     logger.debug(pooled_res)
     return pooled_res
 
@@ -293,7 +296,7 @@ class ForecastingTransformer:
             if not self.load_from_cache:
                 raise ValueError
             return self.load(*kwargs)
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, EOFError):
             return self.dump(df_endog, *kwargs)
 
     def load(self, *kwargs):
