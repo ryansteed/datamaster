@@ -121,12 +121,14 @@ def model_pooled(df):
 
 
 def fit_write(mod, filename, **kwargs):
-    logger.info("Fitting model {}".format(filename))
-    pooled_res = mod.fit(**kwargs)
+    file = open("data/regression/{}_res.txt".format(filename), 'rwb')
+    try:
+        pooled_res = pickle.load(file)
+    except FileNotFoundError:
+        logger.info("Fitting model {}".format(filename))
+        pooled_res = mod.fit(**kwargs)
+        pickle.dump(pooled_res, file)
     logger.debug(pooled_res)
-    with open("data/regression/{}_res.txt".format(filename), 'w') as f:
-        f.write(str(pooled_res))
-        f.close()
     return pooled_res
 
 
