@@ -12,6 +12,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from linearmodels.panel import PooledOLS
+from linearmodels.panel import compare
 import pickle
 import enlighten
 
@@ -75,18 +76,18 @@ def regress_pooled(df_endog, df_exog, bin_size_weeks):
     df_exog = df_exog.reset_index().drop(columns=["level_1"])
     df_exog = df_exog.set_index(["level_0", df_exog.index.values+1])
     df_exog.index = df_exog.index.rename(["source", "i"])
-    df = df_endog.reset_index()\
-        .merge(df_exog.reset_index(), on=["i", "source"], how="left")\
-        .set_index(["i", "t"], drop=False)\
+    df = df_endog.reset_index().merge(df_exog.reset_index(), on=["i", "source"], how="left")
+    df = df.set_index(["i", "t"], drop=False)\
         .drop(columns=["i"])
     logger.debug(df.head())
-    model_pooled(df, bin_size_weeks)
+    # TODO - REMOVE LIMIT
+    model_pooled(df)
 
 
-def model_pooled(df, bin_size_weeks):
+def model_pooled(df):
     df["age"] = (df["t"] - df["patent_date"]) / np.timedelta64(1, 'Y')
-    df["age_sq"] = df.age * df.age
-    df["t_after"] = ((df["t"] - df["t"].min()) / bin_size_weeks).astype(np.float64)
+    df["agesq"] = np.square(df.age)
+    df["t"] = pd.Categorical(df.t)
 
     logger.debug(df.columns)
     logger.debug(df.head())
@@ -94,9 +95,13 @@ def model_pooled(df, bin_size_weeks):
     df = df.rename(index=str, columns={
         "log(knowledge_forward_cites)": "lknowledge_forward_cites"
     })
+    df.index = df.index.set_levels([
+        df.index.levels[0].astype(int),
+        df.index.levels[1].astype('datetime64[ns]')
+    ])
+
     exog_vars = [
-        "age",
-        "t_after",
+        "t",
         "source",
         'log(avg_inventor_total_num_patents)',
         'one-hot_assignee_type_3',
@@ -106,13 +111,26 @@ def model_pooled(df, bin_size_weeks):
         'one-hot_assignee_type_7',
         'one-hot_assignee_type_9',
         'age',
-        'age_sq'
+        'agesq'
     ]
     exog = add_constant(df[exog_vars])
-    mod = PooledOLS(df.lknowledge_forward_cites, exog)
-    pooled_res = mod.fit()
-    logger.debug(pooled_res)
 
+    logger.debug(exog.dtypes)
+
+    mod = PooledOLS(df.lknowledge_forward_cites, exog)
+    entity_res = fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
+    robust_res = fit_write(mod, "robust", cov_type='robust')
+    both_res = fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
+    logger.debug(compare({"Robust": robust_res, "Entity": entity_res, "Entity-Time": both_res}))
+
+
+def fit_write(mod, filename, **kwargs):
+    pooled_res = mod.fit(**kwargs)
+    logger.debug(pooled_res)
+    with open("data/regression/{}_res.txt".format(filename), 'w') as f:
+        f.write(str(pooled_res))
+        f.close()
+    return pooled_res
 
 def regress_arima(df_endog, bin_size_weeks, relative_series):
 
