@@ -12,9 +12,10 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from linearmodels.panel import PooledOLS
-from linearmodels.panel import compare
+from scipy import stats
 import pickle
 import enlighten
+from collections import namedtuple
 
 from app.config import logger, Config
 
@@ -62,12 +63,15 @@ def test_forecasting(endpoint, bin_size=20, relative_series=False):
     df_endog = df[["log(knowledge_forward_cites)", "t", "patent_date"]]
     features, protected = get_features(True, df)
     df_exog = df[features][df["t"] == 0]
+    logger.debug(features)
 
     if endpoint == "arima":
         regress_arima(df_endog, bin_size_weeks, relative_series)
 
     if endpoint == "pooled":
         regress_pooled(df_endog, df_exog, bin_size_weeks)
+        entity_res = fit_write(None, "entity")
+        plot_coeffs(entity_res)
 
 
 def regress_pooled(df_endog, df_exog, bin_size_weeks):
@@ -79,9 +83,47 @@ def regress_pooled(df_endog, df_exog, bin_size_weeks):
     df = df_endog.reset_index().merge(df_exog.reset_index(), on=["i", "source"], how="left")
     df = df.set_index(["i", "t"], drop=False)\
         .drop(columns=["i"])
-    logger.debug(df.head())
-    # TODO - REMOVE LIMIT
     model_pooled(df)
+
+
+def plot_coeffs(pooled_res):
+    time_coeffs = pd.concat(
+        [
+            pooled_res.params,
+            pooled_res.std_errors,
+            make_conf_int(pooled_res.params, pooled_res.std_errors, pooled_res.df_resid)
+        ],
+        axis=1
+    )
+    time_coeffs =  time_coeffs[time_coeffs.index.str.contains("t\.")]
+    time_coeffs.index = (time_coeffs.index.str.strip("t.")).astype('datetime64[ns]')
+    ax = time_coeffs.parameter.plot(label='_nolegend_')
+    plt.axvline(
+        x=np.datetime64("2011-09-16"),
+        linestyle=':',
+        color='orange',
+        zorder=-1,
+        label="AIA signed"
+    )
+    plt.axvline(
+        x=np.datetime64("2013-03-16"),
+        linestyle='--',
+        color='orange',
+        zorder=-1,
+        label="AIA effective"
+    )
+    ax.legend()
+    ax.set_xlabel("Time Dummy")
+    ax.set_ylabel("Estimated Parameter")
+    plt.savefig("data/regression/time_dummies.png")
+
+
+def make_conf_int(params, std_errors, df_resid, level=.05):
+    ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+    q = stats.t.ppf(ci_quantiles, df_resid)
+    q = q[None, :]
+    ci = params[:, None] + std_errors[:, None] * q
+    return pd.DataFrame(ci, index=params.index, columns=['lower', 'upper'])
 
 
 def model_pooled(df):
@@ -100,6 +142,7 @@ def model_pooled(df):
     exog_vars = [
         "t",
         "source",
+        'log(patent_num_claims)',
         'log(avg_inventor_total_num_patents)',
         'log(patent_processing_time)',
         'one-hot_assignee_type_3',
@@ -114,25 +157,33 @@ def model_pooled(df):
     exog = add_constant(df[exog_vars])
 
     mod = PooledOLS(df.lknowledge_forward_cites, exog)
-    robust_res = fit_write(mod, "robust", cov_type='robust')
-    entity_res = fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
-    both_res = fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
-    logger.debug(compare({"Robust": robust_res, "Entity": entity_res, "Entity-Time": both_res}))
+    # robust_res = fit_write(mod, "robust", cov_type='robust')
+    fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
+    fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
 
 
 def fit_write(mod, filename, **kwargs):
     file = "data/regression/{}_res.pkl".format(filename)
     try:
-        pooled_res = pickle.load(open(file, 'rb'))
+        vars = pickle.load(open(file, 'rb'))
     except (FileNotFoundError, EOFError):
         logger.info("Fitting model {}".format(filename))
         pooled_res = mod.fit(**kwargs)
-        # pickle.dump(pooled_res, open(file, 'wb'), protocol=4)
+        vars = (
+            pooled_res.summary,
+            pooled_res.params,
+            pooled_res.pvalues,
+            pooled_res.resids,
+            pooled_res.std_errors,
+            pooled_res.df_resid,
+            pooled_res.tstats
+        )
+        pickle.dump(vars, open(file, 'wb'), protocol=4)
         with open(file.strip(".pkl")+".txt", 'w') as f:
             f.write(str(pooled_res))
             f.close()
-    logger.debug(pooled_res)
-    return pooled_res
+    Results = namedtuple('Results', 'summary params pvalues resids std_errors df_resid tstats')
+    return Results(*vars)
 
 
 def regress_arima(df_endog, bin_size_weeks, relative_series):
@@ -476,8 +527,6 @@ def get_features(exclude_nber, columns):
         # "one-hot_assignee_type_5",
         # "one-hot_assignee_type_9"
     ]
-    for e in exclude:
-        df = df[df[e] == 0]
     features = [feature for feature in features if feature not in exclude]
 
     if exclude_nber:
