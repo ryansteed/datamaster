@@ -69,7 +69,7 @@ def test_forecasting(endpoint, bin_size=20, relative_series=False):
         regress_arima(df_endog, bin_size_weeks, relative_series)
 
     if endpoint == "pooled":
-        regress_pooled(df_endog, df_exog, bin_size_weeks)
+        # regress_pooled(df_endog, df_exog, bin_size_weeks)
         entity_res = fit_write(None, "entity")
         plot_coeffs(entity_res)
 
@@ -98,6 +98,7 @@ def plot_coeffs(pooled_res):
     time_coeffs =  time_coeffs[time_coeffs.index.str.contains("t\.")]
     time_coeffs.index = (time_coeffs.index.str.strip("t.")).astype('datetime64[ns]')
     ax = time_coeffs.parameter.plot(label='_nolegend_')
+    # ax = plt.scatter(time_coeffs.parameter.index, time_coeffs.parameter, label='_nolegend_')
     plt.axvline(
         x=np.datetime64("2011-09-16"),
         linestyle=':',
@@ -158,8 +159,8 @@ def model_pooled(df):
 
     mod = PooledOLS(df.lknowledge_forward_cites, exog)
     # robust_res = fit_write(mod, "robust", cov_type='robust')
-    fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
     fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
+    fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
 
 
 def fit_write(mod, filename, **kwargs):

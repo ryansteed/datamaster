@@ -12,7 +12,7 @@ transportation = read.csv(sprintf("colonial/METRICS_both_None_transportation_20F
 xray = read.csv(sprintf("colonial/METRICS_both_None_xray_20Feb19.csv"), sep=",", header=TRUE)
 coherentlight = read.csv(sprintf("colonial/METRICS_both_None_coherent-light_19Feb19.csv"), sep=",", header=TRUE)
 
-names=c("Engines", "Radio", "Robots", "Transportation", "X-Ray", "Coherent Light")
+names=c("Engines", "Radio", "Robots", "Transp.", "X-Ray", "Laser")
 dat = combine(
   engines,
   radio,
@@ -48,9 +48,10 @@ head(to_plot)
 hp = ggplot(to_plot, aes("", xx, colour=src)) + 
   geom_boxplot() +
   ggtitle("Total Knowledge Contribution") +
-  ylab("K") +
+  ylab("TKC") +
+  xlab("") +
   guides(colour=FALSE) + 
   theme_bw()
 gg = hp + facet_grid(yy ~ src)
 gg
-ggsave(sprintf("r/tkc_boxplots.png"), gg)
+ggsave(sprintf("r/tkc_boxplots.png"), gg, height=6, width=6)
