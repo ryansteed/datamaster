@@ -6,13 +6,16 @@ import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
-from statsmodels.api import OLS
+from statsmodels.api import add_constant
 from statsmodels.tsa.statespace.varmax import VARMAX
 from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from linearmodels.panel import PooledOLS
+from scipy import stats
 import pickle
 import enlighten
+from collections import namedtuple
 
 from app.config import logger, Config
 
@@ -37,7 +40,7 @@ def test_regression():
             write(regress(df.loc[key], metric=metric, exclude_nber=True), "{}_{}".format(key, metric))
 
 
-def test_forecasting(bin_size=20, relative_series=False):
+def test_forecasting(endpoint, bin_size=20, relative_series=False):
     cache_name = os.path.abspath("data/regression/forecasting_cache.pkl")
 
     keys = [
@@ -59,49 +62,253 @@ def test_forecasting(bin_size=20, relative_series=False):
 
     df_endog = df[["log(knowledge_forward_cites)", "t", "patent_date"]]
     features, protected = get_features(True, df)
-    df_exog = df[features]
+    df_exog = df[features][df["t"] == 0]
+    logger.debug(features)
 
-    # regress_varmax(df_endog, bin_size_weeks, n)
+    if endpoint == "arima":
+        regress_arima(df_endog, bin_size_weeks, relative_series)
 
-    regress_arima(df_endog, bin_size_weeks, relative_series)
+    if endpoint == "pooled":
+        # regress_pooled(df_endog, df_exog, bin_size_weeks)
+        entity_res = fit_write(None, "entity")
+        plot_coeffs(entity_res)
+
+
+def regress_pooled(df_endog, df_exog, bin_size_weeks):
+    df_endog = PooledTransformer('pooled', load_from_cache=True).transform(df_endog, bin_size_weeks)
+    df_endog.index = df_endog.index.rename(["source", "i"])
+    df_exog = df_exog.reset_index().drop(columns=["level_1"])
+    df_exog = df_exog.set_index(["level_0", df_exog.index.values+1])
+    df_exog.index = df_exog.index.rename(["source", "i"])
+    df = df_endog.reset_index().merge(df_exog.reset_index(), on=["i", "source"], how="left")
+    df = df.set_index(["i", "t"], drop=False)\
+        .drop(columns=["i"])
+    model_pooled(df)
+
+
+def plot_coeffs(pooled_res):
+    time_coeffs = pd.concat(
+        [
+            pooled_res.params,
+            pooled_res.std_errors,
+            make_conf_int(pooled_res.params, pooled_res.std_errors, pooled_res.df_resid)
+        ],
+        axis=1
+    )
+    time_coeffs =  time_coeffs[time_coeffs.index.str.contains("t\.")]
+    time_coeffs.index = (time_coeffs.index.str.strip("t.")).astype('datetime64[ns]')
+    ax = time_coeffs.parameter.plot(label='_nolegend_')
+    # ax = plt.scatter(time_coeffs.parameter.index, time_coeffs.parameter, label='_nolegend_')
+    plt.axvline(
+        x=np.datetime64("2011-09-16"),
+        linestyle=':',
+        color='orange',
+        zorder=-1,
+        label="AIA signed"
+    )
+    plt.axvline(
+        x=np.datetime64("2013-03-16"),
+        linestyle='--',
+        color='orange',
+        zorder=-1,
+        label="AIA effective"
+    )
+    ax.legend()
+    ax.set_xlabel("Time Dummy")
+    ax.set_ylabel("Estimated Parameter")
+    plt.savefig("data/regression/time_dummies.png")
+
+
+def make_conf_int(params, std_errors, df_resid, level=.05):
+    ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+    q = stats.t.ppf(ci_quantiles, df_resid)
+    q = q[None, :]
+    ci = params[:, None] + std_errors[:, None] * q
+    return pd.DataFrame(ci, index=params.index, columns=['lower', 'upper'])
+
+
+def model_pooled(df):
+    df["age"] = (df["t"] - df["patent_date"]) / np.timedelta64(1, 'Y')
+    df["agesq"] = np.square(df.age)
+    df["t"] = pd.Categorical(df.t)
+
+    df = df.rename(index=str, columns={
+        "log(knowledge_forward_cites)": "lknowledge_forward_cites"
+    })
+    df.index = df.index.set_levels([
+        df.index.levels[0].astype(int),
+        df.index.levels[1].astype('datetime64[ns]')
+    ])
+
+    exog_vars = [
+        "t",
+        "source",
+        'log(patent_num_claims)',
+        'log(avg_inventor_total_num_patents)',
+        'log(patent_processing_time)',
+        'one-hot_assignee_type_3',
+        'one-hot_assignee_type_4',
+        'one-hot_assignee_type_5',
+        'one-hot_assignee_type_6',
+        'one-hot_assignee_type_7',
+        'one-hot_assignee_type_9',
+        'age',
+        'agesq'
+    ]
+    exog = add_constant(df[exog_vars])
+
+    mod = PooledOLS(df.lknowledge_forward_cites, exog)
+    # robust_res = fit_write(mod, "robust", cov_type='robust')
+    fit_write(mod, "entity", cov_type='clustered', cluster_entity=True)
+    fit_write(mod, "entity-time", cov_type='clustered', cluster_entity=True, cluster_time=True)
+
+
+def fit_write(mod, filename, **kwargs):
+    file = "data/regression/{}_res.pkl".format(filename)
+    try:
+        vars = pickle.load(open(file, 'rb'))
+    except (FileNotFoundError, EOFError):
+        logger.info("Fitting model {}".format(filename))
+        pooled_res = mod.fit(**kwargs)
+        vars = (
+            pooled_res.summary,
+            pooled_res.params,
+            pooled_res.pvalues,
+            pooled_res.resids,
+            pooled_res.std_errors,
+            pooled_res.df_resid,
+            pooled_res.tstats
+        )
+        pickle.dump(vars, open(file, 'wb'), protocol=4)
+        with open(file.strip(".pkl")+".txt", 'w') as f:
+            f.write(str(pooled_res))
+            f.close()
+    Results = namedtuple('Results', 'summary params pvalues resids std_errors df_resid tstats')
+    return Results(*vars)
 
 
 def regress_arima(df_endog, bin_size_weeks, relative_series):
-
     df_endog = ARIMATransformer('arima', load_from_cache=True).transform(df_endog, bin_size_weeks)
+    aia_date = np.datetime64("2013-03-16")
     if relative_series:
-        time_from_t = (df_endog["patent_date"] - df_endog["patent_date"].min()) / bin_size_weeks
-        df_endog["t"] = df_endog["t"] - time_from_t
-    df_endog = df_endog.groupby("t").mean()
+        arima_relative(df_endog, bin_size_weeks, aia_date)
+    else:
+        arima_absolute(df_endog, aia_date)
 
+
+def arima_relative(df_endog, bin_size_weeks, aia_date):
+    duration_since_pub = ((df_endog["t"] - df_endog["patent_date"]) / bin_size_weeks).astype(int)
+    df_endog["t"] = duration_since_pub
+    plt.clf()
+    plt.close()
+
+    df_before = df_endog[df_endog["patent_date"] < aia_date].groupby("t").count()
+    df_after = df_endog[df_endog["patent_date"] >= aia_date].groupby("t").count()
+    ax = df_before.plot()
+    df_after.plot(ax=ax)
+    plt.show()
+
+    df_before = df_endog[df_endog["patent_date"] < aia_date].groupby("t").mean()
+    df_after = df_endog[df_endog["patent_date"] >= aia_date].groupby("t").mean()
+    df_before.columns = ["Before AIA"]
+    df_after.columns = ["After AIA"]
+    ax = df_before.plot()
+    df_after.plot(ax=ax)
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Average Log(TKC)")
+    plt.savefig("data/regression/tkc_by_age.png")
+
+    # df_endog["t"] = df_endog["t"] * bin_size_weeks + df_endog["patent_date"].min()
+    # logger.warn(
+    #    "Reminder that dummy date indexes were used to comply with statsmodels API. These dates are not real."
+    # )
+    # data = {
+    #     "before": {},
+    #     "after": {}
+    # }
+    # data["before"]["df"] = df_endog[df_endog["patent_date"] < aia_date].groupby("t").mean()
+    # data["after"]["df"] = df_endog[df_endog["patent_date"] >= aia_date].groupby("t").mean()
+    # for key, d in data.items():
+    #     logger.debug("Fit for {}".format(key))
+    #     # explore_series(d["df"])
+    #     data[key]["model"] = ARIMA(d["df"]["log(knowledge_forward_cites)"], order=(4, 1, 0))
+    #     data[key]["fit"] = data[key]["model"].fit(maxiter=1000000, disp=False, transparams=True, trend='c')
+    #     logger.debug(data[key]["fit"].summary())
+    # data["before"]["fit"].plot_predict(
+    #     start=data["after"]["df"].index[1],
+    #     end=data["after"]["df"].index[-1]+5*bin_size_weeks
+    # )
+    # ax = data["before"]["df"].plot()
+    # data["after"]["fit"].plot_predict(
+    #     start=data["after"]["df"].index[1],
+    #     end=data["after"]["df"].index[-1]+5*bin_size_weeks,
+    #     ax=ax
+    # )
+    # plt.show()
+
+
+def arima_absolute(df_endog, aia_date, stratify=True):
+    df_grouped = df_endog.groupby("t").mean()
+    # df_count = df_endog.groupby("t").mean() / df_endog.groupby("t").count()
+    # df_count.plot()
+    # plt.show()
+
+    # Note that the index before the last index is used
+    # - the last index includes values averaged from during the AIA period
+    aia_index = df_grouped.index[df_grouped.index < aia_date][-2]
+    train = df_grouped.loc[:aia_index]
+    test = df_grouped.loc[aia_index:]
+
+    model = ARIMA(train["log(knowledge_forward_cites)"], order=(2, 1, 0))
+    fit = model.fit(maxiter=1000000, disp=False, transparams=True, trend='c')
+    logger.debug(fit.summary())
+
+    # adapted from
+    # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
+    test["actual"] = test["log(knowledge_forward_cites)"]
+    ax = test["actual"].plot()
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Average Log(TKC)")
+    fit.plot_predict(start=train.index[50], end=test.index[-1], ax=ax)
+    plt.savefig("data/regression/absolute_forecast.png")
+
+    analyze_res(fit)
+
+    if stratify:
+        logger.debug(np.unique(df_endog.index.get_level_values(0)))
+        ax = None
+        for source in np.unique(df_endog.index.get_level_values(0)):
+            df_grouped_strat = df_endog.xs(source, level=0).groupby("t").mean()
+            df_grouped_strat.columns = [source.split("_")[0]]
+            if ax is None:
+                ax = df_grouped_strat.plot()
+            else:
+                df_grouped_strat.plot(ax=ax)
+        # df_grouped.plot(ax=ax)
+        ax.set_xlabel("Year")
+        ax.set_ylabel("Log(TKC)")
+    plt.savefig("data/regression/strat_time_series.png")
+
+    return fit
+
+
+def analyze_res(fit):
+    plt.cla()
+    plt.clf()
+    residuals = pd.Series(fit.resid)
+    autocorrelation_plot(residuals)
+    plt.savefig("data/regression/autocorrelation_plot.png")
+    # residuals.plot(kind='kde')
+    # plt.show()
+
+
+def explore_series(df_endog):
     df_endog.plot()
     plt.show()
     autocorrelation_plot(df_endog)
     plt.show()
     result = seasonal_decompose(df_endog, model="linear")
     result.plot()
-    plt.show()
-
-    aia_date = np.datetime64("2013-03-16")
-    train = df_endog.loc[df_endog.index < aia_date]
-    test = df_endog.loc[df_endog.index >= aia_date]
-
-    model = ARIMA(train["log(knowledge_forward_cites)"], order=(2, 1, 0))
-    fit = model.fit(maxiter=1000000, disp=False, transparams=True, trend='c')
-    logger.debug(fit.summary())
-
-    residuals = pd.DataFrame(fit.resid)
-    autocorrelation_plot(residuals)
-    plt.show()
-    residuals.plot(kind='kde')
-    plt.show()
-    print(residuals.describe())
-
-    # adapted from
-    # http://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_model.html#ARIMAResults.plot_predict
-    test["actual"] = test["log(knowledge_forward_cites)"]
-    ax = test["actual"].plot()
-    fit.plot_predict(start=train.index[-10], end=test.index[-1], ax=ax)
     plt.show()
 
 
@@ -141,14 +348,12 @@ class ForecastingTransformer:
             if not self.load_from_cache:
                 raise ValueError
             return self.load(*kwargs)
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, EOFError):
             return self.dump(df_endog, *kwargs)
 
     def load(self, *kwargs):
         logger.debug("Attempting to load from cache {}".format(self.cache))
         df_endog, stored = pickle.load(open(self.cache, 'rb'))
-        logger.debug(kwargs)
-        logger.debug(stored)
         if stored != kwargs:
             logger.warn("Load failed due to param mismatch, refitting")
             raise ValueError
@@ -165,26 +370,33 @@ class ForecastingTransformer:
     def fit(self, *args):
         raise NotImplementedError
 
+    @staticmethod
+    def entity_id(df_endog):
+        c = Counter()
+        return df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
+
 
 class ARIMATransformer(ForecastingTransformer):
     def fit(self, df_endog, bin_size_weeks):
-        cutoff_date = np.datetime64("2018-11-27")
-        df_endog = df_endog[(df_endog["patent_date"] + df_endog["t"]*bin_size_weeks) < cutoff_date]
-        # average columns along "i" index
-        start_date = df_endog["patent_date"].min()
-        # logger.debug(df_endog["t"].describe())
-        # logger.debug(start_date)
-        time_from_t = ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int)
-        # logger.debug(time_from_t.describe())
-        df_endog["t"] = df_endog["t"] + time_from_t
-        # logger.debug(df_endog["t"].max())
+        df_endog = self.apply_cutoff(df_endog, bin_size_weeks)
+        df_endog = self.add_duplicates(df_endog, bin_size_weeks)
+        df_endog["t"] = df_endog["t"] * bin_size_weeks + df_endog["patent_date"].min()
+        return df_endog
 
+    @staticmethod
+    def apply_cutoff(df_endog, bin_size_weeks, cutoff_date=np.datetime64("2018-11-27")):
+        return df_endog[(df_endog["patent_date"] + df_endog["t"] * bin_size_weeks) < cutoff_date]
+
+    @staticmethod
+    def add_duplicates(df_endog, bin_size_weeks):
+        start_date = df_endog["patent_date"].min()
+        t_from_start = ((df_endog["patent_date"] - start_date) / bin_size_weeks).astype(int)
+        df_endog["t"] = df_endog["t"] + t_from_start
         # iterate through rows where next t is zero - so iterating through last entry in each series
         data = []
         ind = []
         # a mask where true if row after is less than row before
         mask = (df_endog["t"].shift(-1) < df_endog["t"])
-
         manager = enlighten.get_manager()
         ticker = manager.counter(
             total=df_endog[mask].shape[0],
@@ -197,22 +409,25 @@ class ARIMATransformer(ForecastingTransformer):
             for i in range(int(df_endog["t"].max()) - int(t)):
                 data.append((k, t + 1 + i, date))
                 ind.append(index)
-            # logger.debug(data[-1][1])
             ticker.update()
         ticker.close()
 
         to_add = pd.DataFrame(data, index=ind, columns=["log(knowledge_forward_cites)", "t", "patent_date"])
         df_endog = df_endog.append(to_add)
 
-        df_endog["t"] = df_endog["t"] * bin_size_weeks + start_date
-
         return df_endog
+
+
+class PooledTransformer(ARIMATransformer):
+    def fit(self, df_endog, bin_size_weeks):
+        df_endog["i"] = ForecastingTransformer.entity_id(df_endog)
+        df_endog = df_endog.set_index([df_endog.index.get_level_values(0), "i"])
+        return super().fit(df_endog, bin_size_weeks)
 
 
 class VARMAXTransformer(ForecastingTransformer):
     def fit(self, df_endog, bin_size_weeks, n, ascending=True):
-        c = Counter()
-        df_endog["i"] = df_endog.t.apply(lambda x: c.inc() if x == 0 else c.get())
+        df_endog["i"] = ForecastingTransformer.entity_id(df_endog)
         df_endog["t"] = df_endog.patent_date + df_endog.t * bin_size_weeks
         df_endog = df_endog.set_index(
             [df_endog.index.get_level_values(0), "i", "t"]
@@ -300,7 +515,7 @@ def get_features(exclude_nber, columns):
     features = [
         "patent_date_center",
         'log(patent_num_claims)',
-        # 'log(patent_processing_time)',
+        'log(patent_processing_time)',
         "log(avg_inventor_total_num_patents)",
         # "interaction"
     ]
@@ -313,8 +528,6 @@ def get_features(exclude_nber, columns):
         # "one-hot_assignee_type_5",
         # "one-hot_assignee_type_9"
     ]
-    for e in exclude:
-        df = df[df[e] == 0]
     features = [feature for feature in features if feature not in exclude]
 
     if exclude_nber:
