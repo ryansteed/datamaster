@@ -6,6 +6,8 @@
 DataMASTER Documentation
 ==============================================================
 
+Installation and source code on `Github <https://github.com/ryansteed/datamaster>`_.
+
 .. toctree::
    :maxdepth: 2
    :glob:
@@ -13,6 +15,7 @@ DataMASTER Documentation
    README
 
    modules
+
 
 
 
